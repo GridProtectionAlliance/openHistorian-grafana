@@ -58,7 +58,7 @@ If the “[GrafanaAdapters.dll](https://www.gridprotectionalliance.org/NightlyBu
 ```
 If the service is using the default NT SERVICE account, the service will likely not have rights to start the web service on a new port, so this will need to be registered. As an example, to register a new web service on port 6057 for the openPDC service use the following command:
 ```
-netsh http add urlacl url=http://+:6057/api/grafana user="NT SERVCICE\openPDC"
+netsh http add urlacl url=http://+:6057/api/grafana user="NT SERVICE\openPDC"
 ```
 This command must be run with administrative privileges.
 
