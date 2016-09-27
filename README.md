@@ -59,7 +59,7 @@ Recent versions of the following Time-series Framework applications now include 
 
 #### Enabling Grafana Services with Custom Time-series Framework Applications
 
-If the “[GrafanaAdapters.dll](https://www.gridprotectionalliance.org/NightlyBuilds/GridSolutionsFramework/Beta/Libraries/)” is deployed with an existing Time-series Framework based project, e.g., [Project Alpha](https://github.com/GridProtectionAlliance/projectalpha), the 1.0 openHistorian Grafana interfaces will be available per configured openHistorian instance. For Grafana support the time-series project needs to use [Grid Solutions Framework](https://github.com/GridProtectionAlliance/gsf) dependencies for version 2.1.330 or beyond, or be built with Project Alpha starting from version 0.1.157.
+If the “[GrafanaAdapters.dll](https://www.gridprotectionalliance.org/NightlyBuilds/GridSolutionsFramework/Beta/Libraries/)” is deployed with an existing Time-series Framework based project, e.g., [Project Alpha](https://github.com/GridProtectionAlliance/projectalpha), the 1.0 openHistorian Grafana interfaces will be available per configured openHistorian instance. For Grafana support, the time-series project needs to use [Grid Solutions Framework](https://github.com/GridProtectionAlliance/gsf) dependencies for version 2.1.330 or beyond &mdash; or to be built with Project Alpha starting from version 0.1.157.
 
 When the GrafanaAdapters.dll is deployed in the time-series project installation folder, a new Grafana data service entry will be added in the local configuration file for each configured historian when the new DLL is detected and loaded. Each historian web service instance for Grafana will need to be enabled and configured with a unique port:
 ```
