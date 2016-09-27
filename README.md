@@ -50,12 +50,12 @@ Recent versions of the following Time-series Framework applications now include 
 
 | Time-series Application (min version) | Statistics Interface | Archive Interface (if applicable) |
 | ----- |:-----:|:-----:|
-| [openPDC](https://github.com/GridProtectionAlliance/openPDC) (v2.2.131) | http://localhost:6352/api/grafana/ | http://localhost:6452/api/grafana/ |
-| [SIEGate](https://github.com/GridProtectionAlliance/SIEGate) (v1.3.5) | http://localhost:6354/api/grafana/ | http://localhost:6454/api/grafana/ |
-| [substationSBG](https://github.com/GridProtectionAlliance/substationSBG) (v1.1.5) | http://localhost:6358/api/grafana/ | http://localhost:6458/api/grafana/ |
-| [openMIC](https://github.com/GridProtectionAlliance/openMIC) (v0.9.45) | http://localhost:6364/api/grafana/ | http://localhost:6464/api/grafana/ |
-| [PDQTracker](https://github.com/GridProtectionAlliance/pdqtracker) (v1.0.173) | http://localhost:6360/api/grafana/ | http://localhost:6460/api/grafana/ |
-| [openECA](https://github.com/GridProtectionAlliance/openECA) (v0.1.43) | http://localhost:6362/api/grafana/ | http://localhost:6462/api/grafana/ |
+| ![openPDC Logo](http://www.gridprotectionalliance.org/images/products/icons%2016/openPDC.png) [openPDC](https://github.com/GridProtectionAlliance/openPDC) (v2.2.131) | http://localhost:6352/api/grafana/ | http://localhost:6452/api/grafana/ |
+| ![SIEGate Logo](http://www.gridprotectionalliance.org/images/products/icons%2016/SIEGate.png) [SIEGate](https://github.com/GridProtectionAlliance/SIEGate) (v1.3.5) | http://localhost:6354/api/grafana/ | http://localhost:6454/api/grafana/ |
+|  ![substationSBG Logo](http://www.gridprotectionalliance.org/images/products/icons%2016/substationSBG.png) [substationSBG](https://github.com/GridProtectionAlliance/substationSBG) (v1.1.5) | http://localhost:6358/api/grafana/ | http://localhost:6458/api/grafana/ |
+|  ![openMIC Logo](http://www.gridprotectionalliance.org/images/products/icons%2016/openMIC.png) [openMIC](https://github.com/GridProtectionAlliance/openMIC) (v0.9.45) | http://localhost:6364/api/grafana/ | http://localhost:6464/api/grafana/ |
+|  ![PDQTracker Logo](http://www.gridprotectionalliance.org/images/products/icons%2016/PDQTracker.png) [PDQTracker](https://github.com/GridProtectionAlliance/pdqtracker) (v1.0.173) | http://localhost:6360/api/grafana/ | http://localhost:6460/api/grafana/ |
+|  ![openECA Logo](http://www.gridprotectionalliance.org/images/products/icons%2016/openECA.png) [openECA](https://github.com/GridProtectionAlliance/openECA) (v0.1.43) | http://localhost:6362/api/grafana/ | http://localhost:6462/api/grafana/ |
 
 #### Enabling Grafana Services with Custom Time-series Framework Applications
 
