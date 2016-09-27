@@ -36,7 +36,7 @@ The openHistorian 2.0 automatically includes Grafana web service interfaces star
 
 For archived time-series data, the Grafana web service is hosted within the existing MVC based web server architecture and is just “on” with nothing extra to configure. To use the interface, simply register a new openHistorian Grafana data source using the path “/api/grafana” from the existing web based user interface URL, typically: http://localhost:8180/api/grafana/ \*
 
-The openHistorian 2.0 also includes a pre-configured local statistics archive web service interface that can be accessed from http://localhost:6356/api/grafana/ \* - note that the trailing slash is relevant.
+The openHistorian 2.0 also includes a pre-configured local statistics archive web service interface that can be accessed from http://localhost:6356/api/grafana/ \* &mdash; note that the trailing slash is relevant.
 
 Statistical information is archived every ten seconds for a variety of data source and system parameters.
 
