@@ -34,18 +34,37 @@ sudo service grafana-server restart
 
 The openHistorian 2.0 automatically includes Grafana web service interfaces starting with version 2.0.405.
 
-For archived time-series data, the Grafana web service is hosted within the existing MVC based web server architecture and is just “on” with nothing to extra configure. To use the interface, simply register a new openHistorian Grafana data source using the path “/api/grafana” from the existing web based user interface URL, typically: http://localhost:8180/api/grafana/
+For archived time-series data, the Grafana web service is hosted within the existing MVC based web server architecture and is just “on” with nothing to extra configure. To use the interface, simply register a new openHistorian Grafana data source using the path “/api/grafana” from the existing web based user interface URL, typically: http://localhost:8180/api/grafana/ \*
 
-The openHistorian 2.0 also includes a pre-configured local statistics archive web service interface that can be accessed from http://localhost:6057/api/grafana/ - note that the trailing slash is relevant.
+The openHistorian 2.0 also includes a pre-configured local statistics archive web service interface that can be accessed from http://localhost:6057/api/grafana/ \* - note that the trailing slash is relevant.
 
 Statistical information is archived every ten seconds for a variety of data source and system parameters.
 
 ### Configuration for openHistorian 1.0 and Statistics Archives
 
-If the “[GrafanaAdapters.dll](https://www.gridprotectionalliance.org/NightlyBuilds/GridSolutionsFramework/Beta/Libraries/)” is deployed with a time-series based project, e.g., [Project Alpha](https://github.com/GridProtectionAlliance/projectalpha) or the [openPDC](https://github.com/GridProtectionAlliance/openPDC), the 1.0 openHistorian Grafana interfaces will be available per configured openHistorian instance. For Grafana support, the time-series project needs to use [Grid Solutions Framework](https://github.com/GridProtectionAlliance/gsf) dependencies for version 2.1.330 or beyond. A new Grafana data service entry will be added in the local configuration file for each configured historian when the new DLL is detected and loaded. Each historian web service instance for Grafana will need to be configured with a unique port:
+The openHistorian 1.0 is a core component of the [Grid Solutions Framework Time-series Library](https://www.gridprotectionalliance.org/technology.asp#TSL) and is used for archival of statistics and other time-series data. Applications built using the openHistorian 1.0 can also be integrated with Grafana. 
+
+#### Time-series Framework Applications with Existing Grafana Support
+
+Recent versions of the following Time-series Framework applications now include support for Grafana. To use the Grafana interface with an existing openHistorian 1.0 archive, simply register a new openHistorian Grafana data source using the appropriate interface URL as defined below\*:
+
+| Time-series Application (min version) | Statistics Interface | Archive Interface (if applicable) |
+| ----- |:-----:|:-----:|
+| [openPDC](https://github.com/GridProtectionAlliance/openPDC) (v2.2.131) | http://localhost:6352/api/grafana/ | http://localhost:6452/api/grafana/ |
+| [SIEGate](https://github.com/GridProtectionAlliance/SIEGate) (v1.3.5) | http://localhost:6354/api/grafana/ | http://localhost:6454/api/grafana/ |
+| [substationSBG](https://github.com/GridProtectionAlliance/substationSBG) (v1.1.5) | http://localhost:6358/api/grafana/ | http://localhost:6458/api/grafana/ |
+| [openMIC](https://github.com/GridProtectionAlliance/openMIC) (v0.9.45) | http://localhost:6364/api/grafana/ | http://localhost:6464/api/grafana/ |
+| [PDQTracker](https://github.com/GridProtectionAlliance/pdqtracker) (v1.0.173) | http://localhost:6360/api/grafana/ | http://localhost:6460/api/grafana/ |
+| [openECA](https://github.com/GridProtectionAlliance/openECA) (v0.1.43) | http://localhost:6362/api/grafana/ | http://localhost:6462/api/grafana/ |
+
+#### Enabling Grafana Services with Custom Time-series Framework Applications
+
+If the “[GrafanaAdapters.dll](https://www.gridprotectionalliance.org/NightlyBuilds/GridSolutionsFramework/Beta/Libraries/)” is deployed with an existing Time-series Framework based project, e.g., [Project Alpha](https://github.com/GridProtectionAlliance/projectalpha), the 1.0 openHistorian Grafana interfaces will be available per configured openHistorian instance. For Grafana support the time-series project needs to use [Grid Solutions Framework](https://github.com/GridProtectionAlliance/gsf) dependencies for version 2.1.330 or beyond, or be built with Project Alpha starting from version 0.1.157.
+
+When the GrafanaAdapters.dll is deployed with the time-series project installation folder, a new Grafana data service entry will be added in the local configuration file for each configured historian when the new DLL is detected and loaded. Each historian web service instance for Grafana will need to be configured with a unique port:
 ```
     <statGrafanaDataService>
-      <add name="Endpoints" value="http.rest://+:6057/api/grafana" description="Semicolon delimited list of URIs where the web service can be accessed." encrypted="false" />
+      <add name="Endpoints" value="http.rest://+:6357/api/grafana" description="Semicolon delimited list of URIs where the web service can be accessed." encrypted="false" />
       <add name="Contract" value="GrafanaAdapters.IGrafanaDataService, GrafanaAdapters" description="Assembly qualified name of the contract interface implemented by the web service." encrypted="false" />
       <add name="Singleton" value="True" description="True if the web service is singleton; otherwise False." encrypted="false" />
       <add name="SecurityPolicy" value="" description="Assembly qualified name of the authorization policy to be used for securing the web service." encrypted="false" />
@@ -56,11 +75,13 @@ If the “[GrafanaAdapters.dll](https://www.gridprotectionalliance.org/NightlyBu
       <add name="Enabled" value="True" description="Determines if web service should be enabled at startup." encrypted="false" />
     </statGrafanaDataService>
 ```
-If the service is using the default NT SERVICE account, the service will likely not have rights to start the web service on a new port, so this will need to be registered. As an example, to register a new web service on port 6057 for the openPDC service use the following command:
+If the service is using the default NT SERVICE account, the service will likely not have rights to start the web service on a new port, so this will need to be registered. As an example, to register a new web service on port 6357 for the ProjectAlpha service use the following command:
 ```
-netsh http add urlacl url=http://+:6057/api/grafana user="NT SERVICE\openPDC"
+netsh http add urlacl url=http://+:6357/api/grafana user="NT SERVICE\ProjectAlpha"
 ```
 This command must be run with administrative privileges.
+
+\* _Replace "localhost" as needed with the IP or DNS name of system hosting the archive._
 
 ### Tag Selection
 
