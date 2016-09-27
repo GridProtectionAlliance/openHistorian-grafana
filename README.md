@@ -61,7 +61,7 @@ Recent versions of the following Time-series Framework applications now include 
 
 If the “[GrafanaAdapters.dll](https://www.gridprotectionalliance.org/NightlyBuilds/GridSolutionsFramework/Beta/Libraries/)” is deployed with an existing Time-series Framework based project, e.g., [Project Alpha](https://github.com/GridProtectionAlliance/projectalpha), the 1.0 openHistorian Grafana interfaces will be available per configured openHistorian instance. For Grafana support the time-series project needs to use [Grid Solutions Framework](https://github.com/GridProtectionAlliance/gsf) dependencies for version 2.1.330 or beyond, or be built with Project Alpha starting from version 0.1.157.
 
-When the GrafanaAdapters.dll is deployed with the time-series project installation folder, a new Grafana data service entry will be added in the local configuration file for each configured historian when the new DLL is detected and loaded. Each historian web service instance for Grafana will need to be configured with a unique port:
+When the GrafanaAdapters.dll is deployed in the time-series project installation folder, a new Grafana data service entry will be added in the local configuration file for each configured historian when the new DLL is detected and loaded. Each historian web service instance for Grafana will need to be enabled and configured with a unique port:
 ```
     <statGrafanaDataService>
       <add name="Endpoints" value="http.rest://+:6357/api/grafana" description="Semicolon delimited list of URIs where the web service can be accessed." encrypted="false" />
@@ -75,7 +75,7 @@ When the GrafanaAdapters.dll is deployed with the time-series project installati
       <add name="Enabled" value="True" description="Determines if web service should be enabled at startup." encrypted="false" />
     </statGrafanaDataService>
 ```
-If the service is using the default NT SERVICE account, the service will likely not have rights to start the web service on a new port, so this will need to be registered. As an example, to register a new web service on port 6357 for the ProjectAlpha service use the following command:
+If the service is using the default NT SERVICE account, the service will likely not have rights to start the web service on a new port and will need to be registered. As an example, to register a new Grafana web service end-point on port 6357 for the ProjectAlpha service, you would use the following command:
 ```
 netsh http add urlacl url=http://+:6357/api/grafana user="NT SERVICE\ProjectAlpha"
 ```
