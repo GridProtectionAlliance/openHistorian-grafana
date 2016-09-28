@@ -18,7 +18,7 @@
       "name": "Grid Protection Alliance",
       "url": "https://www.gridprotectionalliance.org"
     },
-    "keywords": ["openHistorian", "GPA"],
+    "keywords": ["openHistorian", "openPDC", "SIEGate", "substationSBG", "openMIC", "PDQTracker", "openECA", "synchrophasor", "GPA"],
     "logos": {
       "small": "img/openHistorian.png",
       "large": "img/openHistorian.png"
