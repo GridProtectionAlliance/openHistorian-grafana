@@ -2,7 +2,7 @@
 
 This repository defines a Grafana [data source](http://docs.grafana.org/datasources/overview/) plug-in for the [openHistorian](https://github.com/GridProtectionAlliance/openHistorian).
 
-The openHistorian is a back office system designed to efficiently integrate and archive process control data, e.g., SCADA, synchrophasor, digital fault recorder or any other time-series data used to support process operations.
+The openHistorian is a back office system developed by the @GridProtectionAlliance designed to efficiently integrate and archive process control data, e.g., SCADA, synchrophasor, digital fault recorder or any other time-series data used to support process operations.
 
 The openHistorian is optimized to store and retrieve large volumes of time-series data quickly and efficiently, including high-resolution sub-second information that is measured very rapidly, e.g., many thousands of times per second.
 
@@ -34,7 +34,7 @@ sudo service grafana-server restart
 
 The openHistorian 2.0 automatically includes Grafana web service interfaces starting with version 2.0.405.
 
-For archived time-series data, the Grafana web service is hosted within the existing MVC based web server architecture and is just “on” with nothing extra to configure. To use the interface, simply register a new openHistorian Grafana data source using the path “/api/grafana” from the existing web based user interface URL, typically: http://localhost:8180/api/grafana/ [\*](#localhost)
+For archived time-series data, the Grafana web service is hosted within the existing MVC based web server architecture and is just “on” with nothing extra to configure. To use the interface, simply register a new openHistorian Grafana data source using the path “/api/grafana” from the existing web based user interface URL, typically: http://localhost:8180/api/grafana/ [\*](#localhost).
 
 The openHistorian 2.0 also includes a pre-configured local statistics archive web service interface that can be accessed from http://localhost:6356/api/grafana/ [\*](#localhost) &mdash; note that the trailing slash is relevant.
 
@@ -44,11 +44,11 @@ Statistical information is archived every ten seconds for a variety of data sour
 
 The openHistorian 1.0 is a core component of the [Grid Solutions Framework Time-series Library](https://www.gridprotectionalliance.org/technology.asp#TSL) and is used for archival of statistics and other time-series data. Applications built using the openHistorian 1.0 can also be integrated with Grafana. 
 
-#### Time-series Framework Applications with Existing Grafana Support
+#### Time-series Library Applications with Existing Grafana Support
 
-Recent versions of the following Time-series Framework applications now include support for Grafana. To use the Grafana interface with an existing openHistorian 1.0 archive, simply register a new openHistorian Grafana data source using the appropriate interface URL as defined below [\*](#localhost):
+Recent versions of the following Time-series Library (TSL) applications now include support for Grafana. To use the Grafana interface with an existing openHistorian 1.0 archive, simply register a new openHistorian Grafana data source using the appropriate interface URL as defined below [\*](#localhost):
 
-| Time-series Application (min version) | Statistics Interface | Archive Interface (if applicable) |
+| TSL Application (min version) | Statistics Interface | Archive Interface (if applicable) |
 | ----- |:-----:|:-----:|
 | ![openPDC Logo](http://www.gridprotectionalliance.org/images/products/icons%2016/openPDC.png) [openPDC](https://github.com/GridProtectionAlliance/openPDC) (v2.2.131) | http://localhost:6352/api/grafana/ | http://localhost:6452/api/grafana/ |
 | ![SIEGate Logo](http://www.gridprotectionalliance.org/images/products/icons%2016/SIEGate.png) [SIEGate](https://github.com/GridProtectionAlliance/SIEGate) (v1.3.5) | http://localhost:6354/api/grafana/ | http://localhost:6454/api/grafana/ |
@@ -62,7 +62,7 @@ Recent versions of the following Time-series Framework applications now include 
 If the “[GrafanaAdapters.dll](https://www.gridprotectionalliance.org/NightlyBuilds/GridSolutionsFramework/Beta/Libraries/)” is deployed with an existing Time-series Framework based project, e.g., [Project Alpha](https://github.com/GridProtectionAlliance/projectalpha), the 1.0 openHistorian Grafana interfaces will be available per configured openHistorian instance. For Grafana support, the time-series project needs to use [Grid Solutions Framework](https://github.com/GridProtectionAlliance/gsf) dependencies for version 2.1.330 or beyond &mdash; or to be built with Project Alpha starting from version 0.1.157.
 
 When the GrafanaAdapters.dll is deployed in the time-series project installation folder, a new Grafana data service entry will be added in the local configuration file for each configured historian when the new DLL is detected and loaded. Each historian web service instance for Grafana will need to be enabled and configured with a unique port:
-```
+```xml
     <statGrafanaDataService>
       <add name="Endpoints" value="http.rest://+:6357/api/grafana" description="Semicolon delimited list of URIs where the web service can be accessed." encrypted="false" />
       <add name="Contract" value="GrafanaAdapters.IGrafanaDataService, GrafanaAdapters" description="Assembly qualified name of the contract interface implemented by the web service." encrypted="false" />
@@ -81,7 +81,7 @@ netsh http add urlacl url=http://+:6357/api/grafana user="NT SERVICE\ProjectAlph
 ```
 This command must be run with administrative privileges.
 
-<a name="localhost" /> \*  _Replace "localhost" as needed with the IP or DNS name of system hosting the archive._
+\* _Replace "localhost" as needed with the IP or DNS name of system hosting the archive._
 
 ### Tag Selection
 
