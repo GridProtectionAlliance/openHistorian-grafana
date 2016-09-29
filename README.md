@@ -6,30 +6,6 @@ The openHistorian is a back office system developed by the [GridProtectionAllian
 
 The openHistorian is optimized to store and retrieve large volumes of time-series data quickly and efficiently, including high-resolution sub-second information that is measured very rapidly, e.g., many thousands of times per second.
 
-### Suggested Installation Method
-
-Use the grafana-cli tool to install the openHistorian data source from the command line:
-
-```
-grafana-cli plugins install gridprotectionalliance-openhistorian-datasource
-```
-
-The plugin will be installed into the grafana plugins directory.
-
-More instructions on the cli tool can be found here: [http://docs.grafana.org/v3.0/plugins/installation/](http://docs.grafana.org/v3.0/plugins/installation/)
-
-You need to use Grafana 3.0 or better to enable plugin support: [http://grafana.org/download/builds.html](http://grafana.org/download/builds.html)
-
-### Alternate Installation Method
-
-It is also possible to clone this repository directly into the Grafana plugins directory.
-
-After cloning, restart the grafana-server and the plugin should be automatically detected and be available for use:
-```
-git clone https://github.com/GridProtectionAlliance/openHistorian-grafana.git
-sudo service grafana-server restart
-```
-
 ### Configuration for openHistorian 2.0
 
 The openHistorian 2.0 automatically includes Grafana web service interfaces starting with [version 2.0.410](https://github.com/GridProtectionAlliance/openHistorian/releases).
@@ -104,4 +80,28 @@ FILTER TOP 10 ClearedAlarms WHERE Severity >= 500 AND TagName LIKE '%TESTDEVICE%
 or
 ```
 FILTER RaisedAlarms WHERE Description LIKE '%High Frequency%'
+```
+
+### Suggested Installation Method
+
+Use the grafana-cli tool to install the openHistorian data source from the command line:
+
+```
+grafana-cli plugins install gridprotectionalliance-openhistorian-datasource
+```
+
+The plugin will be installed into the grafana plugins directory.
+
+More instructions on the cli tool can be found here: [http://docs.grafana.org/v3.0/plugins/installation/](http://docs.grafana.org/v3.0/plugins/installation/)
+
+You need to use Grafana 3.0 or better to enable plugin support: [http://grafana.org/download/builds.html](http://grafana.org/download/builds.html)
+
+### Alternate Installation Method
+
+It is also possible to clone this repository directly into the Grafana plugins directory.
+
+After cloning, restart the grafana-server and the plugin should be automatically detected and be available for use:
+```
+git clone https://github.com/GridProtectionAlliance/openHistorian-grafana.git
+sudo service grafana-server restart
 ```
