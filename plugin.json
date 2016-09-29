@@ -28,7 +28,7 @@
       {"name": "MIT License", "url": "https://github.com/GridProtectionAlliance/openHistorian-grafana/blob/master/LICENSE"},
       {"name": "openHistorian", "url": "http://openHistorian.com"}
     ],
-    "version": "1.0.0",
+    "version": "1.0.1",
     "updated": "2016-09-29"
   },
 
