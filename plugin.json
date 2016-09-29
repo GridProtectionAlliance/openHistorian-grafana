@@ -1,6 +1,6 @@
 {
   "name": "openHistorian",
-  "id": "grafana-openhistorian",
+  "id": "grafana-openhistorian-datasource",
   "type": "datasource",
   
   "staticRoot": ".",
