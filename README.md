@@ -11,7 +11,7 @@ The openHistorian is optimized to store and retrieve large volumes of time-serie
 Use the grafana-cli tool to install the openHistorian data source from the command line:
 
 ```
-grafana-cli plugins install grafana-openhistorian
+grafana-cli plugins install gridprotectionalliance-openhistorian-datasource
 ```
 
 The plugin will be installed into the grafana plugins directory.
