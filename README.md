@@ -84,6 +84,8 @@ or
 FILTER RaisedAlarms WHERE Description LIKE '%High Frequency%'
 ```
 
+See [Alarm table defintion](https://github.com/GridProtectionAlliance/gsf/blob/master/Source/Documentation/FilterExpressions.md#alarms) for available query fields.
+
 ### Suggested Installation Method
 
 Use the grafana-cli tool to install the openHistorian data source from the command line:
