@@ -67,9 +67,9 @@ When adding metric queries from Grafana for the openHistorian, you can enter poi
 ```
 FILTER TOP 5 ActiveMeasurements WHERE SignalType LIKE '%PHA' AND Device LIKE 'SHELBY%' ORDER BY DeviceID
 ```
-This expression would trend 5 phase angles, voltages or currents, for any device with a name that starts with "SHELBY".
+This expression would trend 5 phase angles, voltages or currents, for any device with a name that starts with "SHELBY". See [syntax documentation](https://github.com/GridProtectionAlliance/gsf/blob/master/Source/Documentation/FilterExpressions.md) for filter expressions for more information.
 
-See [syntax documentation](https://github.com/GridProtectionAlliance/gsf/blob/master/Source/Documentation/FilterExpressions.md) for filter expressions for more information.
+See [ActiveMeasurements table definition](https://github.com/GridProtectionAlliance/gsf/blob/master/Source/Documentation/FilterExpressions.md#activemeasurements) for available query fields.
 
 ### Alarm Annotations
 
