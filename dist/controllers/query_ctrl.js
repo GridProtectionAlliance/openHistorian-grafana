@@ -117,10 +117,18 @@ System.register(['app/plugins/sdk', './../css/query-editor.css!', 'lodash', 'ang
               var altSegments = _.map(data, function (item) {
                 return ctrl.uiSegmentSrv.newSegment({ value: item.text, expandable: item.expandable });
               });
+              altSegments.sort(function (a, b) {
+                if (a.value < b.value) return -1;
+                if (a.value > b.value) return 1;
+                return 0;
+              });
               altSegments.unshift(ctrl.uiSegmentSrv.newSegment('-REMOVE-'));
-              //console.log(altSegments);
 
-              return altSegments;
+              return _.filter(altSegments, function (segment) {
+                return _.find(ctrl.segments, function (x) {
+                  return x.value == segment.value;
+                }) == undefined;
+              });
             });
           }
         }, {
@@ -131,9 +139,17 @@ System.register(['app/plugins/sdk', './../css/query-editor.css!', 'lodash', 'ang
               var altSegments = _.map(data, function (item) {
                 return ctrl.uiSegmentSrv.newSegment({ value: item.text, expandable: item.expandable });
               });
-              //console.log(altSegments);
+              altSegments.sort(function (a, b) {
+                if (a.value < b.value) return -1;
+                if (a.value > b.value) return 1;
+                return 0;
+              });
 
-              return altSegments;
+              return _.filter(altSegments, function (segment) {
+                return _.find(ctrl.segments, function (x) {
+                  return x.value == segment.value;
+                }) == undefined;
+              });
             });
           }
         }, {

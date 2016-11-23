@@ -48,12 +48,22 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
     var ctrl = this;
     return this.datasource.metricFindQuery().then( data => {
         var altSegments = _.map(data, item => {
-          return ctrl.uiSegmentSrv.newSegment({value: item.text, expandable: item.expandable})
+            return ctrl.uiSegmentSrv.newSegment({value: item.text, expandable: item.expandable})
+        });
+        altSegments.sort((a,b)=>{           
+          if(a.value < b.value)
+            return -1;
+          if(a.value > b.value)
+            return 1;
+          return 0;
         });
         altSegments.unshift(ctrl.uiSegmentSrv.newSegment('-REMOVE-'));
-        //console.log(altSegments);
 
-        return altSegments;
+        return _.filter(altSegments, segment => {
+          return _.find(ctrl.segments, x => {
+            return x.value == segment.value
+          }) == undefined;
+        });
     });
     
   }
@@ -62,11 +72,21 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
     var ctrl = this;
     return this.datasource.metricFindQuery().then( data => {
         var altSegments = _.map(data, item => {
-          return ctrl.uiSegmentSrv.newSegment({value: item.text, expandable: item.expandable})
+            return ctrl.uiSegmentSrv.newSegment({value: item.text, expandable: item.expandable})
         });
-        //console.log(altSegments);
+        altSegments.sort((a,b)=>{ 
+          if(a.value < b.value)
+            return -1;
+          if(a.value > b.value)
+            return 1;
+          return 0;
+        });
 
-        return altSegments;
+        return _.filter(altSegments, segment => {
+          return _.find(ctrl.segments, x => {
+            return x.value == segment.value
+          }) == undefined;
+        });
     });
     
   }
