@@ -1,0 +1,25 @@
+<query-editor-row id="queryCtrlBox" query-ctrl="ctrl" class="generic-datasource-query-row" can-collaspe="true" has-text-edit-mode="true">
+  <div class="gf-form" ng-show="ctrl.target.textEditor">
+				<!--<label class="gf-form-label query-keyword width-12">
+					<span>Filter Expression</span>
+				</label>-->
+		<input type="text" class="gf-form-input" ng-model="ctrl.target.target" spellcheck="false" ng-blur="ctrl.textEditorChanged()"></input>
+	</div>
+
+  <div ng-hide="ctrl.target.textEditor">
+    <div class="gf-form-inline">
+      <div class="gf-form">
+				<label class="gf-form-label query-keyword width-7">
+					<span>Elements</span>
+				</label>
+				<div ng-repeat="segment in ctrl.segments" role="menuitem">
+					<metric-segment segment="segment" get-options="ctrl.getElementSegmentsToEdit()" on-change="ctrl.segmentValueChanged(segment,$index)"></metric-segment>
+				</div>
+ 				<metric-segment segment="ctrl.elementSegment" get-options="ctrl.getElementSegmentsToAddNew()" on-change="ctrl.addElementSegment()"></metric-segment>
+      </div>
+			<div class="gf-form gf-form--grow">
+				<div class="gf-form-label gf-form-label--grow"></div>
+			</div>
+    </div>
+  </div>
+</query-editor-row>

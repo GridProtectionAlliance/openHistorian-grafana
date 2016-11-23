@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../src/controllers/config_ctrl.js"],"names":["OpenHistorianConfigCtrl","templateUrl"],"mappings":";;;;;;;;;;;;;;;;yCAAaA,uB;;;;;;AACbA,8BAAwBC,WAAxB,GAAsC,qBAAtC","file":"config_ctrl.js","sourcesContent":["export class OpenHistorianConfigCtrl{}\r\nOpenHistorianConfigCtrl.templateUrl = 'partial/config.html';"]}

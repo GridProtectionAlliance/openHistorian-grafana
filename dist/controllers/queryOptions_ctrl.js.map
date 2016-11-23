@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../src/controllers/queryOptions_ctrl.js"],"names":["OpenHistorianQueryOptionsCtrl","templateUrl"],"mappings":";;;;;;;;;;;;;;;;+CAAaA,6B;;;;;;AACbA,oCAA8BC,WAA9B,GAA4C,4BAA5C","file":"queryOptions_ctrl.js","sourcesContent":["export class OpenHistorianQueryOptionsCtrl{}\r\nOpenHistorianQueryOptionsCtrl.templateUrl = 'partial/query.options.html';"]}
