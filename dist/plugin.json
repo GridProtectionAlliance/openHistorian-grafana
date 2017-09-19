@@ -1,6 +1,6 @@
 {
-  "name": "openHistorian2",
-  "id": "gridprotectionalliance-openhistorian2-datasource",
+  "name": "openHistorian",
+  "id": "gridprotectionalliance-openhistorian-datasource",
   "type": "datasource",
   
   "staticRoot": ".",

@@ -10,9 +10,11 @@ The openHistorian is optimized to store and retrieve large volumes of time-serie
 
 The openHistorian 2.0 automatically includes Grafana web service interfaces starting with [version 2.0.410](https://github.com/GridProtectionAlliance/openHistorian/releases).
 
-For archived time-series data, the Grafana web service is hosted within the existing MVC based web server architecture and is just “on” with nothing extra to configure. To use the interface, simply register a new openHistorian Grafana data source using the path “/api/grafana” from the existing web based user interface URL, typically: http://localhost:8180/api/grafana/ [\*](#localhost).
+For archived time-series data, the Grafana web service is hosted within the existing MVC based web server architecture and is just “on” with nothing extra to configure. To use the interface, simply register a new openHistorian Grafana data source using the path “/api/grafana/” from the existing web based user interface URL, typically: [http://localhost:8180/api/grafana/](http://localhost:8180/api/grafana/) [\*](#localhost).
 
-The openHistorian 2.0 also includes a pre-configured local statistics archive web service interface that can be accessed from http://localhost:6356/api/grafana/ [\*](#localhost) &mdash; note that the trailing slash is relevant.
+When the openHistorian service is hosting multitple historian instances, you can reference a specific historian instance using a path like "/instance/{instanceName}/grafana/", e.g.: [http://localhost:8180/instance/ppa/grafana/](http://localhost:8180/instance/ppa/grafana/) [\*](#localhost).
+
+The openHistorian 2.0 also includes a pre-configured local statistics archive web service interface that can be accessed from [http://localhost:6356/api/grafana/](http://localhost:6356/api/grafana/) [\*](#localhost) &mdash; note that the trailing slash is relevant.
 
 Statistical information is archived every ten seconds for a variety of data source and system parameters.
 
@@ -26,12 +28,12 @@ Recent versions of the following Time-series Library (TSL) applications now incl
 
 | TSL Application (min version) | Statistics Interface | Archive Interface (if applicable) |
 | ----- |:-----:|:-----:|
-| ![openPDC Logo](https://www.gridprotectionalliance.org/images/products/icons%2016/openPDC.png) [openPDC](https://github.com/GridProtectionAlliance/openPDC) (v2.2.133) | http://localhost:6352/api/grafana/ | http://localhost:6452/api/grafana/ |
-| ![SIEGate Logo](https://www.gridprotectionalliance.org/images/products/icons%2016/SIEGate.png) [SIEGate](https://github.com/GridProtectionAlliance/SIEGate) (v1.3.7) | http://localhost:6354/api/grafana/ | http://localhost:6454/api/grafana/ |
-|  ![substationSBG Logo](https://www.gridprotectionalliance.org/images/products/icons%2016/substationSBG.png) [substationSBG](https://github.com/GridProtectionAlliance/substationSBG) (v1.1.7) | http://localhost:6358/api/grafana/ | http://localhost:6458/api/grafana/ |
-|  ![openMIC Logo](https://www.gridprotectionalliance.org/images/products/icons%2016/openMIC.png) [openMIC](https://github.com/GridProtectionAlliance/openMIC) (v0.9.47) | http://localhost:6364/api/grafana/ | http://localhost:6464/api/grafana/ |
-|  ![PDQTracker Logo](https://www.gridprotectionalliance.org/images/products/icons%2016/PDQTracker.png) [PDQTracker](https://github.com/GridProtectionAlliance/pdqtracker) (v1.0.175) | http://localhost:6360/api/grafana/ | http://localhost:6460/api/grafana/ |
-|  ![openECA Logo](https://www.gridprotectionalliance.org/images/products/icons%2016/openECA.png) [openECA](https://github.com/GridProtectionAlliance/openECA) (v0.1.44) | http://localhost:6362/api/grafana/ | http://localhost:6462/api/grafana/ |
+| ![openPDC Logo](https://www.gridprotectionalliance.org/images/products/icons%2016/openPDC.png) [openPDC](https://github.com/GridProtectionAlliance/openPDC) (v2.2.133) | [http://localhost:6352/api/grafana/](http://localhost:6352/api/grafana/) | [http://localhost:6452/api/grafana/](http://localhost:6452/api/grafana/) |
+| ![SIEGate Logo](https://www.gridprotectionalliance.org/images/products/icons%2016/SIEGate.png) [SIEGate](https://github.com/GridProtectionAlliance/SIEGate) (v1.3.7) | [http://localhost:6354/api/grafana/](http://localhost:6354/api/grafana/) | [http://localhost:6454/api/grafana/](http://localhost:6454/api/grafana/) |
+|  ![substationSBG Logo](https://www.gridprotectionalliance.org/images/products/icons%2016/substationSBG.png) [substationSBG](https://github.com/GridProtectionAlliance/substationSBG) (v1.1.7) | [http://localhost:6358/api/grafana/](http://localhost:6358/api/grafana/) | [http://localhost:6458/api/grafana/](http://localhost:6458/api/grafana/) |
+|  ![openMIC Logo](https://www.gridprotectionalliance.org/images/products/icons%2016/openMIC.png) [openMIC](https://github.com/GridProtectionAlliance/openMIC) (v0.9.47) | [http://localhost:6364/api/grafana/](http://localhost:6364/api/grafana/) | [http://localhost:6464/api/grafana/](http://localhost:6464/api/grafana/) |
+|  ![PDQTracker Logo](https://www.gridprotectionalliance.org/images/products/icons%2016/PDQTracker.png) [PDQTracker](https://github.com/GridProtectionAlliance/pdqtracker) (v1.0.175) | [http://localhost:6360/api/grafana/](http://localhost:6360/api/grafana/) | [http://localhost:6460/api/grafana/](http://localhost:6460/api/grafana/) |
+|  ![openECA Logo](https://www.gridprotectionalliance.org/images/products/icons%2016/openECA.png) [openECA](https://github.com/GridProtectionAlliance/openECA) (v0.1.44) | [http://localhost:6362/api/grafana/](http://localhost:6362/api/grafana/) | [http://localhost:6462/api/grafana/](http://localhost:6462/api/grafana/) |
 
 #### Enabling Grafana Services with Custom Time-series Library Applications
 
@@ -65,9 +67,9 @@ When adding metric queries from Grafana for the openHistorian, you can enter poi
 ```
 FILTER TOP 5 ActiveMeasurements WHERE SignalType LIKE '%PHA' AND Device LIKE 'SHELBY%' ORDER BY DeviceID
 ```
-This expression would trend 5 phase angles, voltages or currents, for any device with a name that starts with "SHELBY".
+This expression would trend 5 phase angles, voltages or currents, for any device with a name that starts with "SHELBY". See filter expression [syntax documentation](https://github.com/GridProtectionAlliance/gsf/blob/master/Source/Documentation/FilterExpressions.md) for more information.
 
-See [syntax documentation](https://github.com/GridProtectionAlliance/openPDC/blob/master/Source/Documentation/wiki/Connection_Strings.md#input_and_output_syntax) for time-series framework input measurement keys more information.
+See [ActiveMeasurements table definition](https://github.com/GridProtectionAlliance/gsf/blob/master/Source/Documentation/FilterExpressions.md#activemeasurements) for available query fields.
 
 ### Alarm Annotations
 
@@ -81,6 +83,8 @@ or
 ```
 FILTER RaisedAlarms WHERE Description LIKE '%High Frequency%'
 ```
+
+See [Alarm table defintion](https://github.com/GridProtectionAlliance/gsf/blob/master/Source/Documentation/FilterExpressions.md#alarms) for available query fields.
 
 ### Suggested Installation Method
 

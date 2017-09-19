@@ -1,0 +1,2 @@
+C:\Users\bernest\Source\Repos\openHistorian-grafana\obj\Debug\openHistorian-grafana.njsprojResolveAssemblyReference.cache
+C:\Users\bernest\Source\Repos\openHistorian-grafana\bin\Microsoft.NodejsTools.WebRole.dll
