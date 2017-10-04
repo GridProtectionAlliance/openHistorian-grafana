@@ -1,25 +1,117 @@
 <query-editor-row id="queryCtrlBox" query-ctrl="ctrl" class="generic-datasource-query-row" can-collaspe="true" has-text-edit-mode="true">
-  <div class="gf-form" ng-show="ctrl.target.textEditor">
-				<!--<label class="gf-form-label query-keyword width-12">
-					<span>Filter Expression</span>
-				</label>-->
-		<input type="text" class="gf-form-input" ng-model="ctrl.target.target" spellcheck="false" ng-blur="ctrl.textEditorChanged()"/>
-	</div>
-
-  <div ng-hide="ctrl.target.textEditor">
-    <div class="gf-form-inline">
-      <div class="gf-form">
-				<label class="gf-form-label query-keyword width-7">
-					<span>Elements</span>
-				</label>
-				<div ng-repeat="segment in ctrl.segments" role="menuitem">
-					<metric-segment segment="segment" get-options="ctrl.getElementSegmentsToEdit()" on-change="ctrl.segmentValueChanged(segment,$index)"></metric-segment>
-				</div>
- 				<metric-segment segment="ctrl.elementSegment" get-options="ctrl.getElementSegmentsToAddNew()" on-change="ctrl.addElementSegment()"></metric-segment>
-      </div>
-			<div class="gf-form gf-form--grow">
-				<div class="gf-form-label gf-form-label--grow"></div>
-			</div>
+    <!-- Free form text area for typing up custom queries-->
+    <div class="gf-form" ng-show="ctrl.target.textEditor">
+        <textarea type="text" rows="5"class="gf-form-input" ng-model="ctrl.target.target" spellcheck="false" ng-blur="ctrl.textEditorChanged()"></textarea>
     </div>
-  </div>
+
+    <!-- Query Builder -->
+    <div ng-hide="ctrl.target.textEditor">
+        <!-- First Line - Contains Select box and Query Type label -->
+        <div class="gf-form-inline">
+            <div class="gf-form">
+                <label class="gf-form-label query-keyword width-7">Query Type</label>
+                <div class="gf-form-select-wrapper">
+                    <select class="gf-form-input gf-size-auto" ng-init="ctrl.queryType='1'" ng-model="ctrl.queryType" ng-change="ctrl.changeQueryType()">
+                        <option value="1">Element List</option>
+                        <option value="2">Filter Expression</option>
+                    </select>
+                </div>
+            </div>
+            <div class="gf-form gf-form--grow">
+                <div class="gf-form-label gf-form-label--grow"></div>
+            </div>
+        </div>
+
+        <!-- Element List Picker -->
+        <div class="gf-form-inline" ng-if="ctrl.queryType == 1">
+            <label class="gf-form-label query-keyword width-7">
+                <span>Elements</span>
+            </label>
+            <div ng-repeat="segment in ctrl.segments" role="menuitem">
+                <metric-segment segment="segment" get-options="ctrl.getElementSegmentsToEdit(this)" on-change="ctrl.segmentValueChanged(segment,$index)"></metric-segment>
+            </div>
+            <metric-segment segment="ctrl.elementSegment" get-options="ctrl.getElementSegmentsToAddNew()" on-change="ctrl.addElementSegment()"></metric-segment>
+            <div class="gf-form gf-form--grow">
+                <div class="gf-form-label gf-form-label--grow"></div>
+            </div>
+        </div>
+
+        <!-- Filter Expression Builder -->
+        <div style="width:100%" ng-if="ctrl.queryType == 2">
+
+            <!-- Filter Row -->
+            <div class="gf-form-inline">
+                <div class="gf-form">
+                    <label class="gf-form-label query-keyword width-7">
+                        <span>FILTER</span>
+                    </label>
+                    <metric-segment segment="ctrl.filterSegment" get-options="ctrl.getFilterToEdit()" on-change="ctrl.filterValueChanged()"></metric-segment>
+                </div>
+                <div class="gf-form gf-form--grow">
+                    <div class="gf-form-label gf-form-label--grow"></div>
+                </div>
+            </div>
+
+            <!-- Top n Row -->
+            <div class="gf-form-inline">
+                <div class="gf-form">
+                    <label class="gf-form-label query-keyword width-7">
+                        <span>TOP</span>
+                    </label>
+                    <input type="number" class="gf-form-input" ng-model="ctrl.topNSegment" ng-change="ctrl.topNValueChanged()" spellcheck="false" placeholder="Insert Number" ng-blur="ctrl.panelCtrl.refresh()">
+                </div>
+
+                <div class="gf-form gf-form--grow">
+                    <div class="gf-form-label gf-form-label--grow"></div>
+                </div>
+            </div>
+
+            <!-- Where Clause Row -->
+            <div class="gf-form-inline">
+                <div class="gf-form">
+                    <label class="gf-form-label query-keyword width-7">
+                        <span>WHERE</span>
+                    </label>
+                    <div ng-repeat="where in ctrl.wheres" role="menuitem">
+                        <metric-segment segment="where" get-options="ctrl.getWheresToEdit(where, $index)" on-change="ctrl.whereValueChanged(where, $index)"></metric-segment>
+                    </div>
+                    <metric-segment segment="ctrl.whereSegment" get-options="ctrl.getWheresToAddNew()" on-change="ctrl.addWhere()"></metric-segment>
+
+                </div>
+                <div class="gf-form gf-form--grow">
+                    <div class="gf-form-label gf-form-label--grow"></div>
+                </div>
+            </div>
+
+            <!-- ORDER BY Row -->
+            <div class="gf-form-inline">
+                <div class="gf-form">
+                    <label class="gf-form-label query-keyword width-7">
+                        <span>ORDER BY</span>
+                    </label>
+                    <metric-segment segment="ctrl.orderBySegment" get-options="ctrl.getOrderBysToAddNew()" on-change="ctrl.orderByValueChanged()"></metric-segment>
+                </div>
+
+                <div class="gf-form gf-form--grow">
+                    <div class="gf-form-label gf-form-label--grow"></div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Aggregates/Sets Builder -->
+        <div class="gf-form-inline" hidden>
+            <label class="gf-form-label query-keyword width-7">
+                <span>Functions</span>
+            </label>
+            <!--<div ng-repeat="segment in ctrl.segments" role="menuitem">
+                <metric-segment segment="segment" get-options="ctrl.getElementSegmentsToEdit()" on-change="ctrl.segmentValueChanged(segment,$index)"></metric-segment>
+            </div>-->
+            <!--<metric-segment segment="ctrl.elementSegment" get-options="ctrl.getElementSegmentsToAddNew()" on-change="ctrl.addElementSegment()"></metric-segment>-->
+            <div class="gf-form gf-form--grow">
+                <div class="gf-form-label gf-form-label--grow"></div>
+            </div>
+        </div>
+          
+    </div>
 </query-editor-row>

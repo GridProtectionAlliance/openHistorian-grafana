@@ -104,9 +104,28 @@ System.register(['lodash'], function (_export, _context) {
         }, {
           key: 'metricFindQuery',
           value: function metricFindQuery(options) {
+            var interpolated = {
+              target: this.templateSrv.replace(options, null, 'regex')
+            };
+
             return this.backendSrv.datasourceRequest({
               url: this.url + '/search',
-              data: options,
+              data: interpolated,
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' }
+            }).then(this.mapToTextValue);
+          }
+        }, {
+          key: 'whereFindQuery',
+          value: function whereFindQuery(options) {
+
+            var interpolated = {
+              target: this.templateSrv.replace(options, null, 'regex')
+            };
+
+            return this.backendSrv.datasourceRequest({
+              url: this.url + '/SearchFields',
+              data: interpolated,
               method: 'POST',
               headers: { 'Content-Type': 'application/json' }
             }).then(this.mapToTextValue);
@@ -139,6 +158,30 @@ System.register(['lodash'], function (_export, _context) {
             options.targets = targets;
 
             return options;
+          }
+        }, {
+          key: 'filterFindQuery',
+          value: function filterFindQuery() {
+
+            return this.backendSrv.datasourceRequest({
+              url: this.url + '/SearchFilters',
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' }
+            }).then(this.mapToTextValue);
+          }
+        }, {
+          key: 'orderByFindQuery',
+          value: function orderByFindQuery(options) {
+            var interpolated = {
+              target: this.templateSrv.replace(options, null, 'regex')
+            };
+
+            return this.backendSrv.datasourceRequest({
+              url: this.url + '/SearchOrderBys',
+              data: interpolated,
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' }
+            }).then(this.mapToTextValue);
           }
         }]);
 
