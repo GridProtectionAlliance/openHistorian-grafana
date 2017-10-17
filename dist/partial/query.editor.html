@@ -6,10 +6,11 @@
 
     <!-- Query Builder -->
     <div ng-hide="ctrl.target.textEditor">
+
         <!-- First Line - Contains Select box and Query Type label -->
         <div class="gf-form-inline">
             <div class="gf-form">
-                <label class="gf-form-label query-keyword width-7">Query Type</label>
+                <label class="gf-form-label query-keyword width-7">TYPE</label>
                 <div class="gf-form-select-wrapper">
                     <select class="gf-form-input gf-size-auto" ng-init="ctrl.queryType='1'" ng-model="ctrl.queryType" ng-change="ctrl.changeQueryType()">
                         <option value="1">Element List</option>
@@ -25,7 +26,7 @@
         <!-- Element List Picker -->
         <div class="gf-form-inline" ng-if="ctrl.queryType == 1">
             <label class="gf-form-label query-keyword width-7">
-                <span>Elements</span>
+                <span>ELEMENTS</span>
             </label>
             <div ng-repeat="segment in ctrl.segments" role="menuitem">
                 <metric-segment segment="segment" get-options="ctrl.getElementSegmentsToEdit(this)" on-change="ctrl.segmentValueChanged(segment,$index)"></metric-segment>
@@ -99,15 +100,23 @@
 
         </div>
 
-        <!-- Aggregates/Sets Builder -->
-        <div class="gf-form-inline" hidden>
+        <!-- Functions Builder -->
+        <div class="gf-form-inline">
             <label class="gf-form-label query-keyword width-7">
-                <span>Functions</span>
+                <span>FUNCTIONS</span>
             </label>
-            <!--<div ng-repeat="segment in ctrl.segments" role="menuitem">
-                <metric-segment segment="segment" get-options="ctrl.getElementSegmentsToEdit()" on-change="ctrl.segmentValueChanged(segment,$index)"></metric-segment>
-            </div>-->
-            <!--<metric-segment segment="ctrl.elementSegment" get-options="ctrl.getElementSegmentsToAddNew()" on-change="ctrl.addElementSegment()"></metric-segment>-->
+            <div ng-repeat="func in ctrl.functions" role="menuitem">
+                <metric-segment segment="func" get-options="ctrl.getFunctionsToEdit(func, $index)" on-change="ctrl.functionValueChanged(func,$index)" ng-if="func.Type == 'Function'"></metric-segment>
+                <label class="gf-form-label operator-keyword" ng-if="func.Type == 'Operator'">{{func.value}}</label>
+                <label class="gf-form-label query-keyword" ng-if="func.Type == 'Query'">{{func.value}}</label>
+                <input style="width: 50px" class="gf-form-label" ng-change="ctrl.inputChange(func,$index)" ng-if="func.Type == 'double'" ng-model="func.value" title="{{func.Description}}"/>
+                <input style="width: 100px" class="gf-form-label" ng-change="ctrl.inputChange(func,$index)" ng-if="func.Type == 'string'" ng-model="func.value" title="{{func.Description}}"/>
+                <metric-segment segment="func" get-options="ctrl.getBooleans()" on-change="ctrl.functionValueChanged(func,$index)" ng-if="func.Type == 'boolean'" title="{{func.Description}}"></metric-segment>
+                <metric-segment segment="func" get-options="ctrl.getAngleUnits()" on-change="ctrl.functionValueChanged(func,$index)" ng-if="func.Type == 'angleUnits'" title="{{func.Description}}"></metric-segment>
+                <metric-segment segment="func" get-options="ctrl.getTimeSelect()" on-change="ctrl.functionValueChanged(func,$index)" ng-if="func.Type == 'time'" title="{{func.Description}}"></metric-segment>
+            </div>
+
+            <metric-segment segment="ctrl.functionSegment" get-options="ctrl.getFunctionsToAddNew()" on-change="ctrl.addFunctionSegment()"></metric-segment>
             <div class="gf-form gf-form--grow">
                 <div class="gf-form-label gf-form-label--grow"></div>
             </div>
