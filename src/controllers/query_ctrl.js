@@ -1,8 +1,6 @@
 import { QueryCtrl } from 'app/plugins/sdk'
-import { QueryPart } from 'app/core/components/query_part/query_part'
 import './../css/query-editor.css!'
 import _ from 'lodash'
-import angular from 'angular'
 
 export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
     constructor($scope, $injector, uiSegmentSrv, templateSrv) {
@@ -10,58 +8,73 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
 
 
         this.scope = $scope;
+        var ctrl = this;
         this.uiSegmentSrv = uiSegmentSrv;
         this.target.target = '';
         this.target.textEditor = false;
-        this.segments = [];
-        this.wheres = [];
+        this.segments = (this.target.segments == undefined ? [] : this.target.segments.map(function (a) { return ctrl.uiSegmentSrv.newSegment({ value: a.text, expandable: true })}));
+        this.queryType = (this.target.queryType == undefined ? 1 : this.target.queryType);
+        this.wheres = (this.target.wheres == undefined ? [] : this.target.wheres.map(function (a) {
+            if (a.type == 'operator') return ctrl.uiSegmentSrv.newOperator(a.text);
+            else if (a.type == 'condition') return ctrl.uiSegmentSrv.newCondition(a.text);
+            else return ctrl.uiSegmentSrv.newSegment(a.value);
+        }));
+        this.functionSegments = (this.target.functionSegments == undefined ? [] : this.target.functionSegments);
+        this.topNSegment = (this.target.topNSegment == undefined ? null : this.target.topNSegment);
         this.functions = [];
-        this.functionSegments = [];
-        this.topNSegment = null;
         this.elementSegment = this.uiSegmentSrv.newPlusButton();
         this.whereSegment = this.uiSegmentSrv.newPlusButton();
-        this.filterSegment = this.uiSegmentSrv.newSegment('ActiveMeasurement');
-        this.orderBySegment = this.uiSegmentSrv.newPlusButton();
+        this.filterSegment = (this.target.filterSegment == undefined ? this.uiSegmentSrv.newSegment('ActiveMeasurement') : this.uiSegmentSrv.newSegment(this.target.filterSegment.value));
+        this.orderBySegment = (this.target.orderBySegment == undefined ? this.uiSegmentSrv.newPlusButton() : this.target.orderBySegment);
         this.functionSegment = this.uiSegmentSrv.newPlusButton();
 
+        this.typingTimer;
+
         this.functionList = {
-        Set : { Function : 'Set', Parameters: [] },
-        Slice : { Function : 'Slice', Parameters: [{ Default: 1, Type: 'double', Description: 'A floating-point value that must be greater than or equal to zero that represents the desired time tolerance, in seconds, for the time slice.' }] },
-        Average : { Function : 'Average', Parameters: [] },
-        Minimum : { Function : 'Minimum', Parameters: [] },
-        Maximum : { Function : 'Maximum', Parameters: [] },
-        Total: {  Function : 'Total', Parameters: [] },
-        Range : { Function : 'Range', Parameters: [] },
-        Count : { Function : 'Count', Parameters: [] },
-        Distinct: { Function : 'Distinct', Parameters: [] },
-        AbsoluteValute : { Function : 'AbsoluteValue', Parameters: [] },
-        Add : { Function : 'Add', Parameters: [{ Default: 0, Type: 'double', Description: 'A floating point value representing an additive offset to be applied to each value the source series.' }] },
-        Multiply : { Function : 'Multiply', Parameters: [{ Default: 1, Type: 'double', Description: 'A floating point value representing an additive offset to be applied to each value the source series.' }] },
-        Round : { Function : 'Round', Parameters: [{ Default: 0, Type: 'double', Description: 'A positive integer value representing the number of decimal places in the return value - defaults to 0.' }] },
-        Floor  : { Function : 'Floor', Parameters: [] },
-        Ceiling : { Function : 'Ceiling', Parameters: [] },
-        Truncate : { Function : 'Truncate', Parameters: [] },
-        StandardDeviation : { Function : 'StandardDeviation', Parameters: [{ Default: false, Type: 'boolean', Description: 'A boolean flag representing if the sample based calculation should be used - defaults to false, which means the population based calculation should be used.' }] },
-        Median : { Function : 'Median', Parameters: [] },
-        Mode : { Function : 'Mode', Parameters: [] },
-        Top : { Function : 'Top', Parameters: [{ Default: '100%', Type: 'string', Description: 'A positive integer value, representing a total, that is greater than zero - or - a floating point value, suffixed with \' %\' representing a percentage, that must range from greater than 0 to less than or equal to 100.' }, { Default: true, Type: 'boolean', Description: 'A boolean flag representing if time in dataset should be normalized - defaults to true.' }] },
-        Bottom : { Function : 'Bottom', Parameters: [{ Default: '100%', Type: 'string', Description: 'A positive integer value, representing a total, that is greater than zero - or - a floating point value, suffixed with \' %\' representing a percentage, that must range from greater than 0 to less than or equal to 100.' }, { Default: true, Type: 'boolean', Description: 'A boolean flag representing if time in dataset should be normalized - defaults to true.' }] },
-        Random : { Function : 'Random', Parameters: [{ Default: '100%', Type: 'string', Description: 'A positive integer value, representing a total, that is greater than zero - or - a floating point value, suffixed with \' %\' representing a percentage, that must range from greater than 0 to less than or equal to 100.' }, { Default: true, Type: 'boolean', Description: 'A boolean flag representing if time in dataset should be normalized - defaults to true.' }] },
-        First : { Function : 'First', Parameters: [{ Default: '1', Type: 'string', Description: 'A positive integer value, representing a total, that is greater than zero - or - a floating point value, suffixed with \' %\' representing a percentage, that must range from greater than 0 to less than or equal to 100 - defaults to 1.' }] },
-        Last : { Function : 'Last', Parameters: [{ Default: '1', Type: 'string', Description: 'A positive integer value, representing a total, that is greater than zero - or - a floating point value, suffixed with \' %\' representing a percentage, that must range from greater than 0 to less than or equal to 100 - defaults to 1.' }] },
-        Percentile : { Function : 'Percentile', Parameters: [{ Default: '100%', Type: 'string', Description: 'A floating point value, representing a percentage, that must range from 0 to 100.' }] },
-        Difference : { Function : 'Difference', Parameters: [] },
-        TimeDifference : { Function : 'TimeDifference', Parameters: [{ Default: 'Seconds', Type: 'time', Description: 'Specifies the type of time units and must be one of the following: Seconds, Nanoseconds, Microseconds, Milliseconds, Minutes, Hours, Days, Weeks, Ke (i.e., traditional Chinese unit of decimal time), Ticks (i.e., 100-nanosecond intervals), PlanckTime or AtomicUnitsOfTime - defaults to Seconds.' }] },
-        Derivative : { Function : 'Derivative', Parameters: [{ Default: 'Seconds', Type: 'time', Description: 'Specifies the type of time units and must be one of the following: Seconds, Nanoseconds, Microseconds, Milliseconds, Minutes, Hours, Days, Weeks, Ke (i.e., traditional Chinese unit of decimal time), Ticks (i.e., 100-nanosecond intervals), PlanckTime or AtomicUnitsOfTime - defaults to Seconds.' }] },
-        TimeIntegration : { Function : 'TimeIntegration', Parameters: [{ Default: 'Hours', Type: 'time', Description: 'Specifies the type of time units and must be one of the following: Seconds, Nanoseconds, Microseconds, Milliseconds, Minutes, Hours, Days, Weeks, Ke (i.e., traditional Chinese unit of decimal time), Ticks (i.e., 100-nanosecond intervals), PlanckTime or AtomicUnitsOfTime - defaults to Hours.' }] },
-        Interval: { Function : 'Interval', Parameters: [{ Default: 0, Type: 'double', Description: 'A floating-point value that must be greater than or equal to zero that represents the desired time interval, in time units, for the returned data. ' }, { Default: 'Seconds', Type: 'time', Description: 'Specifies the type of time units and must be one of the following: Seconds, Nanoseconds, Microseconds, Milliseconds, Minutes, Hours, Days, Weeks, Ke (i.e., traditional Chinese unit of decimal time), Ticks (i.e., 100-nanosecond intervals), PlanckTime or AtomicUnitsOfTime - defaults to Seconds.' }] },
-        IncludeRange: { Function : 'IncludeRange', Parameters: [{ Default: 0, Type: 'double', Description: 'Floating-point number that represents the low range of values allowed in the return series.' }, { Default: 0, Type: 'double', Description: 'Floating-point number that represents the high range of values allowed in the return series.' }, { Default: false, Type: 'boolean', Description: 'A boolean flag that determines if range values are inclusive, i.e., allowed values are >= low and <= high - defaults to false, which means values are exclusive, i.e., allowed values are > low and < high.' }, { Default: false, Type: 'boolean', Description: 'A boolean flag - when four parameters are provided, third parameter determines if low value is inclusive and forth parameter determines if high value is inclusive.' }] },
-        ExcludeRange : { Function : 'ExcludeRange', Parameters: [{ Default: 0, Type: 'double', Description: 'Floating-point number that represents the low range of values allowed in the return series.' }, { Default: 0, Type: 'double', Description: 'Floating-point number that represents the high range of values allowed in the return series.' }, { Default: false, Type: 'boolean', Description: 'A boolean flag that determines if range values are inclusive, i.e., allowed values are >= low and <= high - defaults to false, which means values are exclusive, i.e., allowed values are > low and < high.' }, { Default: false, Type: 'boolean', Description: 'A boolean flag - when four parameters are provided, third parameter determines if low value is inclusive and forth parameter determines if high value is inclusive.' }] },
-        FilterNaN : { Function : 'FilterNaN', Parameters: [{ Default: true, Type: 'boolean', Description: 'A boolean flag that determines if infinite values should also be excluded - defaults to true.' }] },
-        UnwrapAngle : { Function : 'UnwrapAngle', Parameters: [{ Default: 'Degrees', Type: 'angleUnits', Description: 'Specifies the type of angle units and must be one of the following: Degrees, Radians, Grads, ArcMinutes, ArcSeconds or AngularMil - defaults to Degrees.' }] },
-        WrapAngle : { Function : 'WrapAngle', Parameters: [{ Default: 'Degrees', Type: 'angleUnits', Description: 'Specifies the type of angle units and must be one of the following: Degrees, Radians, Grads, ArcMinutes, ArcSeconds or AngularMil - defaults to Degrees.' }] },
-        Label : { Function : 'Label', Parameters: [{ Default: 'Name', Type: 'string', Description: 'Renames a series with the specified label value.' }] },
-    };
+            Set : { Function : 'Set', Parameters: [] },
+            Slice : { Function : 'Slice', Parameters: [{ Default: 1, Type: 'double', Description: 'A floating-point value that must be greater than or equal to zero that represents the desired time tolerance, in seconds, for the time slice.' }] },
+            Average : { Function : 'Average', Parameters: [] },
+            Minimum : { Function : 'Minimum', Parameters: [] },
+            Maximum : { Function : 'Maximum', Parameters: [] },
+            Total: {  Function : 'Total', Parameters: [] },
+            Range : { Function : 'Range', Parameters: [] },
+            Count : { Function : 'Count', Parameters: [] },
+            Distinct: { Function : 'Distinct', Parameters: [] },
+            AbsoluteValute : { Function : 'AbsoluteValue', Parameters: [] },
+            Add : { Function : 'Add', Parameters: [{ Default: 0, Type: 'double', Description: 'A floating point value representing an additive offset to be applied to each value the source series.' }] },
+            Multiply : { Function : 'Multiply', Parameters: [{ Default: 1, Type: 'double', Description: 'A floating point value representing an additive offset to be applied to each value the source series.' }] },
+            Round : { Function : 'Round', Parameters: [{ Default: 0, Type: 'double', Description: 'A positive integer value representing the number of decimal places in the return value - defaults to 0.' }] },
+            Floor  : { Function : 'Floor', Parameters: [] },
+            Ceiling : { Function : 'Ceiling', Parameters: [] },
+            Truncate : { Function : 'Truncate', Parameters: [] },
+            StandardDeviation : { Function : 'StandardDeviation', Parameters: [{ Default: false, Type: 'boolean', Description: 'A boolean flag representing if the sample based calculation should be used - defaults to false, which means the population based calculation should be used.' }] },
+            Median : { Function : 'Median', Parameters: [] },
+            Mode : { Function : 'Mode', Parameters: [] },
+            Top : { Function : 'Top', Parameters: [{ Default: '100%', Type: 'string', Description: 'A positive integer value, representing a total, that is greater than zero - or - a floating point value, suffixed with \' %\' representing a percentage, that must range from greater than 0 to less than or equal to 100.' }, { Default: true, Type: 'boolean', Description: 'A boolean flag representing if time in dataset should be normalized - defaults to true.' }] },
+            Bottom : { Function : 'Bottom', Parameters: [{ Default: '100%', Type: 'string', Description: 'A positive integer value, representing a total, that is greater than zero - or - a floating point value, suffixed with \' %\' representing a percentage, that must range from greater than 0 to less than or equal to 100.' }, { Default: true, Type: 'boolean', Description: 'A boolean flag representing if time in dataset should be normalized - defaults to true.' }] },
+            Random : { Function : 'Random', Parameters: [{ Default: '100%', Type: 'string', Description: 'A positive integer value, representing a total, that is greater than zero - or - a floating point value, suffixed with \' %\' representing a percentage, that must range from greater than 0 to less than or equal to 100.' }, { Default: true, Type: 'boolean', Description: 'A boolean flag representing if time in dataset should be normalized - defaults to true.' }] },
+            First : { Function : 'First', Parameters: [{ Default: '1', Type: 'string', Description: 'A positive integer value, representing a total, that is greater than zero - or - a floating point value, suffixed with \' %\' representing a percentage, that must range from greater than 0 to less than or equal to 100 - defaults to 1.' }] },
+            Last : { Function : 'Last', Parameters: [{ Default: '1', Type: 'string', Description: 'A positive integer value, representing a total, that is greater than zero - or - a floating point value, suffixed with \' %\' representing a percentage, that must range from greater than 0 to less than or equal to 100 - defaults to 1.' }] },
+            Percentile : { Function : 'Percentile', Parameters: [{ Default: '100%', Type: 'string', Description: 'A floating point value, representing a percentage, that must range from 0 to 100.' }] },
+            Difference : { Function : 'Difference', Parameters: [] },
+            TimeDifference : { Function : 'TimeDifference', Parameters: [{ Default: 'Seconds', Type: 'time', Description: 'Specifies the type of time units and must be one of the following: Seconds, Nanoseconds, Microseconds, Milliseconds, Minutes, Hours, Days, Weeks, Ke (i.e., traditional Chinese unit of decimal time), Ticks (i.e., 100-nanosecond intervals), PlanckTime or AtomicUnitsOfTime - defaults to Seconds.' }] },
+            Derivative : { Function : 'Derivative', Parameters: [{ Default: 'Seconds', Type: 'time', Description: 'Specifies the type of time units and must be one of the following: Seconds, Nanoseconds, Microseconds, Milliseconds, Minutes, Hours, Days, Weeks, Ke (i.e., traditional Chinese unit of decimal time), Ticks (i.e., 100-nanosecond intervals), PlanckTime or AtomicUnitsOfTime - defaults to Seconds.' }] },
+            TimeIntegration : { Function : 'TimeIntegration', Parameters: [{ Default: 'Hours', Type: 'time', Description: 'Specifies the type of time units and must be one of the following: Seconds, Nanoseconds, Microseconds, Milliseconds, Minutes, Hours, Days, Weeks, Ke (i.e., traditional Chinese unit of decimal time), Ticks (i.e., 100-nanosecond intervals), PlanckTime or AtomicUnitsOfTime - defaults to Hours.' }] },
+            Interval: { Function : 'Interval', Parameters: [{ Default: 0, Type: 'double', Description: 'A floating-point value that must be greater than or equal to zero that represents the desired time interval, in time units, for the returned data. ' }, { Default: 'Seconds', Type: 'time', Description: 'Specifies the type of time units and must be one of the following: Seconds, Nanoseconds, Microseconds, Milliseconds, Minutes, Hours, Days, Weeks, Ke (i.e., traditional Chinese unit of decimal time), Ticks (i.e., 100-nanosecond intervals), PlanckTime or AtomicUnitsOfTime - defaults to Seconds.' }] },
+            IncludeRange: { Function : 'IncludeRange', Parameters: [{ Default: 0, Type: 'double', Description: 'Floating-point number that represents the low range of values allowed in the return series.' }, { Default: 0, Type: 'double', Description: 'Floating-point number that represents the high range of values allowed in the return series.' }, { Default: false, Type: 'boolean', Description: 'A boolean flag that determines if range values are inclusive, i.e., allowed values are >= low and <= high - defaults to false, which means values are exclusive, i.e., allowed values are > low and < high.' }, { Default: false, Type: 'boolean', Description: 'A boolean flag - when four parameters are provided, third parameter determines if low value is inclusive and forth parameter determines if high value is inclusive.' }] },
+            ExcludeRange : { Function : 'ExcludeRange', Parameters: [{ Default: 0, Type: 'double', Description: 'Floating-point number that represents the low range of values allowed in the return series.' }, { Default: 0, Type: 'double', Description: 'Floating-point number that represents the high range of values allowed in the return series.' }, { Default: false, Type: 'boolean', Description: 'A boolean flag that determines if range values are inclusive, i.e., allowed values are >= low and <= high - defaults to false, which means values are exclusive, i.e., allowed values are > low and < high.' }, { Default: false, Type: 'boolean', Description: 'A boolean flag - when four parameters are provided, third parameter determines if low value is inclusive and forth parameter determines if high value is inclusive.' }] },
+            FilterNaN : { Function : 'FilterNaN', Parameters: [{ Default: true, Type: 'boolean', Description: 'A boolean flag that determines if infinite values should also be excluded - defaults to true.' }] },
+            UnwrapAngle : { Function : 'UnwrapAngle', Parameters: [{ Default: 'Degrees', Type: 'angleUnits', Description: 'Specifies the type of angle units and must be one of the following: Degrees, Radians, Grads, ArcMinutes, ArcSeconds or AngularMil - defaults to Degrees.' }] },
+            WrapAngle : { Function : 'WrapAngle', Parameters: [{ Default: 'Degrees', Type: 'angleUnits', Description: 'Specifies the type of angle units and must be one of the following: Degrees, Radians, Grads, ArcMinutes, ArcSeconds or AngularMil - defaults to Degrees.' }] },
+            Label : { Function : 'Label', Parameters: [{ Default: 'Name', Type: 'string', Description: 'Renames a series with the specified label value.' }] },
+        };
+
+        this.buildFunctionArray();
+
+        if (this.queryType == 2)
+            this.setTargetWithQuery();
+        else
+            this.setTargetWithElements()
   }
 
   setTargetWithQuery() {
@@ -83,7 +96,13 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
           else functions += element.value;
       });
 
-      this.target.target = (functions != ""? functions: query);
+      this.target.target = (functions != "" ? functions : query);
+      this.target.topNSegment = this.topNSegment;
+      this.target.filterSegment = this.filterSegment;
+      this.target.orderBySegment = this.orderBySegment;
+      this.target.wheres = this.wheres;
+      this.target.functionSegments = this.functionSegments;
+      this.target.queryType = this.queryType;
       this.panelCtrl.refresh()
 
   }
@@ -97,6 +116,10 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
       });
 
       this.target.target = (functions != "" ? functions : this.segments.map(function (a) { return a.value }).join(';'));
+
+      this.target.functionSegments = this.functionSegments;
+      this.target.segments = this.segments;
+      this.target.queryType = this.queryType;
       this.panelCtrl.refresh()
 
   }
@@ -127,7 +150,6 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
       this.orderBySegment = this.uiSegmentSrv.newPlusButton();
       this.functionSegment = this.uiSegmentSrv.newPlusButton();
       this.panelCtrl.refresh();
-      this.typingTimer;
   }
 
 
@@ -188,8 +210,8 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
 
   addElementSegment(){
           // if value is not empty, add new attribute segment
-    if (this.elementSegment.value != null) {
-      this.segments.push(this.uiSegmentSrv.newSegment({value: this.elementSegment.value, expandable: true}))
+    if (event.target.text != null) {
+        this.segments.push(this.uiSegmentSrv.newSegment({ value: event.target.text, expandable: true}))
       this.setTargetWithElements()
     }
 
@@ -425,11 +447,13 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
 
           this.functionSegments.splice(fi,l);
       }
-      else if(func.Type != 'Function') {
-          funcSeg.Parameters[func.Index].Default = func.value;
+      else if (func.Type != 'Function') {
+          var fi = _.findIndex(this.functionSegments, function (segment) { return segment.Function == func.Function });
+          this.functionSegments[fi].Parameters[func.Index].Default = func.value;
       }
 
       this.buildFunctionArray()
+
       if (this.queryType == 2)
           this.setTargetWithQuery();
       else
@@ -440,11 +464,11 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
   addFunctionSegment() {
       var func = this.functionList[event.target.text];
 
-      if (this.functionSegment.value == 'Slice') {
+      if (func.Function == 'Slice') {
           this.functionSegments[0].Parameters.unshift(func.Parameters[0])
       }
 
-      this.functionSegments.unshift(Object.assign({},func));
+      this.functionSegments.unshift(JSON.parse(JSON.stringify(func)));
       this.buildFunctionArray();
 
       // reset the + button
@@ -452,7 +476,10 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
       this.functionSegment.value = plusButton.value
       this.functionSegment.html = plusButton.html
 
-
+      if (this.queryType == 2)
+          this.setTargetWithQuery();
+      else
+          this.setTargetWithElements()
   }
 
   buildFunctionArray() {
@@ -501,11 +528,6 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
           }
 
       }
-
-      if (ctrl.queryType == 2)
-          ctrl.setTargetWithQuery();
-      else
-          ctrl.setTargetWithElements() 
 
   }
 

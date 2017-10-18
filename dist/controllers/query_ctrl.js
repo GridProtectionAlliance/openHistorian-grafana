@@ -1,9 +1,9 @@
 'use strict';
 
-System.register(['app/plugins/sdk', 'app/core/components/query_part/query_part', './../css/query-editor.css!', 'lodash', 'angular'], function (_export, _context) {
+System.register(['app/plugins/sdk', './../css/query-editor.css!', 'lodash'], function (_export, _context) {
     "use strict";
 
-    var QueryCtrl, QueryPart, _, angular, _createClass, OpenHistorianDataSourceQueryCtrl;
+    var QueryCtrl, _, _createClass, OpenHistorianDataSourceQueryCtrl;
 
     function _classCallCheck(instance, Constructor) {
         if (!(instance instanceof Constructor)) {
@@ -38,12 +38,8 @@ System.register(['app/plugins/sdk', 'app/core/components/query_part/query_part',
     return {
         setters: [function (_appPluginsSdk) {
             QueryCtrl = _appPluginsSdk.QueryCtrl;
-        }, function (_appCoreComponentsQuery_partQuery_part) {
-            QueryPart = _appCoreComponentsQuery_partQuery_part.QueryPart;
         }, function (_cssQueryEditorCss) {}, function (_lodash) {
             _ = _lodash.default;
-        }, function (_angular) {
-            angular = _angular.default;
         }],
         execute: function () {
             _createClass = function () {
@@ -73,19 +69,27 @@ System.register(['app/plugins/sdk', 'app/core/components/query_part/query_part',
                     var _this = _possibleConstructorReturn(this, (OpenHistorianDataSourceQueryCtrl.__proto__ || Object.getPrototypeOf(OpenHistorianDataSourceQueryCtrl)).call(this, $scope, $injector));
 
                     _this.scope = $scope;
+                    var ctrl = _this;
                     _this.uiSegmentSrv = uiSegmentSrv;
                     _this.target.target = '';
                     _this.target.textEditor = false;
-                    _this.segments = [];
-                    _this.wheres = [];
+                    _this.segments = _this.target.segments == undefined ? [] : _this.target.segments.map(function (a) {
+                        return ctrl.uiSegmentSrv.newSegment({ value: a.text, expandable: true });
+                    });
+                    _this.queryType = _this.target.queryType == undefined ? 1 : _this.target.queryType;
+                    _this.wheres = _this.target.wheres == undefined ? [] : _this.target.wheres.map(function (a) {
+                        if (a.type == 'operator') return ctrl.uiSegmentSrv.newOperator(a.text);else if (a.type == 'condition') return ctrl.uiSegmentSrv.newCondition(a.text);else return ctrl.uiSegmentSrv.newSegment(a.value);
+                    });
+                    _this.functionSegments = _this.target.functionSegments == undefined ? [] : _this.target.functionSegments;
+                    _this.topNSegment = _this.target.topNSegment == undefined ? null : _this.target.topNSegment;
                     _this.functions = [];
-                    _this.functionSegments = [];
-                    _this.topNSegment = null;
                     _this.elementSegment = _this.uiSegmentSrv.newPlusButton();
                     _this.whereSegment = _this.uiSegmentSrv.newPlusButton();
-                    _this.filterSegment = _this.uiSegmentSrv.newSegment('ActiveMeasurement');
-                    _this.orderBySegment = _this.uiSegmentSrv.newPlusButton();
+                    _this.filterSegment = _this.target.filterSegment == undefined ? _this.uiSegmentSrv.newSegment('ActiveMeasurement') : _this.uiSegmentSrv.newSegment(_this.target.filterSegment.value);
+                    _this.orderBySegment = _this.target.orderBySegment == undefined ? _this.uiSegmentSrv.newPlusButton() : _this.target.orderBySegment;
                     _this.functionSegment = _this.uiSegmentSrv.newPlusButton();
+
+                    _this.typingTimer;
 
                     _this.functionList = {
                         Set: { Function: 'Set', Parameters: [] },
@@ -125,6 +129,10 @@ System.register(['app/plugins/sdk', 'app/core/components/query_part/query_part',
                         WrapAngle: { Function: 'WrapAngle', Parameters: [{ Default: 'Degrees', Type: 'angleUnits', Description: 'Specifies the type of angle units and must be one of the following: Degrees, Radians, Grads, ArcMinutes, ArcSeconds or AngularMil - defaults to Degrees.' }] },
                         Label: { Function: 'Label', Parameters: [{ Default: 'Name', Type: 'string', Description: 'Renames a series with the specified label value.' }] }
                     };
+
+                    _this.buildFunctionArray();
+
+                    if (_this.queryType == 2) _this.setTargetWithQuery();else _this.setTargetWithElements();
                     return _this;
                 }
 
@@ -149,6 +157,12 @@ System.register(['app/plugins/sdk', 'app/core/components/query_part/query_part',
                         });
 
                         this.target.target = functions != "" ? functions : query;
+                        this.target.topNSegment = this.topNSegment;
+                        this.target.filterSegment = this.filterSegment;
+                        this.target.orderBySegment = this.orderBySegment;
+                        this.target.wheres = this.wheres;
+                        this.target.functionSegments = this.functionSegments;
+                        this.target.queryType = this.queryType;
                         this.panelCtrl.refresh();
                     }
                 }, {
@@ -165,6 +179,10 @@ System.register(['app/plugins/sdk', 'app/core/components/query_part/query_part',
                         this.target.target = functions != "" ? functions : this.segments.map(function (a) {
                             return a.value;
                         }).join(';');
+
+                        this.target.functionSegments = this.functionSegments;
+                        this.target.segments = this.segments;
+                        this.target.queryType = this.queryType;
                         this.panelCtrl.refresh();
                     }
                 }, {
@@ -197,7 +215,6 @@ System.register(['app/plugins/sdk', 'app/core/components/query_part/query_part',
                         this.orderBySegment = this.uiSegmentSrv.newPlusButton();
                         this.functionSegment = this.uiSegmentSrv.newPlusButton();
                         this.panelCtrl.refresh();
-                        this.typingTimer;
                     }
                 }, {
                     key: 'getElementSegmentsToEdit',
@@ -252,8 +269,8 @@ System.register(['app/plugins/sdk', 'app/core/components/query_part/query_part',
                     key: 'addElementSegment',
                     value: function addElementSegment() {
                         // if value is not empty, add new attribute segment
-                        if (this.elementSegment.value != null) {
-                            this.segments.push(this.uiSegmentSrv.newSegment({ value: this.elementSegment.value, expandable: true }));
+                        if (event.target.text != null) {
+                            this.segments.push(this.uiSegmentSrv.newSegment({ value: event.target.text, expandable: true }));
                             this.setTargetWithElements();
                         }
 
@@ -465,10 +482,14 @@ System.register(['app/plugins/sdk', 'app/core/components/query_part/query_part',
 
                             this.functionSegments.splice(fi, l);
                         } else if (func.Type != 'Function') {
-                            funcSeg.Parameters[func.Index].Default = func.value;
+                            var fi = _.findIndex(this.functionSegments, function (segment) {
+                                return segment.Function == func.Function;
+                            });
+                            this.functionSegments[fi].Parameters[func.Index].Default = func.value;
                         }
 
                         this.buildFunctionArray();
+
                         if (this.queryType == 2) this.setTargetWithQuery();else this.setTargetWithElements();
                     }
                 }, {
@@ -476,17 +497,19 @@ System.register(['app/plugins/sdk', 'app/core/components/query_part/query_part',
                     value: function addFunctionSegment() {
                         var func = this.functionList[event.target.text];
 
-                        if (this.functionSegment.value == 'Slice') {
+                        if (func.Function == 'Slice') {
                             this.functionSegments[0].Parameters.unshift(func.Parameters[0]);
                         }
 
-                        this.functionSegments.unshift(Object.assign({}, func));
+                        this.functionSegments.unshift(JSON.parse(JSON.stringify(func)));
                         this.buildFunctionArray();
 
                         // reset the + button
                         var plusButton = this.uiSegmentSrv.newPlusButton();
                         this.functionSegment.value = plusButton.value;
                         this.functionSegment.html = plusButton.html;
+
+                        if (this.queryType == 2) this.setTargetWithQuery();else this.setTargetWithElements();
                     }
                 }, {
                     key: 'buildFunctionArray',
@@ -534,8 +557,6 @@ System.register(['app/plugins/sdk', 'app/core/components/query_part/query_part',
                                 ctrl.functions.push(operator);
                             }
                         }
-
-                        if (ctrl.queryType == 2) ctrl.setTargetWithQuery();else ctrl.setTargetWithElements();
                     }
                 }, {
                     key: 'getBooleans',
