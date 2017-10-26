@@ -84,10 +84,13 @@ System.register(['app/plugins/sdk', './../css/query-editor.css!', 'lodash'], fun
                     _this.functionSegments = _this.target.functionSegments == undefined ? [] : _this.target.functionSegments;
                     _this.topNSegment = _this.target.topNSegment == undefined ? null : _this.target.topNSegment;
                     _this.functions = [];
+                    _this.orderBys = _this.target.orderBys == undefined ? [] : _this.target.orderBys.map(function (a) {
+                        if (a.type == 'condition') return ctrl.uiSegmentSrv.newCondition(a.value);else return ctrl.uiSegmentSrv.newSegment(a.value);
+                    });
                     _this.elementSegment = _this.uiSegmentSrv.newPlusButton();
                     _this.whereSegment = _this.uiSegmentSrv.newPlusButton();
                     _this.filterSegment = _this.target.filterSegment == undefined ? _this.uiSegmentSrv.newSegment('ActiveMeasurement') : _this.uiSegmentSrv.newSegment(_this.target.filterSegment.value);
-                    _this.orderBySegment = _this.target.orderBySegment == undefined ? _this.uiSegmentSrv.newPlusButton() : _this.target.orderBySegment;
+                    _this.orderBySegment = _this.uiSegmentSrv.newPlusButton();
                     _this.functionSegment = _this.uiSegmentSrv.newPlusButton();
 
                     _this.phasorSegment = _this.uiSegmentSrv.newPlusButton();
@@ -145,6 +148,7 @@ System.register(['app/plugins/sdk', './../css/query-editor.css!', 'lodash'], fun
                 _createClass(OpenHistorianDataSourceQueryCtrl, [{
                     key: 'setTargetWithQuery',
                     value: function setTargetWithQuery() {
+                        if (this.wheres.length == 0) return;
                         var filter = this.filterSegment.value + ' ';
                         var topn = this.topNSegment ? 'TOP ' + this.topNSegment + ' ' : '';
                         var where = 'WHERE ';
@@ -153,7 +157,10 @@ System.register(['app/plugins/sdk', './../css/query-editor.css!', 'lodash'], fun
                             where += element.value + ' ';
                         });
 
-                        var orderby = this.orderBySegment.value ? 'ORDER BY ' + this.orderBySegment.value + ' ' : '';
+                        var orderby = '';
+                        _.each(this.orderBys, function (element, index, list) {
+                            orderby += (index == 0 ? 'ORDER BY ' : '') + element.value + (element.type == 'condition' && index < list.length - 1 ? ',' : '') + ' ';
+                        });
 
                         var query = 'FILTER ' + topn + filter + where + orderby;
                         var functions = '';
@@ -165,7 +172,7 @@ System.register(['app/plugins/sdk', './../css/query-editor.css!', 'lodash'], fun
                         this.target.target = functions != "" ? functions : query;
                         this.target.topNSegment = this.topNSegment;
                         this.target.filterSegment = this.filterSegment;
-                        this.target.orderBySegment = this.orderBySegment;
+                        this.target.orderBys = this.orderBys;
                         this.target.wheres = this.wheres;
                         this.target.functionSegments = this.functionSegments;
                         this.target.queryType = this.queryType;
@@ -227,6 +234,7 @@ System.register(['app/plugins/sdk', './../css/query-editor.css!', 'lodash'], fun
                         this.wheres = [];
                         this.functions = [];
                         this.functionSegments = [];
+                        this.orderBys = [];
                         this.topNSegment = '';
                         this.elementSegment = this.uiSegmentSrv.newPlusButton();
                         this.whereSegment = this.uiSegmentSrv.newPlusButton();
@@ -509,8 +517,6 @@ System.register(['app/plugins/sdk', './../css/query-editor.css!', 'lodash'], fun
                 }, {
                     key: 'getOrderBysToAddNew',
                     value: function getOrderBysToAddNew() {
-                        var _this3 = this;
-
                         var ctrl = this;
                         return this.datasource.orderByFindQuery(ctrl.filterSegment.value).then(function (data) {
                             var altSegments = _.map(data, function (item) {
@@ -522,19 +528,62 @@ System.register(['app/plugins/sdk', './../css/query-editor.css!', 'lodash'], fun
                                 return 0;
                             });
 
-                            if (_this3.orderBySegment.type !== 'plus-button') altSegments.unshift(_this3.uiSegmentSrv.newSegment('-REMOVE-'));
-
                             return _.filter(altSegments, function (segment) {
-                                return _.find(ctrl.segments, function (x) {
+                                return _.find(ctrl.orderBys, function (x) {
                                     return x.value == segment.value;
                                 }) == undefined;
                             });
                         });
                     }
                 }, {
+                    key: 'getOrderBysToEdit',
+                    value: function getOrderBysToEdit(orderBy) {
+                        var _this3 = this;
+
+                        var ctrl = this;
+                        if (orderBy.type == 'condition') return this.datasource.q.when([this.uiSegmentSrv.newCondition('ASC'), this.uiSegmentSrv.newCondition('DESC')]);
+                        if (orderBy.type == 'condition') return this.datasource.q.when([this.uiSegmentSrv.newCondition('ASC'), this.uiSegmentSrv.newCondition('DESC')]);
+
+                        return this.datasource.orderByFindQuery(ctrl.filterSegment.value).then(function (data) {
+                            var altSegments = _.map(data, function (item) {
+                                return ctrl.uiSegmentSrv.newSegment({ value: item.text, expandable: item.expandable });
+                            });
+                            altSegments.sort(function (a, b) {
+                                if (a.value < b.value) return -1;
+                                if (a.value > b.value) return 1;
+                                return 0;
+                            });
+
+                            if (orderBy.type !== 'plus-button') altSegments.unshift(_this3.uiSegmentSrv.newSegment('-REMOVE-'));
+
+                            return _.filter(altSegments, function (segment) {
+                                return _.find(ctrl.orderBys, function (x) {
+                                    return x.value == segment.value;
+                                }) == undefined;
+                            });
+                        });
+                    }
+                }, {
+                    key: 'addOrderBy',
+                    value: function addOrderBy() {
+                        this.orderBys.push(this.uiSegmentSrv.newSegment(event.target.text));
+                        this.orderBys.push(this.uiSegmentSrv.newCondition('ASC'));
+
+                        // reset the + button
+                        var plusButton = this.uiSegmentSrv.newPlusButton();
+                        this.orderBySegment.value = plusButton.value;
+                        this.orderBySegment.html = plusButton.html;
+
+                        this.setTargetWithQuery();
+
+                        if (this.queryType == 'Filter Expression') this.setTargetWithQuery();else this.setTargetWithElements();
+                    }
+                }, {
                     key: 'orderByValueChanged',
-                    value: function orderByValueChanged() {
-                        if (event.target.text == "-REMOVE-") this.orderBySegment = this.uiSegmentSrv.newPlusButton();else this.orderBySegment = this.uiSegmentSrv.newSegment(event.target.text);
+                    value: function orderByValueChanged(orderBy, index) {
+                        if (event.target.text == "-REMOVE-") this.orderBys.splice(index, 2);else {
+                            if (orderBy.type == 'condition') this.orderBys[index] = this.uiSegmentSrv.newCondition(event.target.text);else this.orderBys[index] = this.uiSegmentSrv.newSegment(event.target.text);
+                        }
                         this.setTargetWithQuery();
                     }
                 }, {

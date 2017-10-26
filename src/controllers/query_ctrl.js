@@ -25,10 +25,17 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
         this.functionSegments = (this.target.functionSegments == undefined ? [] : this.target.functionSegments);
         this.topNSegment = (this.target.topNSegment == undefined ? null : this.target.topNSegment);
         this.functions = [];
+        this.orderBys = (this.target.orderBys == undefined ? [] : this.target.orderBys.map(function (a)
+        {
+            if (a.type == 'condition')
+                return ctrl.uiSegmentSrv.newCondition(a.value);
+            else
+                return ctrl.uiSegmentSrv.newSegment(a.value);
+        }));
         this.elementSegment = this.uiSegmentSrv.newPlusButton();
         this.whereSegment = this.uiSegmentSrv.newPlusButton();
         this.filterSegment = (this.target.filterSegment == undefined ? this.uiSegmentSrv.newSegment('ActiveMeasurement') : this.uiSegmentSrv.newSegment(this.target.filterSegment.value));
-        this.orderBySegment = (this.target.orderBySegment == undefined ? this.uiSegmentSrv.newPlusButton() : this.target.orderBySegment);
+        this.orderBySegment =  this.uiSegmentSrv.newPlusButton();
         this.functionSegment = this.uiSegmentSrv.newPlusButton();
 
         this.phasorSegment = this.uiSegmentSrv.newPlusButton();
@@ -83,7 +90,8 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
   }
 
   // #region Target Compilation
-  setTargetWithQuery() {
+    setTargetWithQuery() {
+      if (this.wheres.length == 0) return;
       var filter = this.filterSegment.value + ' ';
       var topn = (this.topNSegment ? 'TOP ' + this.topNSegment + ' ' : '');
       var where = 'WHERE ';
@@ -92,7 +100,10 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
             where += element.value + ' '
       });
 
-      var orderby = (this.orderBySegment.value ? 'ORDER BY ' + this.orderBySegment.value + ' ' : '');
+      var orderby = '';
+      _.each(this.orderBys, function (element, index, list) {
+          orderby += (index == 0 ? 'ORDER BY ' : '') + element.value + (element.type == 'condition' && index < list.length - 1? ',' : '') +' ';
+      });
 
       var query = 'FILTER ' + topn + filter + where + orderby;
       var functions = '';
@@ -105,7 +116,7 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
       this.target.target = (functions != "" ? functions : query);
       this.target.topNSegment = this.topNSegment;
       this.target.filterSegment = this.filterSegment;
-      this.target.orderBySegment = this.orderBySegment;
+      this.target.orderBys = this.orderBys;
       this.target.wheres = this.wheres;
       this.target.functionSegments = this.functionSegments;
       this.target.queryType = this.queryType;
@@ -162,6 +173,7 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
       this.wheres = [];
       this.functions = [];
       this.functionSegments = [];
+      this.orderBys = [];
       this.topNSegment = '';
       this.elementSegment = this.uiSegmentSrv.newPlusButton();
       this.whereSegment = this.uiSegmentSrv.newPlusButton();
@@ -496,22 +508,72 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
               return 0;
           });
 
-          if(this.orderBySegment.type !== 'plus-button')
-            altSegments.unshift(this.uiSegmentSrv.newSegment('-REMOVE-'));
-
           return _.filter(altSegments, segment => {
-              return _.find(ctrl.segments, x => {
+              return _.find(ctrl.orderBys, x => {
                   return x.value == segment.value
               }) == undefined;
           });
       });
   }
 
-  orderByValueChanged() {
-      if (event.target.text == "-REMOVE-")
-          this.orderBySegment = this.uiSegmentSrv.newPlusButton();
+  getOrderBysToEdit(orderBy) {
+      var ctrl = this;
+      if (orderBy.type == 'condition') return this.datasource.q.when([this.uiSegmentSrv.newCondition('ASC'), this.uiSegmentSrv.newCondition('DESC')]);
+      if (orderBy.type == 'condition') return this.datasource.q.when([this.uiSegmentSrv.newCondition('ASC'), this.uiSegmentSrv.newCondition('DESC')]);
+
+      return this.datasource.orderByFindQuery(ctrl.filterSegment.value).then(data => {
+          var altSegments = _.map(data, item => {
+              return ctrl.uiSegmentSrv.newSegment({ value: item.text, expandable: item.expandable })
+          });
+          altSegments.sort((a, b) => {
+              if (a.value < b.value)
+                  return -1;
+              if (a.value > b.value)
+                  return 1;
+              return 0;
+          });
+
+          if (orderBy.type !== 'plus-button')
+              altSegments.unshift(this.uiSegmentSrv.newSegment('-REMOVE-'));
+
+          return _.filter(altSegments, segment => {
+              return _.find(ctrl.orderBys, x => {
+                  return x.value == segment.value
+              }) == undefined;
+          });
+      });
+  }
+
+  addOrderBy() {
+      this.orderBys.push(this.uiSegmentSrv.newSegment(event.target.text));
+      this.orderBys.push(this.uiSegmentSrv.newCondition('ASC'));
+
+      // reset the + button
+      var plusButton = this.uiSegmentSrv.newPlusButton()
+      this.orderBySegment.value = plusButton.value
+      this.orderBySegment.html = plusButton.html
+
+      this.setTargetWithQuery();
+
+      if (this.queryType == 'Filter Expression')
+          this.setTargetWithQuery();
       else
-        this.orderBySegment = this.uiSegmentSrv.newSegment(event.target.text);
+          this.setTargetWithElements()
+
+  }
+
+
+  orderByValueChanged(orderBy, index) {
+      if (event.target.text == "-REMOVE-")
+          this.orderBys.splice(index, 2);
+      else
+      {
+          if (orderBy.type == 'condition')
+              this.orderBys[index] = this.uiSegmentSrv.newCondition(event.target.text);
+          else
+              this.orderBys[index] = this.uiSegmentSrv.newSegment(event.target.text);
+
+      }
       this.setTargetWithQuery();
 
   }

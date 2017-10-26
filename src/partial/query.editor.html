@@ -88,7 +88,11 @@
                     <label class="gf-form-label query-keyword width-7">
                         <span>ORDER BY</span>
                     </label>
-                    <metric-segment segment="ctrl.orderBySegment" get-options="ctrl.getOrderBysToAddNew()" on-change="ctrl.orderByValueChanged()"></metric-segment>
+                    <div ng-repeat="orderBy in ctrl.orderBys" role="menuitem">
+                        <metric-segment segment="orderBy" get-options="ctrl.getOrderBysToEdit(orderBy, $index)" on-change="ctrl.orderByValueChanged(orderBy, $index)"></metric-segment>
+                    </div>
+
+                    <metric-segment segment="ctrl.orderBySegment" get-options="ctrl.getOrderBysToAddNew()" on-change="ctrl.addOrderBy()"></metric-segment>
                 </div>
 
                 <div class="gf-form gf-form--grow">
