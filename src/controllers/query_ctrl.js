@@ -12,8 +12,11 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
         this.uiSegmentSrv = uiSegmentSrv;
         this.target.target = '';
         this.target.textEditor = false;
-        this.segments = (this.target.segments == undefined ? [] : this.target.segments.map(function (a) { return ctrl.uiSegmentSrv.newSegment({ value: a.text, expandable: true })}));
-        this.queryType = (this.target.queryType == undefined ? 1 : this.target.queryType);
+        this.segments = (this.target.segments == undefined ? [] : this.target.segments.map(function (a) { return ctrl.uiSegmentSrv.newSegment({ value: a.text, expandable: true }) }));
+        this.queryTypes = [
+            "Element List", "Filter Expression", "Phasor List"
+        ];
+        this.queryType = (this.target.queryType == undefined ? "Element List" : this.target.queryType);
         this.wheres = (this.target.wheres == undefined ? [] : this.target.wheres.map(function (a) {
             if (a.type == 'operator') return ctrl.uiSegmentSrv.newOperator(a.text);
             else if (a.type == 'condition') return ctrl.uiSegmentSrv.newCondition(a.text);
@@ -28,6 +31,8 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
         this.orderBySegment = (this.target.orderBySegment == undefined ? this.uiSegmentSrv.newPlusButton() : this.target.orderBySegment);
         this.functionSegment = this.uiSegmentSrv.newPlusButton();
 
+        this.phasorSegment = this.uiSegmentSrv.newPlusButton();
+        this.phasorSegments = [];
         this.typingTimer;
 
         this.functionList = {
@@ -71,12 +76,13 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
 
         this.buildFunctionArray();
 
-        if (this.queryType == 2)
+        if (this.queryType == 'Filter Expression')
             this.setTargetWithQuery();
         else
             this.setTargetWithElements()
   }
 
+  // #region Target Compilation
   setTargetWithQuery() {
       var filter = this.filterSegment.value + ' ';
       var topn = (this.topNSegment ? 'TOP ' + this.topNSegment + ' ' : '');
@@ -123,6 +129,19 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
       this.panelCtrl.refresh()
 
   }
+
+  setTargetWithPhasors() {
+      var ctrl = this;
+
+      this.target.target = this.phasorSegments.map(function (a) { return a.value }).join(';');
+
+      this.target.phasorSegments = this.phasorSegments;
+      this.target.queryType = this.queryType;
+      this.panelCtrl.refresh()
+
+  }
+
+  // #endregion
 
   onChangeInternal() {
     this.panelCtrl.refresh(); // Asks the panel to refresh data.
@@ -241,6 +260,94 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
   }
   // #endregion
 
+  // #region Phasors
+  getPhasorSegmentsToEdit() {
+      var ctrl = this;
+      var option = null;
+      if (event.target.value != "") option = event.target.value;
+
+      var ctrl = this;
+      return this.datasource.phasorFindQuery(option).then(data => {
+          var altSegments = _.map(data, item => {
+              return ctrl.uiSegmentSrv.newSegment({ value: item.text, expandable: item.expandable })
+          });
+          altSegments.sort((a, b) => {
+              if (a.value < b.value)
+                  return -1;
+              if (a.value > b.value)
+                  return 1;
+              return 0;
+          });
+          altSegments.unshift(ctrl.uiSegmentSrv.newSegment('-REMOVE-'));
+
+          return _.filter(altSegments, segment => {
+              return _.find(ctrl.phasorSegments, x => {
+                  return x.value == segment.value
+              }) == undefined;
+          });
+      });
+
+  }
+
+  getPhasorSegmentsToAddNew() {
+      var ctrl = this;
+      var option = null;
+      if (event.target.value != "") option = event.target.value;
+      return this.datasource.phasorFindQuery(option).then(data => {
+          var altSegments = _.map(data, item => {
+              return ctrl.uiSegmentSrv.newSegment({ value: item.text, expandable: item.expandable })
+          });
+          altSegments.sort((a, b) => {
+              if (a.value < b.value)
+                  return -1;
+              if (a.value > b.value)
+                  return 1;
+              return 0;
+          });
+
+          return _.filter(altSegments, segment => {
+              return _.find(ctrl.phasorSegments, x => {
+                  return x.value == segment.value
+              }) == undefined;
+          });
+      });
+
+  }
+
+
+  addPhasorSegment() {
+      // if value is not empty, add new attribute segment
+      if (event.target.text != null) {
+          this.phasorSegments.push(this.uiSegmentSrv.newSegment({ value: event.target.text, expandable: true }))
+          this.setTargetWithPhasors()
+      }
+
+      // reset the + button
+      var plusButton = this.uiSegmentSrv.newPlusButton()
+      this.phasorSegment.value = plusButton.value
+      this.phasorSegment.html = plusButton.html
+      this.panelCtrl.refresh()
+
+  }
+
+  phasorValueChanged(segment, index) {
+      if (segment.value == "-REMOVE-") {
+          var targets = this.target.target.split(';');
+          this.phasorSegments.splice(index, 1);
+          targets.splice(index, 1);
+          this.target.target = targets.join(';');
+      }
+      else {
+          var targets = this.target.target.split(';');
+          this.phasorSegments[index] = segment;
+          targets[index] = segment.value;
+          this.target.target = targets.join(';');
+      }
+
+
+  }
+  // #endregion
+
   // #region TOP N
   topNValueChanged() {
       this.setTargetWithQuery();
@@ -251,7 +358,7 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
   getWheresToEdit(where, index) {
 
       if (where.type === 'operator') {
-          return this.datasource.q.when(this.uiSegmentSrv.newOperators(['=', '<>', '<', '<=', '>', '>=', 'LIKE', 'NOT LIKE', 'IN', 'NOT IN']));
+          return this.datasource.q.when(this.uiSegmentSrv.newOperators(['=', '<>', '<', '<=', '>', '>=', 'LIKE', 'NOT LIKE', 'IN', 'NOT IN', 'IS', 'IS NOT']));
       }
       else if (where.type === 'value') {
           return this.datasource.q.when(null);
@@ -292,6 +399,11 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
           else
               this.wheres.splice(index, 3)
       }
+
+      if (where.type == 'operator')
+          this.wheres[index] = this.uiSegmentSrv.newOperator(where.value)
+      else if (where.type == 'condition')
+          this.wheres[index] = this.uiSegmentSrv.newCondition(where.value)
 
       this.setTargetWithQuery();
   }
@@ -454,7 +566,7 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
 
       this.buildFunctionArray()
 
-      if (this.queryType == 2)
+      if (this.queryType == 'Filter Expression')
           this.setTargetWithQuery();
       else
           this.setTargetWithElements() 
@@ -476,7 +588,7 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
       this.functionSegment.value = plusButton.value
       this.functionSegment.html = plusButton.html
 
-      if (this.queryType == 2)
+      if (this.queryType == 'Filter Expression')
           this.setTargetWithQuery();
       else
           this.setTargetWithElements()

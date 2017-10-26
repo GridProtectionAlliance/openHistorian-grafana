@@ -76,7 +76,8 @@ System.register(['app/plugins/sdk', './../css/query-editor.css!', 'lodash'], fun
                     _this.segments = _this.target.segments == undefined ? [] : _this.target.segments.map(function (a) {
                         return ctrl.uiSegmentSrv.newSegment({ value: a.text, expandable: true });
                     });
-                    _this.queryType = _this.target.queryType == undefined ? 1 : _this.target.queryType;
+                    _this.queryTypes = ["Element List", "Filter Expression", "Phasor List"];
+                    _this.queryType = _this.target.queryType == undefined ? "Element List" : _this.target.queryType;
                     _this.wheres = _this.target.wheres == undefined ? [] : _this.target.wheres.map(function (a) {
                         if (a.type == 'operator') return ctrl.uiSegmentSrv.newOperator(a.text);else if (a.type == 'condition') return ctrl.uiSegmentSrv.newCondition(a.text);else return ctrl.uiSegmentSrv.newSegment(a.value);
                     });
@@ -89,6 +90,8 @@ System.register(['app/plugins/sdk', './../css/query-editor.css!', 'lodash'], fun
                     _this.orderBySegment = _this.target.orderBySegment == undefined ? _this.uiSegmentSrv.newPlusButton() : _this.target.orderBySegment;
                     _this.functionSegment = _this.uiSegmentSrv.newPlusButton();
 
+                    _this.phasorSegment = _this.uiSegmentSrv.newPlusButton();
+                    _this.phasorSegments = [];
                     _this.typingTimer;
 
                     _this.functionList = {
@@ -132,9 +135,12 @@ System.register(['app/plugins/sdk', './../css/query-editor.css!', 'lodash'], fun
 
                     _this.buildFunctionArray();
 
-                    if (_this.queryType == 2) _this.setTargetWithQuery();else _this.setTargetWithElements();
+                    if (_this.queryType == 'Filter Expression') _this.setTargetWithQuery();else _this.setTargetWithElements();
                     return _this;
                 }
+
+                // #region Target Compilation
+
 
                 _createClass(OpenHistorianDataSourceQueryCtrl, [{
                     key: 'setTargetWithQuery',
@@ -182,6 +188,19 @@ System.register(['app/plugins/sdk', './../css/query-editor.css!', 'lodash'], fun
 
                         this.target.functionSegments = this.functionSegments;
                         this.target.segments = this.segments;
+                        this.target.queryType = this.queryType;
+                        this.panelCtrl.refresh();
+                    }
+                }, {
+                    key: 'setTargetWithPhasors',
+                    value: function setTargetWithPhasors() {
+                        var ctrl = this;
+
+                        this.target.target = this.phasorSegments.map(function (a) {
+                            return a.value;
+                        }).join(';');
+
+                        this.target.phasorSegments = this.phasorSegments;
                         this.target.queryType = this.queryType;
                         this.panelCtrl.refresh();
                     }
@@ -296,6 +315,85 @@ System.register(['app/plugins/sdk', './../css/query-editor.css!', 'lodash'], fun
                         }
                     }
                 }, {
+                    key: 'getPhasorSegmentsToEdit',
+                    value: function getPhasorSegmentsToEdit() {
+                        var ctrl = this;
+                        var option = null;
+                        if (event.target.value != "") option = event.target.value;
+
+                        var ctrl = this;
+                        return this.datasource.phasorFindQuery(option).then(function (data) {
+                            var altSegments = _.map(data, function (item) {
+                                return ctrl.uiSegmentSrv.newSegment({ value: item.text, expandable: item.expandable });
+                            });
+                            altSegments.sort(function (a, b) {
+                                if (a.value < b.value) return -1;
+                                if (a.value > b.value) return 1;
+                                return 0;
+                            });
+                            altSegments.unshift(ctrl.uiSegmentSrv.newSegment('-REMOVE-'));
+
+                            return _.filter(altSegments, function (segment) {
+                                return _.find(ctrl.phasorSegments, function (x) {
+                                    return x.value == segment.value;
+                                }) == undefined;
+                            });
+                        });
+                    }
+                }, {
+                    key: 'getPhasorSegmentsToAddNew',
+                    value: function getPhasorSegmentsToAddNew() {
+                        var ctrl = this;
+                        var option = null;
+                        if (event.target.value != "") option = event.target.value;
+                        return this.datasource.phasorFindQuery(option).then(function (data) {
+                            var altSegments = _.map(data, function (item) {
+                                return ctrl.uiSegmentSrv.newSegment({ value: item.text, expandable: item.expandable });
+                            });
+                            altSegments.sort(function (a, b) {
+                                if (a.value < b.value) return -1;
+                                if (a.value > b.value) return 1;
+                                return 0;
+                            });
+
+                            return _.filter(altSegments, function (segment) {
+                                return _.find(ctrl.phasorSegments, function (x) {
+                                    return x.value == segment.value;
+                                }) == undefined;
+                            });
+                        });
+                    }
+                }, {
+                    key: 'addPhasorSegment',
+                    value: function addPhasorSegment() {
+                        // if value is not empty, add new attribute segment
+                        if (event.target.text != null) {
+                            this.phasorSegments.push(this.uiSegmentSrv.newSegment({ value: event.target.text, expandable: true }));
+                            this.setTargetWithPhasors();
+                        }
+
+                        // reset the + button
+                        var plusButton = this.uiSegmentSrv.newPlusButton();
+                        this.phasorSegment.value = plusButton.value;
+                        this.phasorSegment.html = plusButton.html;
+                        this.panelCtrl.refresh();
+                    }
+                }, {
+                    key: 'phasorValueChanged',
+                    value: function phasorValueChanged(segment, index) {
+                        if (segment.value == "-REMOVE-") {
+                            var targets = this.target.target.split(';');
+                            this.phasorSegments.splice(index, 1);
+                            targets.splice(index, 1);
+                            this.target.target = targets.join(';');
+                        } else {
+                            var targets = this.target.target.split(';');
+                            this.phasorSegments[index] = segment;
+                            targets[index] = segment.value;
+                            this.target.target = targets.join(';');
+                        }
+                    }
+                }, {
                     key: 'topNValueChanged',
                     value: function topNValueChanged() {
                         this.setTargetWithQuery();
@@ -306,7 +404,7 @@ System.register(['app/plugins/sdk', './../css/query-editor.css!', 'lodash'], fun
                         var _this2 = this;
 
                         if (where.type === 'operator') {
-                            return this.datasource.q.when(this.uiSegmentSrv.newOperators(['=', '<>', '<', '<=', '>', '>=', 'LIKE', 'NOT LIKE', 'IN', 'NOT IN']));
+                            return this.datasource.q.when(this.uiSegmentSrv.newOperators(['=', '<>', '<', '<=', '>', '>=', 'LIKE', 'NOT LIKE', 'IN', 'NOT IN', 'IS', 'IS NOT']));
                         } else if (where.type === 'value') {
                             return this.datasource.q.when(null);
                         } else if (where.type === 'condition') {
@@ -337,6 +435,8 @@ System.register(['app/plugins/sdk', './../css/query-editor.css!', 'lodash'], fun
                         if (where.value == "-REMOVE-") {
                             if (index == 0 && this.wheres.length > 3 && this.wheres[index + 3].type == 'condition') this.wheres.splice(index, 4);else if (index > 0 && this.wheres[index - 1].type == 'condition') this.wheres.splice(index - 1, 4);else this.wheres.splice(index, 3);
                         }
+
+                        if (where.type == 'operator') this.wheres[index] = this.uiSegmentSrv.newOperator(where.value);else if (where.type == 'condition') this.wheres[index] = this.uiSegmentSrv.newCondition(where.value);
 
                         this.setTargetWithQuery();
                     }
@@ -490,7 +590,7 @@ System.register(['app/plugins/sdk', './../css/query-editor.css!', 'lodash'], fun
 
                         this.buildFunctionArray();
 
-                        if (this.queryType == 2) this.setTargetWithQuery();else this.setTargetWithElements();
+                        if (this.queryType == 'Filter Expression') this.setTargetWithQuery();else this.setTargetWithElements();
                     }
                 }, {
                     key: 'addFunctionSegment',
@@ -509,7 +609,7 @@ System.register(['app/plugins/sdk', './../css/query-editor.css!', 'lodash'], fun
                         this.functionSegment.value = plusButton.value;
                         this.functionSegment.html = plusButton.html;
 
-                        if (this.queryType == 2) this.setTargetWithQuery();else this.setTargetWithElements();
+                        if (this.queryType == 'Filter Expression') this.setTargetWithQuery();else this.setTargetWithElements();
                     }
                 }, {
                     key: 'buildFunctionArray',

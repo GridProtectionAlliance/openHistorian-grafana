@@ -34,7 +34,6 @@ module.exports = function (grunt) {
         dest: 'dist/'
       }
     },
-
     watch: {
       rebuild_all: {
         files: ['src/**/*', 'plugin.json'],

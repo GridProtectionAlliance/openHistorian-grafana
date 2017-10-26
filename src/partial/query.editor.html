@@ -12,9 +12,7 @@
             <div class="gf-form">
                 <label class="gf-form-label query-keyword width-7">TYPE</label>
                 <div class="gf-form-select-wrapper">
-                    <select class="gf-form-input gf-size-auto" ng-model="ctrl.queryType" ng-change="ctrl.changeQueryType()">
-                        <option value="1">Element List</option>
-                        <option value="2">Filter Expression</option>
+                    <select class="gf-form-input gf-size-auto" ng-model="ctrl.queryType" ng-options="x for x in ctrl.queryTypes" ng-change="ctrl.changeQueryType()">
                     </select>
                 </div>
             </div>
@@ -24,7 +22,7 @@
         </div>
 
         <!-- Element List Picker -->
-        <div class="gf-form-inline" ng-if="ctrl.queryType == 1">
+        <div class="gf-form-inline" ng-if="ctrl.queryType == 'Element List'">
             <label class="gf-form-label query-keyword width-7">
                 <span>ELEMENTS</span>
             </label>
@@ -38,7 +36,7 @@
         </div>
 
         <!-- Filter Expression Builder -->
-        <div style="width:100%" ng-if="ctrl.queryType == 2">
+        <div style="width:100%" ng-if="ctrl.queryType == 'Filter Expression'">
 
             <!-- Filter Row -->
             <div class="gf-form-inline">
@@ -100,8 +98,22 @@
 
         </div>
 
+        <!-- Phasor List Picker-->
+        <div class="gf-form-inline" ng-if="ctrl.queryType == 'Phasor List'">
+            <label class="gf-form-label query-keyword width-7">
+                <span>Phasors</span>
+            </label>
+            <div ng-repeat="phasor in ctrl.phasorSegments" role="menuitem">
+                <metric-segment segment="phasor" get-options="ctrl.getPhasorSegmentsToEdit(this)" on-change="ctrl.phasorValueChanged(phasor,$index)"></metric-segment>
+            </div>
+            <metric-segment segment="ctrl.phasorSegment" get-options="ctrl.getPhasorSegmentsToAddNew()" on-change="ctrl.addPhasorSegment()"></metric-segment>
+            <div class="gf-form gf-form--grow">
+                <div class="gf-form-label gf-form-label--grow"></div>
+            </div>
+        </div>
+
         <!-- Functions Builder -->
-        <div class="gf-form-inline">
+        <div class="gf-form-inline" ng-if="ctrl.queryType != 'Phasor List'">
             <label class="gf-form-label query-keyword width-7">
                 <span>FUNCTIONS</span>
             </label>

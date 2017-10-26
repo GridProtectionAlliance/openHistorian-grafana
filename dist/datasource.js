@@ -151,7 +151,8 @@ System.register(['lodash'], function (_export, _context) {
               return {
                 target: _this.templateSrv.replace(target.target),
                 refId: target.refId,
-                hide: target.hide
+                hide: target.hide,
+                queryType: target.queryType
               };
             });
 
@@ -162,9 +163,23 @@ System.register(['lodash'], function (_export, _context) {
         }, {
           key: 'filterFindQuery',
           value: function filterFindQuery() {
-
             return this.backendSrv.datasourceRequest({
               url: this.url + '/SearchFilters',
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' }
+            }).then(this.mapToTextValue);
+          }
+        }, {
+          key: 'phasorFindQuery',
+          value: function phasorFindQuery(options) {
+
+            var interpolated = {
+              target: this.templateSrv.replace(options, null, 'regex')
+            };
+
+            return this.backendSrv.datasourceRequest({
+              url: this.url + '/SearchPhasors',
+              data: interpolated,
               method: 'POST',
               headers: { 'Content-Type': 'application/json' }
             }).then(this.mapToTextValue);
@@ -182,6 +197,20 @@ System.register(['lodash'], function (_export, _context) {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' }
             }).then(this.mapToTextValue);
+          }
+        }, {
+          key: 'getMetaData',
+          value: function getMetaData(options) {
+            var interpolated = {
+              target: this.templateSrv.replace(options, null, 'regex')
+            };
+
+            return this.backendSrv.datasourceRequest({
+              url: this.url + '/GetMetadata',
+              data: interpolated,
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' }
+            });
           }
         }]);
 

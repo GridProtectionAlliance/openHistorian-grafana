@@ -67,6 +67,7 @@ export class OpenHistorianDataSource {
           target: this.templateSrv.replace(options, null, 'regex')
       };
 
+
     return this.backendSrv.datasourceRequest({
       url: this.url + '/search',
       data: interpolated,
@@ -107,7 +108,8 @@ export class OpenHistorianDataSource {
       return {
         target: _this.templateSrv.replace(target.target),
         refId: target.refId,
-        hide: target.hide
+        hide: target.hide, 
+        queryType: target.queryType
       };
     });
 
@@ -117,13 +119,27 @@ export class OpenHistorianDataSource {
   }
 
   filterFindQuery() {
-
       return this.backendSrv.datasourceRequest({
           url: this.url + '/SearchFilters',
           method: 'POST',
           headers: { 'Content-Type': 'application/json' }
       }).then(this.mapToTextValue);
   }
+
+  phasorFindQuery(options) {
+
+      var interpolated = {
+          target: this.templateSrv.replace(options, null, 'regex')
+      };
+
+      return this.backendSrv.datasourceRequest({
+          url: this.url + '/SearchPhasors',
+          data: interpolated,
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+      }).then(this.mapToTextValue);
+  }
+
 
   orderByFindQuery(options) {
       var interpolated = {
@@ -138,4 +154,17 @@ export class OpenHistorianDataSource {
       }).then(this.mapToTextValue);
   }
 
+  getMetaData(options) {
+      var interpolated = {
+          target: this.templateSrv.replace(options, null, 'regex')
+      };
+
+      return this.backendSrv.datasourceRequest({
+          url: this.url + '/GetMetadata',
+          data: interpolated,
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+      });
+
+  }
 }
