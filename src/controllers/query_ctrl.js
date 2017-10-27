@@ -326,19 +326,13 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
 
   phasorValueChanged(segment, index) {
       if (segment.value == "-REMOVE-") {
-          var targets = this.target.target.split(';');
           this.phasorSegments.splice(index, 1);
-          targets.splice(index, 1);
-          this.target.target = targets.join(';');
       }
       else {
-          var targets = this.target.target.split(';');
           this.phasorSegments[index] = segment;
-          targets[index] = segment.value;
-          this.target.target = targets.join(';');
       }
 
-
+      this.setTargetWithPhasors();
   }
   // #endregion
 
