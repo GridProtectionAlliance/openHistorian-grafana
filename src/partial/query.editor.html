@@ -102,20 +102,6 @@
 
         </div>
 
-        <!-- Phasor List Picker-->
-        <div class="gf-form-inline" ng-if="ctrl.queryType == 'Phasor List'">
-            <label class="gf-form-label query-keyword width-7">
-                <span>Phasors</span>
-            </label>
-            <div ng-repeat="phasor in ctrl.phasorSegments" role="menuitem">
-                <metric-segment segment="phasor" get-options="ctrl.getPhasorSegmentsToEdit(this)" on-change="ctrl.phasorValueChanged(phasor,$index)"></metric-segment>
-            </div>
-            <metric-segment segment="ctrl.phasorSegment" get-options="ctrl.getPhasorSegmentsToAddNew()" on-change="ctrl.addPhasorSegment()"></metric-segment>
-            <div class="gf-form gf-form--grow">
-                <div class="gf-form-label gf-form-label--grow"></div>
-            </div>
-        </div>
-
         <!-- Functions Builder -->
         <div class="gf-form-inline" ng-if="ctrl.queryType != 'Phasor List'">
             <label class="gf-form-label query-keyword width-7">
@@ -137,6 +123,38 @@
                 <div class="gf-form-label gf-form-label--grow"></div>
             </div>
         </div>
-          
+
+        <!-- Phasor List Picker-->
+        <div style="width: 100%" ng-if="ctrl.queryType == 'Phasor List'">
+            <div class="gf-form-inline">
+                <label class="gf-form-label query-keyword width-7">
+                    <span>Phasors</span>
+                </label>
+                <div ng-repeat="phasor in ctrl.phasorSegments" role="menuitem">
+                    <metric-segment segment="phasor" get-options="ctrl.getPhasorSegmentsToEdit(this)" on-change="ctrl.phasorValueChanged(phasor,$index)"></metric-segment>
+                </div>
+                <metric-segment segment="ctrl.phasorSegment" get-options="ctrl.getPhasorSegmentsToAddNew()" on-change="ctrl.addPhasorSegment()"></metric-segment>
+                <div class="gf-form gf-form--grow">
+                    <div class="gf-form-label gf-form-label--grow"></div>
+                </div>
+
+            </div>
+            <div class="gf-form-inline">
+                <div class="gf-form">
+                    <label class="gf-form-label query-keyword width-9">
+                        <span>Unwrap Angles</span>
+                    </label>
+                    <gf-form-switch class="gf-form" switch-class="max-width-6" label="" checked="ctrl.target.unwrapPhasorAngle" on-change="ctrl.setTargetWithPhasors()"></gf-form-switch>
+                </div>
+            </div>
+            <div class="gf-form-inline">
+                <div class="gf-form">
+                    <label class="gf-form-label query-keyword width-9">
+                        <span>Label as Phasor</span>
+                    </label>
+                    <gf-form-switch class="gf-form" switch-class="max-width-6" label="" checked="ctrl.target.labelPhasor" on-change="ctrl.setTargetWithPhasors()"></gf-form-switch>
+                </div>
+            </div>
+        </div>
     </div>
 </query-editor-row>

@@ -99,6 +99,9 @@ System.register(['app/plugins/sdk', './../css/query-editor.css!', 'lodash'], fun
                     });
                     _this.typingTimer;
 
+                    _this.target.unwrapPhasorAngle = _this.target.unwrapPhasorAngle == undefined ? false : _this.target.unwrapPhasorAngle;
+                    _this.target.labelPhasor = _this.target.labelPhasor == undefined ? true : _this.target.labelPhasor;
+
                     _this.phasorList = _this.target.phasorList == undefined ? [] : _this.target.phasorList;
 
                     _this.buildFunctionArray();
@@ -173,7 +176,23 @@ System.register(['app/plugins/sdk', './../css/query-editor.css!', 'lodash'], fun
                             var phasor = _.find(ctrl.phasorList, function (o) {
                                 return o.text.m_Item1 == element.value;
                             });
-                            phasors.push(phasor.text.m_Item2 + ';' + phasor.text.m_Item3);
+
+                            var string = "";
+                            if (ctrl.target.labelPhasor) string += "Label(" + phasor.text.m_Item1 + "-Mag,";
+
+                            string += phasor.text.m_Item2;
+                            string += ctrl.target.labelPhasor ? ")" : '';
+                            string += ";";
+
+                            if (ctrl.target.labelPhasor) string += "Label(" + phasor.text.m_Item1 + "-Angle,";
+
+                            if (ctrl.target.unwrapPhasorAngle) string += "Unwrap(";
+
+                            string += phasor.text.m_Item3;
+                            string += ctrl.target.unwrapPhasorAngle ? ")" : '';
+                            string += ctrl.target.labelPhasor ? ")" : '';
+
+                            phasors.push(string);
                         });
 
                         ctrl.target.target = phasors.join(';');
@@ -208,6 +227,8 @@ System.register(['app/plugins/sdk', './../css/query-editor.css!', 'lodash'], fun
                         this.functionSegments = [];
                         this.orderBys = [];
                         this.topNSegment = '';
+                        this.phasorSegments = [];
+                        this.phasorSegment = this.uiSegmentSrv.newPlusButton();
                         this.elementSegment = this.uiSegmentSrv.newPlusButton();
                         this.whereSegment = this.uiSegmentSrv.newPlusButton();
                         this.filterSegment = this.uiSegmentSrv.newSegment('ActiveMeasurements');

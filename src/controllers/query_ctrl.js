@@ -41,6 +41,9 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
         this.phasorSegment = this.uiSegmentSrv.newPlusButton();
         this.phasorSegments = (this.target.phasorSegments == undefined ? [] : this.target.phasorSegments.map(function (a) { return ctrl.uiSegmentSrv.newSegment({ value: a.text, expandable: true }) }));
         this.typingTimer;
+        
+        this.target.unwrapPhasorAngle = (this.target.unwrapPhasorAngle == undefined ? false : this.target.unwrapPhasorAngle);
+        this.target.labelPhasor = (this.target.labelPhasor == undefined ? true : this.target.labelPhasor);
 
         this.phasorList = (this.target.phasorList == undefined ? [] : this.target.phasorList);
 
@@ -112,7 +115,26 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
       var phasors = [];
       _.each(ctrl.phasorSegments, function (element, index, list) {
           var phasor = _.find(ctrl.phasorList, function (o) { return o.text.m_Item1 == element.value });
-          phasors.push(phasor.text.m_Item2 + ';' + phasor.text.m_Item3); 
+
+          var string = "";
+          if (ctrl.target.labelPhasor)
+              string += "Label(" + phasor.text.m_Item1 + "-Mag,";
+
+          string += phasor.text.m_Item2;
+          string += (ctrl.target.labelPhasor ? ")" : '');
+          string += ";"
+
+          if (ctrl.target.labelPhasor)
+              string += "Label(" + phasor.text.m_Item1 + "-Angle,";
+
+          if (ctrl.target.unwrapPhasorAngle)
+              string += "Unwrap(";
+
+          string += phasor.text.m_Item3;
+          string += (ctrl.target.unwrapPhasorAngle ? ")" : '');
+          string += (ctrl.target.labelPhasor ? ")" : '');
+
+          phasors.push(string); 
       });
 
       ctrl.target.target = phasors.join(';');
@@ -147,6 +169,8 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
       this.functionSegments = [];
       this.orderBys = [];
       this.topNSegment = '';
+      this.phasorSegments = [];
+      this.phasorSegment = this.uiSegmentSrv.newPlusButton();
       this.elementSegment = this.uiSegmentSrv.newPlusButton();
       this.whereSegment = this.uiSegmentSrv.newPlusButton();
       this.filterSegment = this.uiSegmentSrv.newSegment('ActiveMeasurements');
