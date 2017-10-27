@@ -39,7 +39,7 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
         this.functionSegment = this.uiSegmentSrv.newPlusButton();
 
         this.phasorSegment = this.uiSegmentSrv.newPlusButton();
-        this.phasorSegments = [];
+        this.phasorSegments = (this.target.phasorSegments == undefined ? [] : this.target.phasorSegments.map(function (a) { return ctrl.uiSegmentSrv.newSegment({ value: a.text, expandable: true }) }));
         this.typingTimer;
 
         this.phasorList = (this.target.phasorList == undefined ? [] : this.target.phasorList);

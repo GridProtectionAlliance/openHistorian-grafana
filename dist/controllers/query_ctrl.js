@@ -94,7 +94,9 @@ System.register(['app/plugins/sdk', './../css/query-editor.css!', 'lodash'], fun
                     _this.functionSegment = _this.uiSegmentSrv.newPlusButton();
 
                     _this.phasorSegment = _this.uiSegmentSrv.newPlusButton();
-                    _this.phasorSegments = [];
+                    _this.phasorSegments = _this.target.phasorSegments == undefined ? [] : _this.target.phasorSegments.map(function (a) {
+                        return ctrl.uiSegmentSrv.newSegment({ value: a.text, expandable: true });
+                    });
                     _this.typingTimer;
 
                     _this.phasorList = _this.target.phasorList == undefined ? [] : _this.target.phasorList;
