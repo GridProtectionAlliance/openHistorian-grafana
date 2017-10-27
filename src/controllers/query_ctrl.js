@@ -42,6 +42,8 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
         this.phasorSegments = [];
         this.typingTimer;
 
+        this.phasorList = (this.target.phasorList == undefined ? [] : this.target.phasorList);
+
         this.functionList = {
             Set : { Function : 'Set', Parameters: [] },
             Slice : { Function : 'Slice', Parameters: [{ Default: 1, Type: 'double', Description: 'A floating-point value that must be greater than or equal to zero that represents the desired time tolerance, in seconds, for the time slice.' }] },
@@ -144,11 +146,18 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
   setTargetWithPhasors() {
       var ctrl = this;
 
-      this.target.target = this.phasorSegments.map(function (a) { return a.value }).join(';');
+      var phasors = [];
+      _.each(ctrl.phasorSegments, function (element, index, list) {
+          var phasor = _.find(ctrl.phasorList, function (o) { return o.text.m_Item1 == element.value });
+          phasors.push(phasor.text.m_Item2 + ';' + phasor.text.m_Item3); 
+      });
 
-      this.target.phasorSegments = this.phasorSegments;
-      this.target.queryType = this.queryType;
-      this.panelCtrl.refresh()
+      ctrl.target.target = phasors.join(';');
+
+      ctrl.target.phasorSegments = this.phasorSegments;
+      ctrl.target.phasorList = this.phasorList;
+      ctrl.target.queryType = this.queryType;
+      ctrl.panelCtrl.refresh()
 
   }
 
@@ -280,8 +289,10 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
 
       var ctrl = this;
       return this.datasource.phasorFindQuery(option).then(data => {
+          ctrl.phasorList = JSON.parse(JSON.stringify(data));
+
           var altSegments = _.map(data, item => {
-              return ctrl.uiSegmentSrv.newSegment({ value: item.text, expandable: item.expandable })
+              return ctrl.uiSegmentSrv.newSegment({ value: item.text.m_Item1, expandable: item.expandable});
           });
           altSegments.sort((a, b) => {
               if (a.value < b.value)
@@ -290,6 +301,8 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
                   return 1;
               return 0;
           });
+
+
           altSegments.unshift(ctrl.uiSegmentSrv.newSegment('-REMOVE-'));
 
           return _.filter(altSegments, segment => {
@@ -297,6 +310,7 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
                   return x.value == segment.value
               }) == undefined;
           });
+
       });
 
   }
@@ -304,10 +318,14 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
   getPhasorSegmentsToAddNew() {
       var ctrl = this;
       var option = null;
+
+
       if (event.target.value != "") option = event.target.value;
       return this.datasource.phasorFindQuery(option).then(data => {
+          ctrl.phasorList = JSON.parse(JSON.stringify(data));
+
           var altSegments = _.map(data, item => {
-              return ctrl.uiSegmentSrv.newSegment({ value: item.text, expandable: item.expandable })
+              return ctrl.uiSegmentSrv.newSegment({ value: item.text.m_Item1, expandable: item.expandable });
           });
           altSegments.sort((a, b) => {
               if (a.value < b.value)
@@ -316,6 +334,7 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
                   return 1;
               return 0;
           });
+
 
           return _.filter(altSegments, segment => {
               return _.find(ctrl.phasorSegments, x => {
