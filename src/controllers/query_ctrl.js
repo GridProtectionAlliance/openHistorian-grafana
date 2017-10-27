@@ -87,6 +87,8 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
 
         if (this.queryType == 'Filter Expression')
             this.setTargetWithQuery();
+        else if (this.queryType == 'Phasor List')
+            this.setTargetWithPhasors()
         else
             this.setTargetWithElements()
   }

@@ -142,7 +142,7 @@ System.register(['app/plugins/sdk', './../css/query-editor.css!', 'lodash'], fun
 
                     _this.buildFunctionArray();
 
-                    if (_this.queryType == 'Filter Expression') _this.setTargetWithQuery();else _this.setTargetWithElements();
+                    if (_this.queryType == 'Filter Expression') _this.setTargetWithQuery();else if (_this.queryType == 'Phasor List') _this.setTargetWithPhasors();else _this.setTargetWithElements();
                     return _this;
                 }
 
