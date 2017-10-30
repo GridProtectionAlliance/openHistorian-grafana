@@ -44,6 +44,8 @@ System.register(['lodash'], function (_export, _context) {
           this.q = $q;
           this.backendSrv = backendSrv;
           this.templateSrv = templateSrv;
+
+          this.options = [{ ExcludeBadData: instanceSettings.jsonData.excludeBadData == undefined ? false : instanceSettings.jsonData.excludeBadData }, { ExcludeBadtime: instanceSettings.jsonData.excludeBadTime == undefined ? false : instanceSettings.jsonData.excludeBadTime }];
         }
 
         _createClass(OpenHistorianDataSource, [{
@@ -53,6 +55,8 @@ System.register(['lodash'], function (_export, _context) {
             query.targets = query.targets.filter(function (t) {
               return !t.hide;
             });
+
+            query.options = this.options;
 
             if (query.targets.length <= 0) {
               return this.q.when({ data: [] });

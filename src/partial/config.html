@@ -1,1 +1,24 @@
 <datasource-http-settings current="ctrl.current" suggest-url="http://localhost:8180/api/grafana"></datasource-http-settings>
+
+<div class="section gf-form-group">
+    <h3 class="section-heading">Data Settings</h3>
+
+
+    <div class="gf-form-inline">
+        <div class="gf-form">
+            <label class="gf-form-label">
+                <span>Exclude data with quality flags that contain 'bad data'</span>
+            </label>
+            <gf-form-switch class="gf-form" switch-class="max-width-6" label="" checked="ctrl.current.jsonData.excludeBadData" on-change="ctrl.updateFlag('removeBadData')"></gf-form-switch>
+        </div>
+    </div>
+    <div class="gf-form-inline">
+        <div class="gf-form">
+            <label class="gf-form-label">
+                <span>Exclude data with quality flags that contain 'bad time'</span>
+            </label>
+            <gf-form-switch class="gf-form" switch-class="max-width-6" label="" checked="ctrl.current.jsonData.excludeBadTime" on-change="ctrl.updateFlag('removeBadTime')"></gf-form-switch>
+        </div>
+    </div>
+</div>
+
