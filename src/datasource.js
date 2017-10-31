@@ -33,8 +33,8 @@ export class OpenHistorianDataSource {
     this.templateSrv = templateSrv;
 
     this.options = [
-        { ExcludeBadData: (instanceSettings.jsonData.excludeBadData == undefined ? false : instanceSettings.jsonData.excludeBadData) },
-        { ExcludeBadtime: (instanceSettings.jsonData.excludeBadTime == undefined ? false : instanceSettings.jsonData.excludeBadTime) }]
+        { Included: (instanceSettings.jsonData.Included == undefined ? 0xFFFFFFFF : instanceSettings.jsonData.Included) },
+        { Excluded: (instanceSettings.jsonData.Excluded == undefined ? 0x00000000 : instanceSettings.jsonData.Excluded) }]
   }
 
   query(options) {
