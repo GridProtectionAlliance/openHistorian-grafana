@@ -3,7 +3,7 @@
 System.register(['lodash'], function (_export, _context) {
     "use strict";
 
-    var _, _createClass, OpenHistorianConfigCtrl, MeasurementStateFlags;
+    var _, _createClass, OpenHistorianConfigCtrl, DefaultFlags, MeasurementStateFlags;
 
     function _classCallCheck(instance, Constructor) {
         if (!(instance instanceof Constructor)) {
@@ -44,42 +44,9 @@ System.register(['lodash'], function (_export, _context) {
                     ctrl.current.jsonData = ctrl.current.jsonData || {};
                     ctrl.current.jsonData.Included = ctrl.current.jsonData.Included == undefined ? 0xFFFFFFF : ctrl.current.jsonData.Included;
                     ctrl.current.jsonData.Excluded = ctrl.current.jsonData.Excluded == undefined ? 0x0000000 : ctrl.current.jsonData.Excluded;
+                    ctrl.current.jsonData.IncludeNormal = ctrl.current.jsonData.IncludeNormal == undefined ? true : ctrl.current.jsonData.IncludeNormal;
 
-                    ctrl.current.jsonData.flags = ctrl.current.jsonData.flags == undefined ? {
-                        'Select All': { Included: true, Excluded: false, Order: 0 },
-                        BadData: { Included: true, Excluded: false, Order: 1 },
-                        SuspectData: { Included: true, Excluded: false, Order: 2 },
-                        OverRangeError: { Included: true, Excluded: false, Order: 3 },
-                        UnderRangeError: { Included: true, Excluded: false, Order: 4 },
-                        AlarmHigh: { Included: true, Excluded: false, Order: 5 },
-                        AlarmLow: { Included: true, Excluded: false, Order: 6 },
-                        WarningHigh: { Included: true, Excluded: false, Order: 7 },
-                        WarningLow: { Included: true, Excluded: false, Order: 8 },
-                        FlatlineAlarm: { Included: true, Excluded: false, Order: 9 },
-                        ComparisonAlarm: { Included: true, Excluded: false, Order: 10 },
-                        ROCAlarm: { Included: true, Excluded: false, Order: 11 },
-                        ReceivedAsBad: { Included: true, Excluded: false, Order: 12 },
-                        CalculatedValue: { Included: true, Excluded: false, Order: 13 },
-                        CalculationError: { Included: true, Excluded: false, Order: 14 },
-                        CalculationWarning: { Included: true, Excluded: false, Order: 15 },
-                        ReservedQualityFlag: { Included: true, Excluded: false, Order: 16 },
-                        BadTime: { Included: true, Excluded: false, Order: 17 },
-                        SuspectTime: { Included: true, Excluded: false, Order: 18 },
-                        LateTimeAlarm: { Included: true, Excluded: false, Order: 19 },
-                        FutureTimeAlarm: { Included: true, Excluded: false, Order: 20 },
-                        UpSampled: { Included: true, Excluded: false, Order: 21 },
-                        DownSampled: { Included: true, Excluded: false, Order: 22 },
-                        DiscardedValue: { Included: true, Excluded: false, Order: 23 },
-                        ReservedTimeFlag: { Included: true, Excluded: false, Order: 24 },
-                        UserDefinedFlag1: { Included: true, Excluded: false, Order: 25 },
-                        UserDefinedFlag2: { Included: true, Excluded: false, Order: 26 },
-                        UserDefinedFlag3: { Included: true, Excluded: false, Order: 27 },
-                        UserDefinedFlag4: { Included: true, Excluded: false, Order: 28 },
-                        UserDefinedFlag5: { Included: true, Excluded: false, Order: 29 },
-                        SystemError: { Included: true, Excluded: false, Order: 30 },
-                        SystemWarning: { Included: true, Excluded: false, Order: 31 },
-                        MeasurementError: { Included: true, Excluded: false, Order: 32 }
-                    } : ctrl.current.jsonData.flags;
+                    ctrl.current.jsonData.flags = ctrl.current.jsonData.flags == undefined ? DefaultFlags : _.merge(DefaultFlags, ctrl.current.jsonData.flags);
 
                     ctrl.flagArray = _.map(Object.keys(ctrl.current.jsonData.flags), function (a) {
                         return { key: a, order: ctrl.current.jsonData.flags[a].Order };
@@ -93,14 +60,8 @@ System.register(['lodash'], function (_export, _context) {
 
                 // #region Methods
 
-                _createClass(OpenHistorianConfigCtrl, [{
-                    key: 'getFlags',
-                    value: function getFlags() {
-                        var ctrl = this;
 
-                        return;
-                    }
-                }, {
+                _createClass(OpenHistorianConfigCtrl, [{
                     key: 'calculateFlags',
                     value: function calculateFlags(flag, type) {
                         var ctrl = this;
@@ -146,6 +107,7 @@ System.register(['lodash'], function (_export, _context) {
 
                         ctrl.current.jsonData.Included = '0x' + ctrl.padDigits(this.dec2hex(flagVarIncluded), 8);
                         ctrl.current.jsonData.Excluded = '0x' + ctrl.padDigits(this.dec2hex(flagVarExcluded), 8);
+                        ctrl.current.jsonData.IncludeNormal = ctrl.current.jsonData.flags['Normal'].Included;
                     }
                 }, {
                     key: 'dec2hex',
@@ -171,11 +133,47 @@ System.register(['lodash'], function (_export, _context) {
             OpenHistorianConfigCtrl.templateUrl = 'partial/config.html';
 
             // #region Constants
+            DefaultFlags = {
+                'Select All': { Included: true, Excluded: false, Order: -1 },
+                Normal: { Included: true, Excluded: false, Order: 0 },
+                BadData: { Included: true, Excluded: false, Order: 1 },
+                SuspectData: { Included: true, Excluded: false, Order: 2 },
+                OverRangeError: { Included: true, Excluded: false, Order: 3 },
+                UnderRangeError: { Included: true, Excluded: false, Order: 4 },
+                AlarmHigh: { Included: true, Excluded: false, Order: 5 },
+                AlarmLow: { Included: true, Excluded: false, Order: 6 },
+                WarningHigh: { Included: true, Excluded: false, Order: 7 },
+                WarningLow: { Included: true, Excluded: false, Order: 8 },
+                FlatlineAlarm: { Included: true, Excluded: false, Order: 9 },
+                ComparisonAlarm: { Included: true, Excluded: false, Order: 10 },
+                ROCAlarm: { Included: true, Excluded: false, Order: 11 },
+                ReceivedAsBad: { Included: true, Excluded: false, Order: 12 },
+                CalculatedValue: { Included: true, Excluded: false, Order: 13 },
+                CalculationError: { Included: true, Excluded: false, Order: 14 },
+                CalculationWarning: { Included: true, Excluded: false, Order: 15 },
+                ReservedQualityFlag: { Included: true, Excluded: false, Order: 16 },
+                BadTime: { Included: true, Excluded: false, Order: 17 },
+                SuspectTime: { Included: true, Excluded: false, Order: 18 },
+                LateTimeAlarm: { Included: true, Excluded: false, Order: 19 },
+                FutureTimeAlarm: { Included: true, Excluded: false, Order: 20 },
+                UpSampled: { Included: true, Excluded: false, Order: 21 },
+                DownSampled: { Included: true, Excluded: false, Order: 22 },
+                DiscardedValue: { Included: true, Excluded: false, Order: 23 },
+                ReservedTimeFlag: { Included: true, Excluded: false, Order: 24 },
+                UserDefinedFlag1: { Included: true, Excluded: false, Order: 25 },
+                UserDefinedFlag2: { Included: true, Excluded: false, Order: 26 },
+                UserDefinedFlag3: { Included: true, Excluded: false, Order: 27 },
+                UserDefinedFlag4: { Included: true, Excluded: false, Order: 28 },
+                UserDefinedFlag5: { Included: true, Excluded: false, Order: 29 },
+                SystemError: { Included: true, Excluded: false, Order: 30 },
+                SystemWarning: { Included: true, Excluded: false, Order: 31 },
+                MeasurementError: { Included: true, Excluded: false, Order: 32 }
+            };
             MeasurementStateFlags = {
                 /// <summary>
                 /// Defines normal state.
                 /// </summary>
-                'Select All': 0,
+                Normal: 0,
                 /// <summary>
                 /// Defines bad data state.
                 /// </summary>

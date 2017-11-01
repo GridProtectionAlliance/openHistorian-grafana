@@ -45,7 +45,11 @@ System.register(['lodash'], function (_export, _context) {
           this.backendSrv = backendSrv;
           this.templateSrv = templateSrv;
 
-          this.options = [{ Included: instanceSettings.jsonData.Included == undefined ? 0xFFFFFFFF : instanceSettings.jsonData.Included }, { Excluded: instanceSettings.jsonData.Excluded == undefined ? 0x00000000 : instanceSettings.jsonData.Excluded }];
+          this.options = {
+            includedDataFlags: instanceSettings.jsonData.Included == undefined ? 0xFFFFFFFF : instanceSettings.jsonData.Included,
+            excludedDataFlags: instanceSettings.jsonData.Excluded == undefined ? 0x00000000 : instanceSettings.jsonData.Excluded,
+            includeNormalData: instanceSettings.jsonData.IncludeNormal == undefined ? true : instanceSettings.jsonData.IncludeNormal
+          };
         }
 
         _createClass(OpenHistorianDataSource, [{
@@ -59,7 +63,7 @@ System.register(['lodash'], function (_export, _context) {
             query.options = this.options;
 
             if (query.targets.length <= 0) {
-              return this.q.when({ data: [] });
+              return Promise.resolve({ data: [] });
             }
 
             return this.backendSrv.datasourceRequest({

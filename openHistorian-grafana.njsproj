@@ -27,6 +27,7 @@
     <Compile Include="spec\datasource_spec.js" />
     <Compile Include="spec\test-main.js" />
     <Content Include="src\plugin.json" />
+    <Content Include="src\query_help.md" />
     <Content Include="src\README.md" />
     <Compile Include="src\datasource.js" />
     <Compile Include="src\module.js" />
