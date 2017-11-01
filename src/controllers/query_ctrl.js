@@ -370,13 +370,13 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
   getWheresToEdit(where, index) {
 
       if (where.type === 'operator') {
-          return this.datasource.q.when(this.uiSegmentSrv.newOperators(['=', '<>', '<', '<=', '>', '>=', 'LIKE', 'NOT LIKE', 'IN', 'NOT IN', 'IS', 'IS NOT']));
+          return Promise.resolve(this.uiSegmentSrv.newOperators(['=', '<>', '<', '<=', '>', '>=', 'LIKE', 'NOT LIKE', 'IN', 'NOT IN', 'IS', 'IS NOT']));
       }
       else if (where.type === 'value') {
-          return this.datasource.q.when(null);
+          return Promise.resolve(null);
       }
       else if (where.type === 'condition') {
-          return this.datasource.q.when([this.uiSegmentSrv.newCondition('AND'), this.uiSegmentSrv.newCondition('OR')]);
+          return Promise.resolve([this.uiSegmentSrv.newCondition('AND'), this.uiSegmentSrv.newCondition('OR')]);
       }
       else {
           return this.datasource.whereFindQuery(this.filterSegment.value).then(data => {
@@ -518,8 +518,8 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
 
   getOrderBysToEdit(orderBy) {
       var ctrl = this;
-      if (orderBy.type == 'condition') return this.datasource.q.when([this.uiSegmentSrv.newCondition('ASC'), this.uiSegmentSrv.newCondition('DESC')]);
-      if (orderBy.type == 'condition') return this.datasource.q.when([this.uiSegmentSrv.newCondition('ASC'), this.uiSegmentSrv.newCondition('DESC')]);
+      if (orderBy.type == 'condition') return Promise.resolve([this.uiSegmentSrv.newCondition('ASC'), this.uiSegmentSrv.newCondition('DESC')]);
+      if (orderBy.type == 'condition') return Promise.resolve([this.uiSegmentSrv.newCondition('ASC'), this.uiSegmentSrv.newCondition('DESC')]);
 
       return this.datasource.orderByFindQuery(ctrl.filterSegment.value).then(data => {
           var altSegments = _.map(data, item => {
@@ -590,7 +590,7 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
 
       if (this.functions.length == 0) array = array.slice(2,array.length);
 
-      return this.datasource.q.when(_.filter( array, segment => {
+      return Promise.resolve(_.filter( array, segment => {
           return _.find(this.functions, x => {
               return x.value == segment.value;
           }) == undefined;
@@ -600,10 +600,10 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
   getFunctionsToEdit(func, index) {
       var ctrl = this;
       var remove = [this.uiSegmentSrv.newSegment('-REMOVE-')];
-      if (func.type == 'Operator') return this.datasource.q.when();
-      else if (func.value == 'Set') return this.datasource.q.when(remove)
+      if (func.type == 'Operator') return Promise.resolve();
+      else if (func.value == 'Set') return Promise.resolve(remove)
 
-      return this.datasource.q.when(remove);
+      return Promise.resolve(remove);
   }
 
   functionValueChanged(func, index) {
@@ -710,7 +710,7 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
           this.uiSegmentSrv.newSegment('true'),
           this.uiSegmentSrv.newSegment('false')
       ];
-      return this.datasource.q.when(array);
+      return Promise.resolve(array);
   }
 
   getAngleUnits() {
@@ -722,7 +722,7 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
           this.uiSegmentSrv.newSegment('ArcSeconds'),
           this.uiSegmentSrv.newSegment('AngularMil')
       ];
-      return this.datasource.q.when(array);
+      return Promise.resolve(array);
   }
 
   getTimeSelect() {
@@ -740,7 +740,7 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
           this.uiSegmentSrv.newSegment('AtomicUnitsOfTime'),
           this.uiSegmentSrv.newSegment('Ke')
       ];
-      return this.datasource.q.when(array);
+      return Promise.resolve(array);
   }
 
   inputChange(func, index) {

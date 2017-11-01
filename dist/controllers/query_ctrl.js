@@ -407,11 +407,11 @@ System.register(['app/plugins/sdk', './../css/query-editor.css!', 'lodash'], fun
                         var _this2 = this;
 
                         if (where.type === 'operator') {
-                            return this.datasource.q.when(this.uiSegmentSrv.newOperators(['=', '<>', '<', '<=', '>', '>=', 'LIKE', 'NOT LIKE', 'IN', 'NOT IN', 'IS', 'IS NOT']));
+                            return Promise.resolve(this.uiSegmentSrv.newOperators(['=', '<>', '<', '<=', '>', '>=', 'LIKE', 'NOT LIKE', 'IN', 'NOT IN', 'IS', 'IS NOT']));
                         } else if (where.type === 'value') {
-                            return this.datasource.q.when(null);
+                            return Promise.resolve(null);
                         } else if (where.type === 'condition') {
-                            return this.datasource.q.when([this.uiSegmentSrv.newCondition('AND'), this.uiSegmentSrv.newCondition('OR')]);
+                            return Promise.resolve([this.uiSegmentSrv.newCondition('AND'), this.uiSegmentSrv.newCondition('OR')]);
                         } else {
                             return this.datasource.whereFindQuery(this.filterSegment.value).then(function (data) {
                                 var altSegments = _.map(data, function (item) {
@@ -536,8 +536,8 @@ System.register(['app/plugins/sdk', './../css/query-editor.css!', 'lodash'], fun
                         var _this3 = this;
 
                         var ctrl = this;
-                        if (orderBy.type == 'condition') return this.datasource.q.when([this.uiSegmentSrv.newCondition('ASC'), this.uiSegmentSrv.newCondition('DESC')]);
-                        if (orderBy.type == 'condition') return this.datasource.q.when([this.uiSegmentSrv.newCondition('ASC'), this.uiSegmentSrv.newCondition('DESC')]);
+                        if (orderBy.type == 'condition') return Promise.resolve([this.uiSegmentSrv.newCondition('ASC'), this.uiSegmentSrv.newCondition('DESC')]);
+                        if (orderBy.type == 'condition') return Promise.resolve([this.uiSegmentSrv.newCondition('ASC'), this.uiSegmentSrv.newCondition('DESC')]);
 
                         return this.datasource.orderByFindQuery(ctrl.filterSegment.value).then(function (data) {
                             var altSegments = _.map(data, function (item) {
@@ -594,7 +594,7 @@ System.register(['app/plugins/sdk', './../css/query-editor.css!', 'lodash'], fun
 
                         if (this.functions.length == 0) array = array.slice(2, array.length);
 
-                        return this.datasource.q.when(_.filter(array, function (segment) {
+                        return Promise.resolve(_.filter(array, function (segment) {
                             return _.find(_this4.functions, function (x) {
                                 return x.value == segment.value;
                             }) == undefined;
@@ -605,9 +605,9 @@ System.register(['app/plugins/sdk', './../css/query-editor.css!', 'lodash'], fun
                     value: function getFunctionsToEdit(func, index) {
                         var ctrl = this;
                         var remove = [this.uiSegmentSrv.newSegment('-REMOVE-')];
-                        if (func.type == 'Operator') return this.datasource.q.when();else if (func.value == 'Set') return this.datasource.q.when(remove);
+                        if (func.type == 'Operator') return Promise.resolve();else if (func.value == 'Set') return Promise.resolve(remove);
 
-                        return this.datasource.q.when(remove);
+                        return Promise.resolve(remove);
                     }
                 }, {
                     key: 'functionValueChanged',
@@ -706,19 +706,19 @@ System.register(['app/plugins/sdk', './../css/query-editor.css!', 'lodash'], fun
                     key: 'getBooleans',
                     value: function getBooleans() {
                         var array = [this.uiSegmentSrv.newSegment('true'), this.uiSegmentSrv.newSegment('false')];
-                        return this.datasource.q.when(array);
+                        return Promise.resolve(array);
                     }
                 }, {
                     key: 'getAngleUnits',
                     value: function getAngleUnits() {
                         var array = [this.uiSegmentSrv.newSegment('Degrees'), this.uiSegmentSrv.newSegment('Radians'), this.uiSegmentSrv.newSegment('Grads'), this.uiSegmentSrv.newSegment('ArcMinutes'), this.uiSegmentSrv.newSegment('ArcSeconds'), this.uiSegmentSrv.newSegment('AngularMil')];
-                        return this.datasource.q.when(array);
+                        return Promise.resolve(array);
                     }
                 }, {
                     key: 'getTimeSelect',
                     value: function getTimeSelect() {
                         var array = [this.uiSegmentSrv.newSegment('Weeks'), this.uiSegmentSrv.newSegment('Days'), this.uiSegmentSrv.newSegment('Hours'), this.uiSegmentSrv.newSegment('Minutes'), this.uiSegmentSrv.newSegment('Seconds'), this.uiSegmentSrv.newSegment('Milliseconds'), this.uiSegmentSrv.newSegment('Microseconds'), this.uiSegmentSrv.newSegment('Nanoseconds'), this.uiSegmentSrv.newSegment('Ticks'), this.uiSegmentSrv.newSegment('PlanckTime'), this.uiSegmentSrv.newSegment('AtomicUnitsOfTime'), this.uiSegmentSrv.newSegment('Ke')];
-                        return this.datasource.q.when(array);
+                        return Promise.resolve(array);
                     }
                 }, {
                     key: 'inputChange',
