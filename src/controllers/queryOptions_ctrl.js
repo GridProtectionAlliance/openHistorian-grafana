@@ -75,7 +75,6 @@ export class OpenHistorianQueryOptionsCtrl{
         });
 
     // #endregion
-
     }
 
     // #region Methods

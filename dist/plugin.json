@@ -12,6 +12,11 @@
   "metrics": true,
   "annotations": true,
 
+  "queryOptions": {
+    "OpenHistorianQueryOptionsCtrl": true
+  },
+
+
   "info": {
     "description": "datasource plugin for openHistorian",
     "author": {

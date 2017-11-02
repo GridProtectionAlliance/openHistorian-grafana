@@ -30,6 +30,7 @@
     <Content Include="src\query_help.md" />
     <Content Include="src\README.md" />
     <Compile Include="src\datasource.js" />
+    <Compile Include="src\js\constants.js" />
     <Compile Include="src\module.js" />
     <Compile Include="dist\controllers\annotations_ctrl.js" />
     <Compile Include="dist\controllers\config_ctrl.js" />

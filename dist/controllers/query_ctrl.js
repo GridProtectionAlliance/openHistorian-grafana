@@ -1,9 +1,9 @@
 'use strict';
 
-System.register(['app/plugins/sdk', './../css/query-editor.css!', 'lodash'], function (_export, _context) {
+System.register(['app/plugins/sdk', './../js/constants.js', './../css/query-editor.css!', 'lodash'], function (_export, _context) {
     "use strict";
 
-    var QueryCtrl, _, _createClass, OpenHistorianDataSourceQueryCtrl, functionList;
+    var QueryCtrl, DefaultFlags, MeasurementStateFlags, _, _createClass, OpenHistorianDataSourceQueryCtrl, functionList;
 
     function _classCallCheck(instance, Constructor) {
         if (!(instance instanceof Constructor)) {
@@ -38,6 +38,9 @@ System.register(['app/plugins/sdk', './../css/query-editor.css!', 'lodash'], fun
     return {
         setters: [function (_appPluginsSdk) {
             QueryCtrl = _appPluginsSdk.QueryCtrl;
+        }, function (_jsConstantsJs) {
+            DefaultFlags = _jsConstantsJs.DefaultFlags;
+            MeasurementStateFlags = _jsConstantsJs.MeasurementStateFlags;
         }, function (_cssQueryEditorCss) {}, function (_lodash) {
             _ = _lodash.default;
         }],
@@ -68,6 +71,8 @@ System.register(['app/plugins/sdk', './../css/query-editor.css!', 'lodash'], fun
 
                     var _this = _possibleConstructorReturn(this, (OpenHistorianDataSourceQueryCtrl.__proto__ || Object.getPrototypeOf(OpenHistorianDataSourceQueryCtrl)).call(this, $scope, $injector));
 
+                    _this.DefaultFlags = DefaultFlags;
+                    _this.MeasurementStateFlags = MeasurementStateFlags;
                     _this.scope = $scope;
                     var ctrl = _this;
                     _this.uiSegmentSrv = uiSegmentSrv;
@@ -107,6 +112,11 @@ System.register(['app/plugins/sdk', './../css/query-editor.css!', 'lodash'], fun
                     _this.buildFunctionArray();
 
                     if (_this.queryType == 'Filter Expression') _this.setTargetWithQuery();else if (_this.queryType == 'Phasor List') _this.setTargetWithPhasors();else _this.setTargetWithElements();
+
+                    $('panel-editor-tab .gf-form-group .gf-form-inline a.gf-form-label:contains("Options")').on('click', function (event) {
+                        console.log(event);
+                    });
+
                     return _this;
                 }
 
