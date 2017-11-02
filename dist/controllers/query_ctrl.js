@@ -3,7 +3,7 @@
 System.register(['app/plugins/sdk', './../js/constants.js', './../css/query-editor.css!', 'lodash'], function (_export, _context) {
     "use strict";
 
-    var QueryCtrl, DefaultFlags, MeasurementStateFlags, FunctionList, Booleans, AngleUnits, TimeUnits, WhereOperators, _, _createClass, OpenHistorianDataSourceQueryCtrl;
+    var QueryCtrl, FunctionList, Booleans, AngleUnits, TimeUnits, WhereOperators, _, _createClass, OpenHistorianDataSourceQueryCtrl;
 
     function _classCallCheck(instance, Constructor) {
         if (!(instance instanceof Constructor)) {
@@ -39,8 +39,6 @@ System.register(['app/plugins/sdk', './../js/constants.js', './../css/query-edit
         setters: [function (_appPluginsSdk) {
             QueryCtrl = _appPluginsSdk.QueryCtrl;
         }, function (_jsConstantsJs) {
-            DefaultFlags = _jsConstantsJs.DefaultFlags;
-            MeasurementStateFlags = _jsConstantsJs.MeasurementStateFlags;
             FunctionList = _jsConstantsJs.FunctionList;
             Booleans = _jsConstantsJs.Booleans;
             AngleUnits = _jsConstantsJs.AngleUnits;
@@ -71,12 +69,14 @@ System.register(['app/plugins/sdk', './../js/constants.js', './../css/query-edit
             _export('OpenHistorianDataSourceQueryCtrl', OpenHistorianDataSourceQueryCtrl = function (_QueryCtrl) {
                 _inherits(OpenHistorianDataSourceQueryCtrl, _QueryCtrl);
 
-                function OpenHistorianDataSourceQueryCtrl($scope, $injector, uiSegmentSrv, templateSrv) {
+                function OpenHistorianDataSourceQueryCtrl($scope, $injector, uiSegmentSrv, templateSrv, $compile) {
                     _classCallCheck(this, OpenHistorianDataSourceQueryCtrl);
 
                     var _this = _possibleConstructorReturn(this, (OpenHistorianDataSourceQueryCtrl.__proto__ || Object.getPrototypeOf(OpenHistorianDataSourceQueryCtrl)).call(this, $scope, $injector));
 
                     _this.scope = $scope;
+                    _this.compile = $compile;
+
                     var ctrl = _this;
                     _this.uiSegmentSrv = uiSegmentSrv;
                     _this.target.target = '';
@@ -112,12 +112,19 @@ System.register(['app/plugins/sdk', './../js/constants.js', './../css/query-edit
 
                     _this.phasorList = _this.target.phasorList == undefined ? [] : _this.target.phasorList;
 
+                    ctrl.target.overriddenDataFlags = ctrl.target.overriddenDataFlags != undefined ? ctrl.target.overriddenDataFlags : ctrl.datasource.dataFlags;
+
+                    ctrl.target.queryOptions = {};
+
                     _this.buildFunctionArray();
 
                     if (_this.queryType == 'Filter Expression') _this.setTargetWithQuery();else if (_this.queryType == 'Phasor List') _this.setTargetWithPhasors();else _this.setTargetWithElements();
 
                     $('panel-editor-tab .gf-form-group .gf-form-inline a.gf-form-label:contains("Options")').on('click', function (event) {
-                        console.log(event);
+                        if ($($('panel-editor-tab .gf-form-group div')[6]).children().first()[0] != $('query-troubleshooter')[0]) {
+                            var string = '<query-options flags="ctrl.target.overriddenDataFlags" return="ctrl.target.queryOptions"></query-options>';
+                            $($('panel-editor-tab .gf-form-group div')[6]).children().first().append(ctrl.compile(string)(ctrl.scope));
+                        }
                     });
 
                     return _this;

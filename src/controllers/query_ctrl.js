@@ -22,15 +22,17 @@
 //******************************************************************************************************
 
 import { QueryCtrl } from 'app/plugins/sdk'
-import { DefaultFlags, MeasurementStateFlags, FunctionList, Booleans, AngleUnits, TimeUnits, WhereOperators } from './../js/constants.js'
+import { FunctionList, Booleans, AngleUnits, TimeUnits, WhereOperators } from './../js/constants.js'
 import './../css/query-editor.css!'
 import _ from 'lodash'
 
 export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
-    constructor($scope, $injector, uiSegmentSrv, templateSrv) {
+    constructor($scope, $injector, uiSegmentSrv, templateSrv, $compile) {
         super($scope, $injector);
 
         this.scope = $scope;
+        this.compile = $compile;
+
         var ctrl = this;
         this.uiSegmentSrv = uiSegmentSrv;
         this.target.target = '';
@@ -70,6 +72,10 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
 
         this.phasorList = (this.target.phasorList == undefined ? [] : this.target.phasorList);
 
+        ctrl.target.overriddenDataFlags = (ctrl.target.overriddenDataFlags != undefined ? ctrl.target.overriddenDataFlags : ctrl.datasource.dataFlags);
+
+        ctrl.target.queryOptions = {};
+
         this.buildFunctionArray();
 
         if (this.queryType == 'Filter Expression')
@@ -79,8 +85,13 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
         else
             this.setTargetWithElements()
 
+
         $('panel-editor-tab .gf-form-group .gf-form-inline a.gf-form-label:contains("Options")').on('click', function (event) {
-            console.log(event);
+            if ($($('panel-editor-tab .gf-form-group div')[6]).children().first()[0] != $('query-troubleshooter')[0]) {
+                var string = '<query-options flags="ctrl.target.overriddenDataFlags" return="ctrl.target.queryOptions"></query-options>';
+                $($('panel-editor-tab .gf-form-group div')[6]).children().first().append(ctrl.compile(string)(ctrl.scope))
+            }
+
         });
 
   }

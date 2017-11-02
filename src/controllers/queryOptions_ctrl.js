@@ -21,69 +21,27 @@
 //
 //******************************************************************************************************
 import _ from "lodash";
+import { DefaultFlags, MeasurementStateFlags } from './../js/constants.js'
 
 export class OpenHistorianQueryOptionsCtrl{
-    constructor($scope) {
+    constructor($scope, $compile) {
         // #region Members
-        var ctrl = this;
 
-        ctrl.current.jsonData = ctrl.current.jsonData || {}
-        ctrl.current.jsonData.Included = (ctrl.current.jsonData.Included == undefined ? 0xFFFFFFF : ctrl.current.jsonData.Included);
-        ctrl.current.jsonData.Excluded = (ctrl.current.jsonData.Excluded == undefined ? 0x0000000 : ctrl.current.jsonData.Excluded);
+        this.$scope = $scope;
+        this.dataFlags = ($scope.flags == undefined ? DefaultFlags : _.merge(DefaultFlags, $scope.flags));
+        this.return = $scope.return;
 
-
-        ctrl.current.jsonData.flags = (ctrl.current.jsonData.flags == undefined ? {
-            'Select All': { Included: true, Excluded: false, Order: 0 },
-            BadData: { Included: true, Excluded: false, Order: 1 },
-            SuspectData: { Included: true, Excluded: false, Order: 2 },
-            OverRangeError: { Included: true, Excluded: false, Order: 3 },
-            UnderRangeError: { Included: true, Excluded: false, Order: 4 },
-            AlarmHigh: { Included: true, Excluded: false, Order: 5 },
-            AlarmLow: { Included: true, Excluded: false, Order: 6 },
-            WarningHigh: { Included: true, Excluded: false, Order: 7 },
-            WarningLow: { Included: true, Excluded: false, Order: 8 },
-            FlatlineAlarm: { Included: true, Excluded: false, Order: 9 },
-            ComparisonAlarm: { Included: true, Excluded: false, Order: 10 },
-            ROCAlarm: { Included: true, Excluded: false, Order: 11 },
-            ReceivedAsBad: { Included: true, Excluded: false, Order: 12 },
-            CalculatedValue: { Included: true, Excluded: false, Order: 13 },
-            CalculationError: { Included: true, Excluded: false, Order: 14 },
-            CalculationWarning: { Included: true, Excluded: false, Order: 15 },
-            ReservedQualityFlag: { Included: true, Excluded: false, Order: 16 },
-            BadTime: { Included: true, Excluded: false, Order: 17 },
-            SuspectTime: { Included: true, Excluded: false, Order: 18 },
-            LateTimeAlarm: { Included: true, Excluded: false, Order: 19 },
-            FutureTimeAlarm: { Included: true, Excluded: false, Order: 20 },
-            UpSampled: { Included: true, Excluded: false, Order: 21 },
-            DownSampled: { Included: true, Excluded: false, Order: 22 },
-            DiscardedValue: { Included: true, Excluded: false, Order: 23 },
-            ReservedTimeFlag: { Included: true, Excluded: false, Order: 24 },
-            UserDefinedFlag1: { Included: true, Excluded: false, Order: 25 },
-            UserDefinedFlag2: { Included: true, Excluded: false, Order: 26 },
-            UserDefinedFlag3: { Included: true, Excluded: false, Order: 27 },
-            UserDefinedFlag4: { Included: true, Excluded: false, Order: 28 },
-            UserDefinedFlag5: { Included: true, Excluded: false, Order: 29 },
-            SystemError: { Included: true, Excluded: false, Order: 30 },
-            SystemWarning: { Included: true, Excluded: false, Order: 31 },
-            MeasurementError: { Included: true, Excluded: false, Order: 32 }
-        } : ctrl.current.jsonData.flags);
-
-        ctrl.flagArray = _.map(Object.keys(ctrl.current.jsonData.flags), function (a) {
-            return { key: a, order: ctrl.current.jsonData.flags[a].Order };
-        }).sort(function (a, b) {
+        this.flagArray = _.map(Object.keys(this.dataFlags), a => {
+            return { key: a, order: this.dataFlags[a].Order };
+        }).sort((a, b) => {
             return a.order - b.order;
         });
 
+        this.calculateInitialFlags();
     // #endregion
     }
 
     // #region Methods
-
-    getFlags() {
-        var ctrl = this;
-
-        return
-    }
     calculateFlags(flag, type) {
         var ctrl = this;
 
@@ -91,14 +49,14 @@ export class OpenHistorianQueryOptionsCtrl{
         var flagVarExcluded = 0;
 
         if (flag == 'Select All') {
-            _.each(Object.keys(ctrl.current.jsonData.flags), function (key, index, list) {
+            _.each(Object.keys(ctrl.dataFlags), function (key, index, list) {
                 if (type == 'Included') {
-                    ctrl.current.jsonData.flags[key].Excluded = false;
-                    ctrl.current.jsonData.flags[key].Included = true;
+                    ctrl.dataFlags[key].Excluded = false;
+                    ctrl.dataFlags[key].Included = true;
                 }
                 else if (type == 'Excluded') {
-                    ctrl.current.jsonData.flags[key].Included = false;
-                    ctrl.current.jsonData.flags[key].Excluded = true;
+                    ctrl.dataFlags[key].Included = false;
+                    ctrl.dataFlags[key].Excluded = true;
                 }
             });
 
@@ -113,27 +71,46 @@ export class OpenHistorianQueryOptionsCtrl{
 
         }
         else {
-            ctrl.current.jsonData.flags['Select All'].Included = false;
-            ctrl.current.jsonData.flags['Select All'].Excluded = false;
+            ctrl.dataFlags['Select All'].Included = false;
+            ctrl.dataFlags['Select All'].Excluded = false;
 
-            _.each(Object.keys(ctrl.current.jsonData.flags), function (key, index, list) {
+            _.each(Object.keys(ctrl.dataFlags), function (key, index, list) {
                 if (key == 'Select All') return;
 
                 if (type == 'Included') {
-                    ctrl.current.jsonData.flags[key].Excluded = !ctrl.current.jsonData.flags[key].Included
+                    ctrl.dataFlags[key].Excluded = !ctrl.dataFlags[key].Included
                 }
                 else if (type == 'Excluded') {
-                    ctrl.current.jsonData.flags[key].Included = !ctrl.current.jsonData.flags[key].Excluded
+                    ctrl.dataFlags[key].Included = !ctrl.dataFlags[key].Excluded
                 }
 
 
-                flagVarIncluded = flagVarIncluded | (ctrl.current.jsonData.flags[key].Included ? MeasurementStateFlags[key] : 0);
-                flagVarExcluded = flagVarExcluded | (ctrl.current.jsonData.flags[key].Excluded ? MeasurementStateFlags[key] : 0);
+                flagVarIncluded = flagVarIncluded | (ctrl.dataFlags[key].Included ? MeasurementStateFlags[key] : 0);
+                flagVarExcluded = flagVarExcluded | (ctrl.dataFlags[key].Excluded ? MeasurementStateFlags[key] : 0);
             });
         }
 
-        ctrl.current.jsonData.Included = '0x' + ctrl.padDigits(this.dec2hex(flagVarIncluded), 8);
-        ctrl.current.jsonData.Excluded = '0x' + ctrl.padDigits(this.dec2hex(flagVarExcluded), 8);
+        ctrl.return.Included = '0x' + ctrl.padDigits(this.dec2hex(flagVarIncluded), 8);
+        ctrl.return.Excluded = '0x' + ctrl.padDigits(this.dec2hex(flagVarExcluded), 8);
+        ctrl.return.Normal = ctrl.dataFlags.Normal.Included
+        ctrl.$scope.flags = ctrl.dataFlags;
+    }
+
+    calculateInitialFlags(){
+        var ctrl = this;
+        var flagVarIncluded = 0;
+        var flagVarExcluded = 0;
+
+        _.each(Object.keys(ctrl.dataFlags), function (key, index, list) {
+            if (key == 'Select All') return;
+
+            flagVarIncluded = flagVarIncluded | (ctrl.dataFlags[key].Included ? MeasurementStateFlags[key] : 0);
+            flagVarExcluded = flagVarExcluded | (ctrl.dataFlags[key].Excluded ? MeasurementStateFlags[key] : 0);
+        });
+
+        ctrl.return.Included = '0x' + ctrl.padDigits(this.dec2hex(flagVarIncluded), 8);
+        ctrl.return.Excluded = '0x' + ctrl.padDigits(this.dec2hex(flagVarExcluded), 8);
+
     }
 
     dec2hex(number) {
@@ -151,143 +128,3 @@ export class OpenHistorianQueryOptionsCtrl{
     // #endregion
 
 }
-OpenHistorianQueryOptionsCtrl.templateUrl = 'partial/query.options.html';
-
-// #region Constants
-const MeasurementStateFlags =
-    {
-        /// <summary>
-        /// Defines normal state.
-        /// </summary>
-        'Select All': 0,
-        /// <summary>
-        /// Defines bad data state.
-        /// </summary>
-        BadData: Math.pow(2, 0),
-        /// <summary>
-        /// Defines suspect data state.
-        /// </summary>
-        SuspectData: Math.pow(2, 1),
-        /// <summary>
-        /// Defines over range error, i.e., unreasonable high value.
-        /// </summary>
-        OverRangeError: Math.pow(2, 2),
-        /// <summary>
-        /// Defines under range error, i.e., unreasonable low value.
-        /// </summary>
-        UnderRangeError: Math.pow(2, 3),
-        /// <summary>
-        /// Defines alarm for high value.
-        /// </summary>
-        AlarmHigh: Math.pow(2, 4),
-        /// <summary>
-        /// Defines alarm for low value.
-        /// </summary>
-        AlarmLow: Math.pow(2, 5),
-        /// <summary>
-        /// Defines warning for high value.
-        /// </summary>
-        WarningHigh: Math.pow(2, 6),
-        /// <summary>
-        /// Defines warning for low value.
-        /// </summary>
-        WarningLow: Math.pow(2, 7),
-        /// <summary>
-        /// Defines alarm for flat-lined value, i.e., latched value test alarm.
-        /// </summary>
-        FlatlineAlarm: Math.pow(2, 8),
-        /// <summary>
-        /// Defines comparison alarm, i.e., outside threshold of comparison with a real-time value.
-        /// </summary>
-        ComparisonAlarm: Math.pow(2, 9),
-        /// <summary>
-        /// Defines rate-of-change alarm.
-        /// </summary>
-        ROCAlarm: Math.pow(2, 10),
-        /// <summary>
-        /// Defines bad value received.
-        /// </summary>
-        ReceivedAsBad: Math.pow(2, 11),
-        /// <summary>
-        /// Defines calculated value state.
-        /// </summary>
-        CalculatedValue: Math.pow(2, 12),
-        /// <summary>
-        /// Defines calculation error with the value.
-        /// </summary>
-        CalculationError: Math.pow(2, 13),
-        /// <summary>
-        /// Defines calculation warning with the value.
-        /// </summary>
-        CalculationWarning: Math.pow(2, 14),
-        /// <summary>
-        /// Defines reserved quality flag.
-        /// </summary>
-        ReservedQualityFlag: Math.pow(2, 15),
-        /// <summary>
-        /// Defines bad time state.
-        /// </summary>
-        BadTime: Math.pow(2, 16),
-        /// <summary>
-        /// Defines suspect time state.
-        /// </summary>
-        SuspectTime: Math.pow(2, 17),
-        /// <summary>
-        /// Defines late time alarm.
-        /// </summary>
-        LateTimeAlarm: Math.pow(2, 18),
-        /// <summary>
-        /// Defines future time alarm.
-        /// </summary>
-        FutureTimeAlarm: Math.pow(2, 19),
-        /// <summary>
-        /// Defines up-sampled state.
-        /// </summary>
-        UpSampled: Math.pow(2, 20),
-        /// <summary>
-        /// Defines down-sampled state.
-        /// </summary>
-        DownSampled: Math.pow(2, 21),
-        /// <summary>
-        /// Defines discarded value state.
-        /// </summary>
-        DiscardedValue: Math.pow(2, 22),
-        /// <summary>
-        /// Defines reserved time flag.
-        /// </summary>
-        ReservedTimeFlag: Math.pow(2, 23),
-        /// <summary>
-        /// Defines user defined flag 1.
-        /// </summary>
-        UserDefinedFlag1: Math.pow(2, 24),
-        /// <summary>
-        /// Defines user defined flag 2.
-        /// </summary>
-        UserDefinedFlag2: Math.pow(2, 25),
-        /// <summary>
-        /// Defines user defined flag 3.
-        /// </summary>
-        UserDefinedFlag3: Math.pow(2, 26),
-        /// <summary>
-        /// Defines user defined flag 4.
-        /// </summary>
-        UserDefinedFlag4: Math.pow(2, 27),
-        /// <summary>
-        /// Defines user defined flag 5.
-        /// </summary>
-        UserDefinedFlag5: Math.pow(2, 28),
-        /// <summary>
-        /// Defines system error state.
-        /// </summary>
-        SystemError: Math.pow(2, 29),
-        /// <summary>
-        /// Defines system warning state.
-        /// </summary>
-        SystemWarning: Math.pow(2, 30),
-        /// <summary>
-        /// Defines measurement error flag.
-        /// </summary>
-        MeasurementError: Math.pow(2, 31)
-    }
-
-// #endregion

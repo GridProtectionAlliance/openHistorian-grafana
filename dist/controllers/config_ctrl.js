@@ -44,15 +44,12 @@ System.register(['lodash', './../js/constants.js'], function (_export, _context)
                     // #region Members
                     var ctrl = this;
 
-                    ctrl.DefaultFlags = DefaultFlags;
-                    ctrl.MeasurementStateFlags = MeasurementStateFlags;
-
                     ctrl.current.jsonData = ctrl.current.jsonData || {};
                     ctrl.current.jsonData.Included = ctrl.current.jsonData.Included == undefined ? 0xFFFFFFF : ctrl.current.jsonData.Included;
                     ctrl.current.jsonData.Excluded = ctrl.current.jsonData.Excluded == undefined ? 0x0000000 : ctrl.current.jsonData.Excluded;
                     ctrl.current.jsonData.IncludeNormal = ctrl.current.jsonData.IncludeNormal == undefined ? true : ctrl.current.jsonData.IncludeNormal;
 
-                    ctrl.current.jsonData.flags = ctrl.current.jsonData.flags == undefined ? ctrl.DefaultFlags : _.merge(ctrl.DefaultFlags, ctrl.current.jsonData.flags);
+                    ctrl.current.jsonData.flags = ctrl.current.jsonData.flags == undefined ? DefaultFlags : _.merge(DefaultFlags, ctrl.current.jsonData.flags);
 
                     ctrl.flagArray = _.map(Object.keys(ctrl.current.jsonData.flags), function (a) {
                         return { key: a, order: ctrl.current.jsonData.flags[a].Order };
@@ -106,8 +103,8 @@ System.register(['lodash', './../js/constants.js'], function (_export, _context)
                                     ctrl.current.jsonData.flags[key].Included = !ctrl.current.jsonData.flags[key].Excluded;
                                 }
 
-                                flagVarIncluded = flagVarIncluded | (ctrl.current.jsonData.flags[key].Included ? ctrl.MeasurementStateFlags[key] : 0);
-                                flagVarExcluded = flagVarExcluded | (ctrl.current.jsonData.flags[key].Excluded ? ctrl.MeasurementStateFlags[key] : 0);
+                                flagVarIncluded = flagVarIncluded | (ctrl.current.jsonData.flags[key].Included ? MeasurementStateFlags[key] : 0);
+                                flagVarExcluded = flagVarExcluded | (ctrl.current.jsonData.flags[key].Excluded ? MeasurementStateFlags[key] : 0);
                             });
                         }
 
