@@ -22,7 +22,7 @@
 //******************************************************************************************************
 
 import { QueryCtrl } from 'app/plugins/sdk'
-import { DefaultFlags, MeasurementStateFlags} from './../js/constants.js'
+import { DefaultFlags, MeasurementStateFlags, FunctionList, Booleans, AngleUnits, TimeUnits, WhereOperators } from './../js/constants.js'
 import './../css/query-editor.css!'
 import _ from 'lodash'
 
@@ -30,8 +30,6 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
     constructor($scope, $injector, uiSegmentSrv, templateSrv) {
         super($scope, $injector);
 
-        this.DefaultFlags = DefaultFlags;
-        this.MeasurementStateFlags = MeasurementStateFlags;
         this.scope = $scope;
         var ctrl = this;
         this.uiSegmentSrv = uiSegmentSrv;
@@ -400,7 +398,7 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
   getWheresToEdit(where, index) {
 
       if (where.type === 'operator') {
-          return Promise.resolve(this.uiSegmentSrv.newOperators(['=', '<>', '<', '<=', '>', '>=', 'LIKE', 'NOT LIKE', 'IN', 'NOT IN', 'IS', 'IS NOT']));
+          return Promise.resolve(this.uiSegmentSrv.newOperators(WhereOperators));
       }
       else if (where.type === 'value') {
           return Promise.resolve(null);
@@ -614,7 +612,7 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
   getFunctionsToAddNew() {
       var ctrl = this;
       var array = []
-      _.each(Object.keys(functionList), function (element, index, list) {
+      _.each(Object.keys(FunctionList), function (element, index, list) {
           array.push(ctrl.uiSegmentSrv.newSegment(element));
       });
 
@@ -637,7 +635,7 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
   }
 
   functionValueChanged(func, index) {
-      var funcSeg = functionList[func.Function];
+      var funcSeg = FunctionList[func.Function];
 
       if (func.value == "-REMOVE-") {
           var l = 1;
@@ -666,7 +664,7 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
   }
 
   addFunctionSegment() {
-      var func = functionList[event.target.text];
+      var func = FunctionList[event.target.text];
 
       if (func.Function == 'Slice') {
           this.functionSegments[0].Parameters.unshift(func.Parameters[0])
@@ -735,42 +733,16 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
 
   }
 
-  getBooleans() {
-      var array = [
-          this.uiSegmentSrv.newSegment('true'),
-          this.uiSegmentSrv.newSegment('false')
-      ];
-      return Promise.resolve(array);
+  getBooleans() {    
+      return Promise.resolve(Booleans.map(value => { return this.uiSegmentSrv.newSegment(value)}));
   }
 
   getAngleUnits() {
-      var array = [
-          this.uiSegmentSrv.newSegment('Degrees'),
-          this.uiSegmentSrv.newSegment('Radians'),
-          this.uiSegmentSrv.newSegment('Grads'),
-          this.uiSegmentSrv.newSegment('ArcMinutes'),
-          this.uiSegmentSrv.newSegment('ArcSeconds'),
-          this.uiSegmentSrv.newSegment('AngularMil')
-      ];
-      return Promise.resolve(array);
+      return Promise.resolve(AngleUnits.map(value => { return this.uiSegmentSrv.newSegment(value) }));
   }
 
   getTimeSelect() {
-      var array = [
-          this.uiSegmentSrv.newSegment('Weeks'),
-          this.uiSegmentSrv.newSegment('Days'),
-          this.uiSegmentSrv.newSegment('Hours'),
-          this.uiSegmentSrv.newSegment('Minutes'),
-          this.uiSegmentSrv.newSegment('Seconds'),
-          this.uiSegmentSrv.newSegment('Milliseconds'),
-          this.uiSegmentSrv.newSegment('Microseconds'),
-          this.uiSegmentSrv.newSegment('Nanoseconds'),
-          this.uiSegmentSrv.newSegment('Ticks'),
-          this.uiSegmentSrv.newSegment('PlanckTime'),
-          this.uiSegmentSrv.newSegment('AtomicUnitsOfTime'),
-          this.uiSegmentSrv.newSegment('Ke')
-      ];
-      return Promise.resolve(array);
+      return Promise.resolve(TimeUnits.map(value => { return this.uiSegmentSrv.newSegment(value) }));
   }
 
   inputChange(func, index) {
@@ -787,41 +759,3 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
 
 OpenHistorianDataSourceQueryCtrl.templateUrl = 'partial/query.editor.html';
 
-const functionList = {
-    Set: { Function: 'Set', Parameters: [] },
-    Slice: { Function: 'Slice', Parameters: [{ Default: 1, Type: 'double', Description: 'A floating-point value that must be greater than or equal to zero that represents the desired time tolerance, in seconds, for the time slice.' }] },
-    Average: { Function: 'Average', Parameters: [] },
-    Minimum: { Function: 'Minimum', Parameters: [] },
-    Maximum: { Function: 'Maximum', Parameters: [] },
-    Total: { Function: 'Total', Parameters: [] },
-    Range: { Function: 'Range', Parameters: [] },
-    Count: { Function: 'Count', Parameters: [] },
-    Distinct: { Function: 'Distinct', Parameters: [] },
-    AbsoluteValute: { Function: 'AbsoluteValue', Parameters: [] },
-    Add: { Function: 'Add', Parameters: [{ Default: 0, Type: 'double', Description: 'A floating point value representing an additive offset to be applied to each value the source series.' }] },
-    Multiply: { Function: 'Multiply', Parameters: [{ Default: 1, Type: 'double', Description: 'A floating point value representing an additive offset to be applied to each value the source series.' }] },
-    Round: { Function: 'Round', Parameters: [{ Default: 0, Type: 'double', Description: 'A positive integer value representing the number of decimal places in the return value - defaults to 0.' }] },
-    Floor: { Function: 'Floor', Parameters: [] },
-    Ceiling: { Function: 'Ceiling', Parameters: [] },
-    Truncate: { Function: 'Truncate', Parameters: [] },
-    StandardDeviation: { Function: 'StandardDeviation', Parameters: [{ Default: false, Type: 'boolean', Description: 'A boolean flag representing if the sample based calculation should be used - defaults to false, which means the population based calculation should be used.' }] },
-    Median: { Function: 'Median', Parameters: [] },
-    Mode: { Function: 'Mode', Parameters: [] },
-    Top: { Function: 'Top', Parameters: [{ Default: '100%', Type: 'string', Description: 'A positive integer value, representing a total, that is greater than zero - or - a floating point value, suffixed with \' %\' representing a percentage, that must range from greater than 0 to less than or equal to 100.' }, { Default: true, Type: 'boolean', Description: 'A boolean flag representing if time in dataset should be normalized - defaults to true.' }] },
-    Bottom: { Function: 'Bottom', Parameters: [{ Default: '100%', Type: 'string', Description: 'A positive integer value, representing a total, that is greater than zero - or - a floating point value, suffixed with \' %\' representing a percentage, that must range from greater than 0 to less than or equal to 100.' }, { Default: true, Type: 'boolean', Description: 'A boolean flag representing if time in dataset should be normalized - defaults to true.' }] },
-    Random: { Function: 'Random', Parameters: [{ Default: '100%', Type: 'string', Description: 'A positive integer value, representing a total, that is greater than zero - or - a floating point value, suffixed with \' %\' representing a percentage, that must range from greater than 0 to less than or equal to 100.' }, { Default: true, Type: 'boolean', Description: 'A boolean flag representing if time in dataset should be normalized - defaults to true.' }] },
-    First: { Function: 'First', Parameters: [{ Default: '1', Type: 'string', Description: 'A positive integer value, representing a total, that is greater than zero - or - a floating point value, suffixed with \' %\' representing a percentage, that must range from greater than 0 to less than or equal to 100 - defaults to 1.' }] },
-    Last: { Function: 'Last', Parameters: [{ Default: '1', Type: 'string', Description: 'A positive integer value, representing a total, that is greater than zero - or - a floating point value, suffixed with \' %\' representing a percentage, that must range from greater than 0 to less than or equal to 100 - defaults to 1.' }] },
-    Percentile: { Function: 'Percentile', Parameters: [{ Default: '100%', Type: 'string', Description: 'A floating point value, representing a percentage, that must range from 0 to 100.' }] },
-    Difference: { Function: 'Difference', Parameters: [] },
-    TimeDifference: { Function: 'TimeDifference', Parameters: [{ Default: 'Seconds', Type: 'time', Description: 'Specifies the type of time units and must be one of the following: Seconds, Nanoseconds, Microseconds, Milliseconds, Minutes, Hours, Days, Weeks, Ke (i.e., traditional Chinese unit of decimal time), Ticks (i.e., 100-nanosecond intervals), PlanckTime or AtomicUnitsOfTime - defaults to Seconds.' }] },
-    Derivative: { Function: 'Derivative', Parameters: [{ Default: 'Seconds', Type: 'time', Description: 'Specifies the type of time units and must be one of the following: Seconds, Nanoseconds, Microseconds, Milliseconds, Minutes, Hours, Days, Weeks, Ke (i.e., traditional Chinese unit of decimal time), Ticks (i.e., 100-nanosecond intervals), PlanckTime or AtomicUnitsOfTime - defaults to Seconds.' }] },
-    TimeIntegration: { Function: 'TimeIntegration', Parameters: [{ Default: 'Hours', Type: 'time', Description: 'Specifies the type of time units and must be one of the following: Seconds, Nanoseconds, Microseconds, Milliseconds, Minutes, Hours, Days, Weeks, Ke (i.e., traditional Chinese unit of decimal time), Ticks (i.e., 100-nanosecond intervals), PlanckTime or AtomicUnitsOfTime - defaults to Hours.' }] },
-    Interval: { Function: 'Interval', Parameters: [{ Default: 0, Type: 'double', Description: 'A floating-point value that must be greater than or equal to zero that represents the desired time interval, in time units, for the returned data. ' }, { Default: 'Seconds', Type: 'time', Description: 'Specifies the type of time units and must be one of the following: Seconds, Nanoseconds, Microseconds, Milliseconds, Minutes, Hours, Days, Weeks, Ke (i.e., traditional Chinese unit of decimal time), Ticks (i.e., 100-nanosecond intervals), PlanckTime or AtomicUnitsOfTime - defaults to Seconds.' }] },
-    IncludeRange: { Function: 'IncludeRange', Parameters: [{ Default: 0, Type: 'double', Description: 'Floating-point number that represents the low range of values allowed in the return series.' }, { Default: 0, Type: 'double', Description: 'Floating-point number that represents the high range of values allowed in the return series.' }, { Default: false, Type: 'boolean', Description: 'A boolean flag that determines if range values are inclusive, i.e., allowed values are >= low and <= high - defaults to false, which means values are exclusive, i.e., allowed values are > low and < high.' }, { Default: false, Type: 'boolean', Description: 'A boolean flag - when four parameters are provided, third parameter determines if low value is inclusive and forth parameter determines if high value is inclusive.' }] },
-    ExcludeRange: { Function: 'ExcludeRange', Parameters: [{ Default: 0, Type: 'double', Description: 'Floating-point number that represents the low range of values allowed in the return series.' }, { Default: 0, Type: 'double', Description: 'Floating-point number that represents the high range of values allowed in the return series.' }, { Default: false, Type: 'boolean', Description: 'A boolean flag that determines if range values are inclusive, i.e., allowed values are >= low and <= high - defaults to false, which means values are exclusive, i.e., allowed values are > low and < high.' }, { Default: false, Type: 'boolean', Description: 'A boolean flag - when four parameters are provided, third parameter determines if low value is inclusive and forth parameter determines if high value is inclusive.' }] },
-    FilterNaN: { Function: 'FilterNaN', Parameters: [{ Default: true, Type: 'boolean', Description: 'A boolean flag that determines if infinite values should also be excluded - defaults to true.' }] },
-    UnwrapAngle: { Function: 'UnwrapAngle', Parameters: [{ Default: 'Degrees', Type: 'angleUnits', Description: 'Specifies the type of angle units and must be one of the following: Degrees, Radians, Grads, ArcMinutes, ArcSeconds or AngularMil - defaults to Degrees.' }] },
-    WrapAngle: { Function: 'WrapAngle', Parameters: [{ Default: 'Degrees', Type: 'angleUnits', Description: 'Specifies the type of angle units and must be one of the following: Degrees, Radians, Grads, ArcMinutes, ArcSeconds or AngularMil - defaults to Degrees.' }] },
-    Label: { Function: 'Label', Parameters: [{ Default: 'Name', Type: 'string', Description: 'Renames a series with the specified label value.' }] },
-};

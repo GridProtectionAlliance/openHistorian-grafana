@@ -20,34 +20,12 @@
     <Content Include="package.json" />
     <Content Include="README.md" />
     <Compile Include="Gruntfile.js" />
-    <Content Include="dist\plugin.json" />
-    <Content Include="dist\README.md" />
-    <Compile Include="dist\datasource.js" />
-    <Compile Include="dist\module.js" />
-    <Compile Include="spec\datasource_spec.js" />
-    <Compile Include="spec\test-main.js" />
     <Content Include="src\plugin.json" />
     <Content Include="src\query_help.md" />
     <Content Include="src\README.md" />
     <Compile Include="src\datasource.js" />
     <Compile Include="src\js\constants.js" />
     <Compile Include="src\module.js" />
-    <Compile Include="dist\controllers\annotations_ctrl.js" />
-    <Compile Include="dist\controllers\config_ctrl.js" />
-    <Compile Include="dist\controllers\queryOptions_ctrl.js" />
-    <Compile Include="dist\controllers\query_ctrl.js" />
-    <Content Include="dist\css\bootstrap-multiselect.css" />
-    <Content Include="dist\css\isteven-multi-select.css" />
-    <Content Include="dist\css\query-editor.css" />
-    <Content Include="dist\img\openHistorian.png" />
-    <Compile Include="dist\js\bootstrap-multiselect.js" />
-    <Compile Include="dist\js\isteven-multi-select.js" />
-    <Content Include="dist\partial\annotations.editor.html" />
-    <Content Include="dist\partial\config.html" />
-    <Content Include="dist\partial\query.editor.html" />
-    <Content Include="dist\partial\query.options.html" />
-    <Compile Include="dist\spec\datasource_spec.js" />
-    <Compile Include="dist\spec\test-main.js" />
     <Compile Include="src\controllers\annotations_ctrl.js" />
     <Compile Include="src\controllers\config_ctrl.js" />
     <Compile Include="src\controllers\queryOptions_ctrl.js" />
@@ -60,24 +38,14 @@
     <Content Include="src\partial\config.html" />
     <Content Include="src\partial\query.editor.html" />
     <Content Include="src\partial\query.options.html" />
-    <Compile Include="src\spec\test-main.js" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="dist" />
-    <Folder Include="dist\controllers" />
-    <Folder Include="dist\css" />
-    <Folder Include="dist\img" />
-    <Folder Include="dist\js" />
-    <Folder Include="dist\partial" />
-    <Folder Include="dist\spec" />
-    <Folder Include="spec" />
     <Folder Include="src" />
     <Folder Include="src\controllers" />
     <Folder Include="src\css" />
     <Folder Include="src\img" />
     <Folder Include="src\js" />
     <Folder Include="src\partial" />
-    <Folder Include="src\spec" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <!--Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them.-->

@@ -20,6 +20,7 @@
 //       Generated original version of source code.
 //
 //******************************************************************************************************
+
 import _ from "lodash";
 import { DefaultFlags, MeasurementStateFlags } from './../js/constants.js'
 
