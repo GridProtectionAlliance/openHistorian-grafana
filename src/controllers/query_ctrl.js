@@ -39,7 +39,7 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
         this.target.textEditor = false;
         this.segments = (this.target.segments == undefined ? [] : this.target.segments.map(function (a) { return ctrl.uiSegmentSrv.newSegment({ value: a.text, expandable: true }) }));
         this.queryTypes = [
-            "Element List", "Filter Expression", "Phasor List"
+            "Element List", "Filter Expression"/*, "Phasor List"*/
         ];
         this.queryType = (this.target.queryType == undefined ? "Element List" : this.target.queryType);
         this.wheres = (this.target.wheres == undefined ? [] : this.target.wheres.map(function (a) {
@@ -401,7 +401,12 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
 
   // #region TOP N
   topNValueChanged() {
-      this.setTargetWithQuery();
+      var ctrl = this;
+
+      clearTimeout(ctrl.typingTimer);
+      ctrl.typingTimer = setTimeout(function () { ctrl.setTargetWithQuery() }, 1000);
+      event.target.focus()
+
   }
   // #endregion
 

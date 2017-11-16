@@ -84,7 +84,8 @@ System.register(['app/plugins/sdk', './../js/constants.js', './../css/query-edit
                     _this.segments = _this.target.segments == undefined ? [] : _this.target.segments.map(function (a) {
                         return ctrl.uiSegmentSrv.newSegment({ value: a.text, expandable: true });
                     });
-                    _this.queryTypes = ["Element List", "Filter Expression", "Phasor List"];
+                    _this.queryTypes = ["Element List", "Filter Expression" /*, "Phasor List"*/
+                    ];
                     _this.queryType = _this.target.queryType == undefined ? "Element List" : _this.target.queryType;
                     _this.wheres = _this.target.wheres == undefined ? [] : _this.target.wheres.map(function (a) {
                         if (a.type == 'operator') return ctrl.uiSegmentSrv.newOperator(a.text);else if (a.type == 'condition') return ctrl.uiSegmentSrv.newCondition(a.text);else return ctrl.uiSegmentSrv.newSegment(a.value);
@@ -419,7 +420,13 @@ System.register(['app/plugins/sdk', './../js/constants.js', './../css/query-edit
                 }, {
                     key: 'topNValueChanged',
                     value: function topNValueChanged() {
-                        this.setTargetWithQuery();
+                        var ctrl = this;
+
+                        clearTimeout(ctrl.typingTimer);
+                        ctrl.typingTimer = setTimeout(function () {
+                            ctrl.setTargetWithQuery();
+                        }, 1000);
+                        event.target.focus();
                     }
                 }, {
                     key: 'getWheresToEdit',
