@@ -60,7 +60,7 @@ System.register(['lodash'], function (_export, _context) {
               return !t.hide;
             });
 
-            query.options = this.options;
+            query.options = JSON.parse(JSON.stringify(this.options));
 
             if (options.targets[0].queryOptions != undefined) {
               query.options.includedDataFlags = options.targets[0].queryOptions.Included != undefined ? options.targets[0].queryOptions.Included : query.options.includedDataFlags;
