@@ -24,13 +24,15 @@
 import _ from "lodash";
 
 export class OpenHistorianDataSource {
-  constructor(instanceSettings, $q, backendSrv, templateSrv) {
+  constructor(instanceSettings, $q, backendSrv, templateSrv, uiSegmentSrv) {
     this.type = instanceSettings.type;
     this.url = instanceSettings.url;
     this.name = instanceSettings.name;
     this.q = $q;
     this.backendSrv = backendSrv;
     this.templateSrv = templateSrv;
+    this.uiSegmentSrv = uiSegmentSrv;
+
     this.dataFlags = instanceSettings.jsonData.flags;
     this.options = {
          includedDataFlags: (instanceSettings.jsonData.Included == undefined ? 0xFFFFFFFF : instanceSettings.jsonData.Included), 
@@ -40,6 +42,12 @@ export class OpenHistorianDataSource {
   }
 
   query(options) {
+
+      _.each(options.targets, (element, index, list) => {
+          if (element.queryType == 'Element List')
+              this.setTargetWithElements(element);
+      });
+
     var query = this.buildQueryParameters(options);
     query.targets = query.targets.filter(function (t) {
       return !t.hide;
@@ -207,4 +215,119 @@ export class OpenHistorianDataSource {
       });
 
   }
+
+  // #region Target Compilation
+  setTargetWithQuery() {
+      if (this.wheres.length == 0) return;
+      var filter = this.filterSegment.value + ' ';
+      var topn = (this.topNSegment ? 'TOP ' + this.topNSegment + ' ' : '');
+      var where = 'WHERE ';
+
+      _.each(this.wheres, function (element, index, list) {
+          where += element.value + ' '
+      });
+
+      var orderby = '';
+      _.each(this.orderBys, function (element, index, list) {
+          orderby += (index == 0 ? 'ORDER BY ' : '') + element.value + (element.type == 'condition' && index < list.length - 1 ? ',' : '') + ' ';
+      });
+
+      var query = 'FILTER ' + topn + filter + where + orderby;
+      var functions = '';
+
+      _.each(this.functions, function (element, index, list) {
+          if (element.value == 'QUERY') functions += query;
+          else functions += element.value;
+      });
+
+      this.target.target = (functions != "" ? functions : query);
+      this.target.topNSegment = this.topNSegment;
+      this.target.filterSegment = this.filterSegment;
+      this.target.orderBys = this.orderBys;
+      this.target.wheres = this.wheres;
+      this.target.functionSegments = this.functionSegments;
+      this.target.queryType = this.queryType;
+      this.panelCtrl.refresh()
+
+  }
+
+  setTargetWithElements(target) {
+      var functions = this.buildFunctionArray(target);
+      var functionsString = ''
+      var ctrl = this;
+      _.each(functions, function (element, index, list) {
+          if (element.value == 'QUERY') functionsString += target.segments.map(function (a) {
+              if (ctrl.templateSrv.variableExists(a.text)) {
+                  return ctrl.templateSrv.replaceWithText(a.text);
+              }
+              else
+                  return a.value
+          }).join(';')
+          else if (ctrl.templateSrv.variableExists(element.value)) functionsString += ctrl.templateSrv.replaceWithText(element.text);
+          else functionsString += element.value;
+      });
+
+      target.target = (functionsString != "" ? functionsString : target.segments.map(function (a) {
+          if (ctrl.templateSrv.variableExists(a.text)) {
+              return ctrl.templateSrv.replaceWithText(a.text);
+          }
+          else
+              return a.value
+      }).join(';'));
+      
+  }
+
+  buildFunctionArray(target) {
+      var ctrl = this;
+      var functions = [];
+
+      if (target.functionSegments.length == 0) return;
+
+      _.each(target.functionSegments, function (element, index, list) {
+          var newElement = ctrl.uiSegmentSrv.newSegment(element.Function)
+          newElement.Type = 'Function';
+          newElement.Function = element.Function;
+
+          functions.push(newElement)
+
+          if (newElement.value == 'Set' || newElement.value == 'Slice') return;
+
+          var operator = ctrl.uiSegmentSrv.newOperator('(');
+          operator.Type = 'Operator';
+          functions.push(operator);
+
+          _.each(element.Parameters, function (param, i, j) {
+              var d = ctrl.uiSegmentSrv.newFake(param.Default.toString());
+              d.Type = param.Type;
+              d.Function = element.Function;
+              d.Description = param.Description;
+              d.Index = i;
+              functions.push(d);
+
+              var operator = ctrl.uiSegmentSrv.newOperator(',');
+              operator.Type = 'Operator';
+              functions.push(operator);
+          });
+      });
+
+      var query = ctrl.uiSegmentSrv.newCondition('QUERY');
+      query.Type = 'Query';
+      functions.push(query);
+
+      for (var i in target.functionSegments) {
+          if (target.functionSegments[i].Function != 'Set' && target.functionSegments[i].Function != 'Slice') {
+              var operator = ctrl.uiSegmentSrv.newOperator(')');
+              operator.Type = 'Operator';
+              functions.push(operator);
+          }
+
+      }
+
+      return functions;
+
+  }
+
+
+  // #endregion
+
 }

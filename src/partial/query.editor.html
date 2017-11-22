@@ -27,9 +27,9 @@
                 <span>ELEMENTS</span>
             </label>
             <div ng-repeat="segment in ctrl.segments" role="menuitem">
-                <metric-segment segment="segment" get-options="ctrl.getElementSegmentsToEdit(this)" on-change="ctrl.segmentValueChanged(segment,$index)"></metric-segment>
+                <metric-segment segment="segment" get-options="ctrl.getElementSegments(false)" on-change="ctrl.segmentValueChanged(segment,$index)"></metric-segment>
             </div>
-            <metric-segment segment="ctrl.elementSegment" get-options="ctrl.getElementSegmentsToAddNew()" on-change="ctrl.addElementSegment()"></metric-segment>
+            <metric-segment segment="ctrl.elementSegment" get-options="ctrl.getElementSegments(true)" on-change="ctrl.addElementSegment()"></metric-segment>
             <div class="gf-form gf-form--grow">
                 <div class="gf-form-label gf-form-label--grow"></div>
             </div>

@@ -94,57 +94,77 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
 
         });
 
-  }
+    }
+
+    // ran on dom creation
+    link(scope, elem, attr, ctrl) {
+        console.log('link')
+
+    } 
+
 
   // #region Target Compilation
     setTargetWithQuery() {
-      if (this.wheres.length == 0) return;
-      var filter = this.filterSegment.value + ' ';
-      var topn = (this.topNSegment ? 'TOP ' + this.topNSegment + ' ' : '');
-      var where = 'WHERE ';
+        if (this.wheres.length == 0) return;
+        var filter = this.filterSegment.value + ' ';
+        var topn = (this.topNSegment ? 'TOP ' + this.topNSegment + ' ' : '');
+        var where = 'WHERE ';
       
-      _.each(this.wheres, function (element, index, list) {
+        _.each(this.wheres, function (element, index, list) {
             where += element.value + ' '
-      });
+        });
 
-      var orderby = '';
-      _.each(this.orderBys, function (element, index, list) {
-          orderby += (index == 0 ? 'ORDER BY ' : '') + element.value + (element.type == 'condition' && index < list.length - 1? ',' : '') +' ';
-      });
+        var orderby = '';
+        _.each(this.orderBys, function (element, index, list) {
+            orderby += (index == 0 ? 'ORDER BY ' : '') + element.value + (element.type == 'condition' && index < list.length - 1? ',' : '') +' ';
+        });
 
-      var query = 'FILTER ' + topn + filter + where + orderby;
-      var functions = '';
+        var query = 'FILTER ' + topn + filter + where + orderby;
+        var functions = '';
 
-      _.each(this.functions, function (element, index, list) {
-          if (element.value == 'QUERY') functions += query;
-          else functions += element.value;
-      });
+        _.each(this.functions, function (element, index, list) {
+            if (element.value == 'QUERY') functions += query;
+            else functions += element.value;
+        });
 
-      this.target.target = (functions != "" ? functions : query);
-      this.target.topNSegment = this.topNSegment;
-      this.target.filterSegment = this.filterSegment;
-      this.target.orderBys = this.orderBys;
-      this.target.wheres = this.wheres;
-      this.target.functionSegments = this.functionSegments;
-      this.target.queryType = this.queryType;
-      this.panelCtrl.refresh()
+        this.target.target = (functions != "" ? functions : query);
+        this.target.topNSegment = this.topNSegment;
+        this.target.filterSegment = this.filterSegment;
+        this.target.orderBys = this.orderBys;
+        this.target.wheres = this.wheres;
+        this.target.functionSegments = this.functionSegments;
+        this.target.queryType = this.queryType;
+        this.panelCtrl.refresh()
 
-  }
+    }
 
   setTargetWithElements() {
       var functions = '';
       var ctrl = this;
-      _.each(this.functions, function (element, index, list) {
-          if (element.value == 'QUERY') functions += ctrl.segments.map(function (a) { return a.value }).join(';');
+      _.each(ctrl.functions, function (element, index, list) {
+          if (element.value == 'QUERY') functions += ctrl.segments.map(function (a) {
+              if (ctrl.datasource.templateSrv.variableExists(a.text)) {
+                  return ctrl.datasource.templateSrv.replaceWithText(a.text);
+              }
+              else
+                  return a.value
+          }).join(';')
+          else if (ctrl.datasource.templateSrv.variableExists(element.value)) functions += ctrl.datasource.templateSrv.replaceWithText(element.text);
           else functions += element.value;
       });
 
-      this.target.target = (functions != "" ? functions : this.segments.map(function (a) { return a.value }).join(';'));
+      ctrl.target.target = (functions != "" ? functions : ctrl.segments.map(function (a) {
+          if (ctrl.datasource.templateSrv.variableExists(a.text)) {
+                return ctrl.datasource.templateSrv.replaceWithText(a.text);
+          }
+          else
+            return a.value
+      }).join(';'));
 
-      this.target.functionSegments = this.functionSegments;
-      this.target.segments = this.segments;
-      this.target.queryType = this.queryType;
-      this.panelCtrl.refresh()
+      ctrl.target.functionSegments = ctrl.functionSegments;
+      ctrl.target.segments = ctrl.segments;
+      ctrl.target.queryType = ctrl.queryType;
+      ctrl.panelCtrl.refresh()
 
   }
 
@@ -220,12 +240,11 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
 
 
   // #region Elements
-  getElementSegmentsToEdit() {
+  getElementSegments(newSegment) {
       var ctrl = this;
       var option = null;
       if (event.target.value != "") option = event.target.value; 
 
-    var ctrl = this;
     return this.datasource.metricFindQuery(option).then( data => {
         var altSegments = _.map(data, item => {
             return ctrl.uiSegmentSrv.newSegment({value: item.text, expandable: item.expandable})
@@ -237,7 +256,14 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
             return 1;
           return 0;
         });
-        altSegments.unshift(ctrl.uiSegmentSrv.newSegment('-REMOVE-'));
+
+        _.each(ctrl.datasource.templateSrv.variables, (item, index, list) => {
+            if(item.type == "query")
+                altSegments.unshift(ctrl.uiSegmentSrv.newCondition('$' + item.name));
+        });
+
+        if(!newSegment)
+            altSegments.unshift(ctrl.uiSegmentSrv.newSegment('-REMOVE-'));
 
         return _.filter(altSegments, segment => {
           return _.find(ctrl.segments, x => {
@@ -247,32 +273,6 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
     });
     
   }
-
-  getElementSegmentsToAddNew () {
-        var ctrl = this;
-        var option = null;
-        if (event.target.value != "") option = event.target.value; 
-        return this.datasource.metricFindQuery(option).then( data => {
-            var altSegments = _.map(data, item => {
-                return ctrl.uiSegmentSrv.newSegment({value: item.text, expandable: item.expandable})
-            });
-            altSegments.sort((a,b)=>{ 
-                if(a.value < b.value)
-                return -1;
-                if(a.value > b.value)
-                return 1;
-                return 0;
-            });
-
-            return _.filter(altSegments, segment => {
-                return _.find(ctrl.segments, x => {
-                return x.value == segment.value
-                }) == undefined;
-            });
-        });
-    
-  }
-
 
   addElementSegment(){
           // if value is not empty, add new attribute segment
