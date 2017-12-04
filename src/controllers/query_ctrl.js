@@ -96,13 +96,6 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
 
     }
 
-    // ran on dom creation
-    link(scope, elem, attr, ctrl) {
-        console.log('link')
-
-    } 
-
-
   // #region Target Compilation
     setTargetWithQuery() {
         if (this.wheres.length == 0) return;
@@ -211,11 +204,13 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
     this.panelCtrl.refresh(); // Asks the panel to refresh data.
   }
 
-  toggleEditorMode(){
-    this.target.textEditor = !this.target.textEditor;
+  toggleEditorMode() {
+      this.target.targettext = this.target.target;
+      this.target.textEditor = !this.target.textEditor;
   }
 
-  textEditorChanged(){
+  textEditorChanged() {
+      this.target.target = this.target.targettext;
       this.panelCtrl.refresh(); // Asks the panel to refresh data.
   }
 

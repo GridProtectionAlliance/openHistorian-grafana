@@ -131,15 +131,10 @@ System.register(['app/plugins/sdk', './../js/constants.js', './../css/query-edit
                     return _this;
                 }
 
-                // ran on dom creation
+                // #region Target Compilation
 
 
                 _createClass(OpenHistorianDataSourceQueryCtrl, [{
-                    key: 'link',
-                    value: function link(scope, elem, attr, ctrl) {
-                        console.log('link');
-                    }
-                }, {
                     key: 'setTargetWithQuery',
                     value: function setTargetWithQuery() {
                         if (this.wheres.length == 0) return;
@@ -240,11 +235,13 @@ System.register(['app/plugins/sdk', './../js/constants.js', './../css/query-edit
                 }, {
                     key: 'toggleEditorMode',
                     value: function toggleEditorMode() {
+                        this.target.targettext = this.target.target;
                         this.target.textEditor = !this.target.textEditor;
                     }
                 }, {
                     key: 'textEditorChanged',
                     value: function textEditorChanged() {
+                        this.target.target = this.target.targettext;
                         this.panelCtrl.refresh(); // Asks the panel to refresh data.
                     }
                 }, {
