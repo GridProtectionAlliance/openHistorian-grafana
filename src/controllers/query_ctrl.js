@@ -39,7 +39,7 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
         this.target.textEditor = false;
         this.segments = (this.target.segments == undefined ? [] : this.target.segments.map(function (a) { return ctrl.uiSegmentSrv.newSegment({ value: a.text, expandable: true }) }));
         this.queryTypes = [
-            "Element List", "Filter Expression"/*, "Phasor List"*/
+            "Element List", "Filter Expression", "Text Editor"/*, "Phasor List"*/
         ];
         this.queryType = (this.target.queryType == undefined ? "Element List" : this.target.queryType);
         this.wheres = (this.target.wheres == undefined ? [] : this.target.wheres.map(function (a) {
@@ -62,15 +62,10 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
         this.filterSegment = (this.target.filterSegment == undefined ? this.uiSegmentSrv.newSegment('ActiveMeasurement') : this.uiSegmentSrv.newSegment(this.target.filterSegment.value));
         this.orderBySegment =  this.uiSegmentSrv.newPlusButton();
         this.functionSegment = this.uiSegmentSrv.newPlusButton();
-
-        this.phasorSegment = this.uiSegmentSrv.newPlusButton();
-        this.phasorSegments = (this.target.phasorSegments == undefined ? [] : this.target.phasorSegments.map(function (a) { return ctrl.uiSegmentSrv.newSegment({ value: a.text, expandable: true }) }));
         this.typingTimer;
         
         this.target.unwrapPhasorAngle = (this.target.unwrapPhasorAngle == undefined ? false : this.target.unwrapPhasorAngle);
         this.target.labelPhasor = (this.target.labelPhasor == undefined ? true : this.target.labelPhasor);
-
-        this.phasorList = (this.target.phasorList == undefined ? [] : this.target.phasorList);
 
         ctrl.target.overriddenDataFlags = (ctrl.target.overriddenDataFlags != undefined ? ctrl.target.overriddenDataFlags : ctrl.datasource.dataFlags);
 
@@ -80,10 +75,10 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
 
         if (this.queryType == 'Filter Expression')
             this.setTargetWithQuery();
-        else if (this.queryType == 'Phasor List')
-            this.setTargetWithPhasors()
+        else if (this.queryType == 'Element List')
+            this.setTargetWithElements();
         else
-            this.setTargetWithElements()
+            this.setTargetWithText();
 
 
         $('panel-editor-tab .gf-form-group .gf-form-inline a.gf-form-label:contains("Options")').on('click', function (event) {
@@ -161,76 +156,42 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
 
   }
 
-  setTargetWithPhasors() {
-      var ctrl = this;
-
-      var phasors = [];
-      _.each(ctrl.phasorSegments, function (element, index, list) {
-          var phasor = _.find(ctrl.phasorList, function (o) { return o.text.m_Item1 == element.value });
-
-          var string = "";
-          if (ctrl.target.labelPhasor)
-              string += "Label(" + phasor.text.m_Item1 + "-Mag,";
-
-          string += phasor.text.m_Item2;
-          string += (ctrl.target.labelPhasor ? ")" : '');
-          string += ";"
-
-          if (ctrl.target.labelPhasor)
-              string += "Label(" + phasor.text.m_Item1 + "-Angle,";
-
-          if (ctrl.target.unwrapPhasorAngle)
-              string += "Unwrap(";
-
-          string += phasor.text.m_Item3;
-          string += (ctrl.target.unwrapPhasorAngle ? ")" : '');
-          string += (ctrl.target.labelPhasor ? ")" : '');
-
-          phasors.push(string); 
-      });
-
-      ctrl.target.target = phasors.join(';');
-
-      ctrl.target.phasorSegments = this.phasorSegments;
-      ctrl.target.phasorList = this.phasorList;
-      ctrl.target.queryType = this.queryType;
-      ctrl.panelCtrl.refresh()
-
+  setTargetWithText() {
+      this.target.target = this.target.targettext;
+      this.panelCtrl.refresh(); // Asks the panel to refresh data.
   }
-
   // #endregion
 
   onChangeInternal() {
     this.panelCtrl.refresh(); // Asks the panel to refresh data.
   }
 
-  toggleEditorMode() {
-      this.target.targettext = this.target.target;
-      this.target.textEditor = !this.target.textEditor;
-  }
-
-  textEditorChanged() {
-      this.target.target = this.target.targettext;
-      this.panelCtrl.refresh(); // Asks the panel to refresh data.
-  }
-
   // used to change the query type from element list to filter expression
   changeQueryType() {
-      this.target.target = '';
-      this.segments = [];
-      this.wheres = [];
-      this.functions = [];
-      this.functionSegments = [];
-      this.orderBys = [];
-      this.topNSegment = '';
-      this.phasorSegments = [];
-      this.phasorSegment = this.uiSegmentSrv.newPlusButton();
-      this.elementSegment = this.uiSegmentSrv.newPlusButton();
-      this.whereSegment = this.uiSegmentSrv.newPlusButton();
-      this.filterSegment = this.uiSegmentSrv.newSegment('ActiveMeasurements');
-      this.orderBySegment = this.uiSegmentSrv.newPlusButton();
-      this.functionSegment = this.uiSegmentSrv.newPlusButton();
-      this.panelCtrl.refresh();
+      if (this.queryType != 'Text Editor') {
+          this.target.target = '';
+          this.segments = [];
+          this.wheres = [];
+          this.functions = [];
+          this.functionSegments = [];
+          this.orderBys = [];
+          this.topNSegment = '';
+          this.phasorSegments = [];
+          this.phasorSegment = this.uiSegmentSrv.newPlusButton();
+          this.elementSegment = this.uiSegmentSrv.newPlusButton();
+          this.whereSegment = this.uiSegmentSrv.newPlusButton();
+          this.filterSegment = this.uiSegmentSrv.newSegment('ActiveMeasurements');
+          this.orderBySegment = this.uiSegmentSrv.newPlusButton();
+          this.functionSegment = this.uiSegmentSrv.newPlusButton();
+          this.panelCtrl.refresh(); // Asks the panel to refresh data.
+
+      }
+      else {
+          this.target.targettext = this.target.target;
+          this.setTargetWithText();
+      }
+
+
   }
 
 
@@ -299,98 +260,6 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
     }
     
     
-  }
-  // #endregion
-
-  // #region Phasors
-  getPhasorSegmentsToEdit() {
-      var ctrl = this;
-      var option = null;
-      if (event.target.value != "") option = event.target.value;
-
-      var ctrl = this;
-      return this.datasource.phasorFindQuery(option).then(data => {
-          ctrl.phasorList = JSON.parse(JSON.stringify(data));
-
-          var altSegments = _.map(data, item => {
-              return ctrl.uiSegmentSrv.newSegment({ value: item.text.m_Item1, expandable: item.expandable});
-          });
-          altSegments.sort((a, b) => {
-              if (a.value < b.value)
-                  return -1;
-              if (a.value > b.value)
-                  return 1;
-              return 0;
-          });
-
-
-          altSegments.unshift(ctrl.uiSegmentSrv.newSegment('-REMOVE-'));
-
-          return _.filter(altSegments, segment => {
-              return _.find(ctrl.phasorSegments, x => {
-                  return x.value == segment.value
-              }) == undefined;
-          });
-
-      });
-
-  }
-
-  getPhasorSegmentsToAddNew() {
-      var ctrl = this;
-      var option = null;
-
-
-      if (event.target.value != "") option = event.target.value;
-      return this.datasource.phasorFindQuery(option).then(data => {
-          ctrl.phasorList = JSON.parse(JSON.stringify(data));
-
-          var altSegments = _.map(data, item => {
-              return ctrl.uiSegmentSrv.newSegment({ value: item.text.m_Item1, expandable: item.expandable });
-          });
-          altSegments.sort((a, b) => {
-              if (a.value < b.value)
-                  return -1;
-              if (a.value > b.value)
-                  return 1;
-              return 0;
-          });
-
-
-          return _.filter(altSegments, segment => {
-              return _.find(ctrl.phasorSegments, x => {
-                  return x.value == segment.value
-              }) == undefined;
-          });
-      });
-
-  }
-
-
-  addPhasorSegment() {
-      // if value is not empty, add new attribute segment
-      if (event.target.text != null) {
-          this.phasorSegments.push(this.uiSegmentSrv.newSegment({ value: event.target.text, expandable: true }))
-          this.setTargetWithPhasors()
-      }
-
-      // reset the + button
-      var plusButton = this.uiSegmentSrv.newPlusButton()
-      this.phasorSegment.value = plusButton.value
-      this.phasorSegment.html = plusButton.html
-      this.panelCtrl.refresh()
-
-  }
-
-  phasorValueChanged(segment, index) {
-      if (segment.value == "-REMOVE-") {
-          this.phasorSegments.splice(index, 1);
-      }
-      else {
-          this.phasorSegments[index] = segment;
-      }
-
-      this.setTargetWithPhasors();
   }
   // #endregion
 

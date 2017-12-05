@@ -84,7 +84,7 @@ System.register(['app/plugins/sdk', './../js/constants.js', './../css/query-edit
                     _this.segments = _this.target.segments == undefined ? [] : _this.target.segments.map(function (a) {
                         return ctrl.uiSegmentSrv.newSegment({ value: a.text, expandable: true });
                     });
-                    _this.queryTypes = ["Element List", "Filter Expression" /*, "Phasor List"*/
+                    _this.queryTypes = ["Element List", "Filter Expression", "Text Editor" /*, "Phasor List"*/
                     ];
                     _this.queryType = _this.target.queryType == undefined ? "Element List" : _this.target.queryType;
                     _this.wheres = _this.target.wheres == undefined ? [] : _this.target.wheres.map(function (a) {
@@ -101,17 +101,10 @@ System.register(['app/plugins/sdk', './../js/constants.js', './../css/query-edit
                     _this.filterSegment = _this.target.filterSegment == undefined ? _this.uiSegmentSrv.newSegment('ActiveMeasurement') : _this.uiSegmentSrv.newSegment(_this.target.filterSegment.value);
                     _this.orderBySegment = _this.uiSegmentSrv.newPlusButton();
                     _this.functionSegment = _this.uiSegmentSrv.newPlusButton();
-
-                    _this.phasorSegment = _this.uiSegmentSrv.newPlusButton();
-                    _this.phasorSegments = _this.target.phasorSegments == undefined ? [] : _this.target.phasorSegments.map(function (a) {
-                        return ctrl.uiSegmentSrv.newSegment({ value: a.text, expandable: true });
-                    });
                     _this.typingTimer;
 
                     _this.target.unwrapPhasorAngle = _this.target.unwrapPhasorAngle == undefined ? false : _this.target.unwrapPhasorAngle;
                     _this.target.labelPhasor = _this.target.labelPhasor == undefined ? true : _this.target.labelPhasor;
-
-                    _this.phasorList = _this.target.phasorList == undefined ? [] : _this.target.phasorList;
 
                     ctrl.target.overriddenDataFlags = ctrl.target.overriddenDataFlags != undefined ? ctrl.target.overriddenDataFlags : ctrl.datasource.dataFlags;
 
@@ -119,7 +112,7 @@ System.register(['app/plugins/sdk', './../js/constants.js', './../css/query-edit
 
                     _this.buildFunctionArray();
 
-                    if (_this.queryType == 'Filter Expression') _this.setTargetWithQuery();else if (_this.queryType == 'Phasor List') _this.setTargetWithPhasors();else _this.setTargetWithElements();
+                    if (_this.queryType == 'Filter Expression') _this.setTargetWithQuery();else if (_this.queryType == 'Element List') _this.setTargetWithElements();else _this.setTargetWithText();
 
                     $('panel-editor-tab .gf-form-group .gf-form-inline a.gf-form-label:contains("Options")').on('click', function (event) {
                         if ($($('panel-editor-tab .gf-form-group div')[6]).children().first()[0] != $('query-troubleshooter')[0]) {
@@ -192,40 +185,10 @@ System.register(['app/plugins/sdk', './../js/constants.js', './../css/query-edit
                         ctrl.panelCtrl.refresh();
                     }
                 }, {
-                    key: 'setTargetWithPhasors',
-                    value: function setTargetWithPhasors() {
-                        var ctrl = this;
-
-                        var phasors = [];
-                        _.each(ctrl.phasorSegments, function (element, index, list) {
-                            var phasor = _.find(ctrl.phasorList, function (o) {
-                                return o.text.m_Item1 == element.value;
-                            });
-
-                            var string = "";
-                            if (ctrl.target.labelPhasor) string += "Label(" + phasor.text.m_Item1 + "-Mag,";
-
-                            string += phasor.text.m_Item2;
-                            string += ctrl.target.labelPhasor ? ")" : '';
-                            string += ";";
-
-                            if (ctrl.target.labelPhasor) string += "Label(" + phasor.text.m_Item1 + "-Angle,";
-
-                            if (ctrl.target.unwrapPhasorAngle) string += "Unwrap(";
-
-                            string += phasor.text.m_Item3;
-                            string += ctrl.target.unwrapPhasorAngle ? ")" : '';
-                            string += ctrl.target.labelPhasor ? ")" : '';
-
-                            phasors.push(string);
-                        });
-
-                        ctrl.target.target = phasors.join(';');
-
-                        ctrl.target.phasorSegments = this.phasorSegments;
-                        ctrl.target.phasorList = this.phasorList;
-                        ctrl.target.queryType = this.queryType;
-                        ctrl.panelCtrl.refresh();
+                    key: 'setTargetWithText',
+                    value: function setTargetWithText() {
+                        this.target.target = this.target.targettext;
+                        this.panelCtrl.refresh(); // Asks the panel to refresh data.
                     }
                 }, {
                     key: 'onChangeInternal',
@@ -233,35 +196,28 @@ System.register(['app/plugins/sdk', './../js/constants.js', './../css/query-edit
                         this.panelCtrl.refresh(); // Asks the panel to refresh data.
                     }
                 }, {
-                    key: 'toggleEditorMode',
-                    value: function toggleEditorMode() {
-                        this.target.targettext = this.target.target;
-                        this.target.textEditor = !this.target.textEditor;
-                    }
-                }, {
-                    key: 'textEditorChanged',
-                    value: function textEditorChanged() {
-                        this.target.target = this.target.targettext;
-                        this.panelCtrl.refresh(); // Asks the panel to refresh data.
-                    }
-                }, {
                     key: 'changeQueryType',
                     value: function changeQueryType() {
-                        this.target.target = '';
-                        this.segments = [];
-                        this.wheres = [];
-                        this.functions = [];
-                        this.functionSegments = [];
-                        this.orderBys = [];
-                        this.topNSegment = '';
-                        this.phasorSegments = [];
-                        this.phasorSegment = this.uiSegmentSrv.newPlusButton();
-                        this.elementSegment = this.uiSegmentSrv.newPlusButton();
-                        this.whereSegment = this.uiSegmentSrv.newPlusButton();
-                        this.filterSegment = this.uiSegmentSrv.newSegment('ActiveMeasurements');
-                        this.orderBySegment = this.uiSegmentSrv.newPlusButton();
-                        this.functionSegment = this.uiSegmentSrv.newPlusButton();
-                        this.panelCtrl.refresh();
+                        if (this.queryType != 'Text Editor') {
+                            this.target.target = '';
+                            this.segments = [];
+                            this.wheres = [];
+                            this.functions = [];
+                            this.functionSegments = [];
+                            this.orderBys = [];
+                            this.topNSegment = '';
+                            this.phasorSegments = [];
+                            this.phasorSegment = this.uiSegmentSrv.newPlusButton();
+                            this.elementSegment = this.uiSegmentSrv.newPlusButton();
+                            this.whereSegment = this.uiSegmentSrv.newPlusButton();
+                            this.filterSegment = this.uiSegmentSrv.newSegment('ActiveMeasurements');
+                            this.orderBySegment = this.uiSegmentSrv.newPlusButton();
+                            this.functionSegment = this.uiSegmentSrv.newPlusButton();
+                            this.panelCtrl.refresh(); // Asks the panel to refresh data.
+                        } else {
+                            this.target.targettext = this.target.target;
+                            this.setTargetWithText();
+                        }
                     }
                 }, {
                     key: 'getElementSegments',
@@ -322,87 +278,6 @@ System.register(['app/plugins/sdk', './../js/constants.js', './../css/query-edit
                             targets[index] = segment.value;
                             this.target.target = targets.join(';');
                         }
-                    }
-                }, {
-                    key: 'getPhasorSegmentsToEdit',
-                    value: function getPhasorSegmentsToEdit() {
-                        var ctrl = this;
-                        var option = null;
-                        if (event.target.value != "") option = event.target.value;
-
-                        var ctrl = this;
-                        return this.datasource.phasorFindQuery(option).then(function (data) {
-                            ctrl.phasorList = JSON.parse(JSON.stringify(data));
-
-                            var altSegments = _.map(data, function (item) {
-                                return ctrl.uiSegmentSrv.newSegment({ value: item.text.m_Item1, expandable: item.expandable });
-                            });
-                            altSegments.sort(function (a, b) {
-                                if (a.value < b.value) return -1;
-                                if (a.value > b.value) return 1;
-                                return 0;
-                            });
-
-                            altSegments.unshift(ctrl.uiSegmentSrv.newSegment('-REMOVE-'));
-
-                            return _.filter(altSegments, function (segment) {
-                                return _.find(ctrl.phasorSegments, function (x) {
-                                    return x.value == segment.value;
-                                }) == undefined;
-                            });
-                        });
-                    }
-                }, {
-                    key: 'getPhasorSegmentsToAddNew',
-                    value: function getPhasorSegmentsToAddNew() {
-                        var ctrl = this;
-                        var option = null;
-
-                        if (event.target.value != "") option = event.target.value;
-                        return this.datasource.phasorFindQuery(option).then(function (data) {
-                            ctrl.phasorList = JSON.parse(JSON.stringify(data));
-
-                            var altSegments = _.map(data, function (item) {
-                                return ctrl.uiSegmentSrv.newSegment({ value: item.text.m_Item1, expandable: item.expandable });
-                            });
-                            altSegments.sort(function (a, b) {
-                                if (a.value < b.value) return -1;
-                                if (a.value > b.value) return 1;
-                                return 0;
-                            });
-
-                            return _.filter(altSegments, function (segment) {
-                                return _.find(ctrl.phasorSegments, function (x) {
-                                    return x.value == segment.value;
-                                }) == undefined;
-                            });
-                        });
-                    }
-                }, {
-                    key: 'addPhasorSegment',
-                    value: function addPhasorSegment() {
-                        // if value is not empty, add new attribute segment
-                        if (event.target.text != null) {
-                            this.phasorSegments.push(this.uiSegmentSrv.newSegment({ value: event.target.text, expandable: true }));
-                            this.setTargetWithPhasors();
-                        }
-
-                        // reset the + button
-                        var plusButton = this.uiSegmentSrv.newPlusButton();
-                        this.phasorSegment.value = plusButton.value;
-                        this.phasorSegment.html = plusButton.html;
-                        this.panelCtrl.refresh();
-                    }
-                }, {
-                    key: 'phasorValueChanged',
-                    value: function phasorValueChanged(segment, index) {
-                        if (segment.value == "-REMOVE-") {
-                            this.phasorSegments.splice(index, 1);
-                        } else {
-                            this.phasorSegments[index] = segment;
-                        }
-
-                        this.setTargetWithPhasors();
                     }
                 }, {
                     key: 'topNValueChanged',
