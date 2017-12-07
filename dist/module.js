@@ -1,45 +1,66 @@
-'use strict';
-
-System.register(['./datasource', './controllers/query_ctrl', './controllers/config_ctrl', './controllers/queryOptions_ctrl', './controllers/annotations_ctrl'], function (_export, _context) {
-  "use strict";
-
-  var OpenHistorianDataSource, OpenHistorianDataSourceQueryCtrl, OpenHistorianConfigCtrl, OpenHistorianQueryOptionsCtrl, OpenHistorianAnnotaionsQueryCtrl;
-  return {
-    setters: [function (_datasource) {
-      OpenHistorianDataSource = _datasource.OpenHistorianDataSource;
-    }, function (_controllersQuery_ctrl) {
-      OpenHistorianDataSourceQueryCtrl = _controllersQuery_ctrl.OpenHistorianDataSourceQueryCtrl;
-    }, function (_controllersConfig_ctrl) {
-      OpenHistorianConfigCtrl = _controllersConfig_ctrl.OpenHistorianConfigCtrl;
-    }, function (_controllersQueryOptions_ctrl) {
-      OpenHistorianQueryOptionsCtrl = _controllersQueryOptions_ctrl.OpenHistorianQueryOptionsCtrl;
-    }, function (_controllersAnnotations_ctrl) {
-      OpenHistorianAnnotaionsQueryCtrl = _controllersAnnotations_ctrl.OpenHistorianAnnotaionsQueryCtrl;
-    }],
-    execute: function () {
-      _export('Datasource', OpenHistorianDataSource);
-
-      _export('QueryCtrl', OpenHistorianDataSourceQueryCtrl);
-
-      _export('ConfigCtrl', OpenHistorianConfigCtrl);
-
-      _export('QueryOptionsCtrl', OpenHistorianQueryOptionsCtrl);
-
-      _export('AnnotationsQueryCtrl', OpenHistorianAnnotaionsQueryCtrl);
-
-      angular.module('grafana.directives').directive("queryOptions", function () {
-        return {
-          templateUrl: 'public/plugins/gridprotectionalliance-openhistorian-datasource/partial/query.options.html',
-          restrict: 'E',
-          controller: OpenHistorianQueryOptionsCtrl,
-          controllerAs: 'queryOptionCtrl',
-          scope: {
-            flags: "=",
-            return: "="
-          }
-        };
-      });
+//******************************************************************************************************
+//  module.js - Gbtc
+//
+//  Copyright � 2017, Grid Protection Alliance.  All Rights Reserved.
+//
+//  Licensed to the Grid Protection Alliance (GPA) under one or more contributor license agreements. See
+//  the NOTICE file distributed with this work for additional information regarding copyright ownership.
+//  The GPA licenses this file to you under the MIT License (MIT), the "License"; you may not use this
+//  file except in compliance with the License. You may obtain a copy of the License at:
+//
+//      http://opensource.org/licenses/MIT
+//
+//  Unless agreed to in writing, the subject software distributed under the License is distributed on an
+//  "AS-IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. Refer to the
+//  License for the specific language governing permissions and limitations.
+//
+//  Code Modification History:
+//  ----------------------------------------------------------------------------------------------------
+//  11/02/2017 - Billy Ernest
+//       Generated original version of source code.
+//
+//******************************************************************************************************
+System.register(['./openHistorianDatasource', './controllers/openHistorianQuery_ctrl', './controllers/openHistorianConfig_ctrl', './controllers/openHistorianQueryOptions_ctrl', './controllers/openHistorianAnnotations_ctrl', "angular"], function(exports_1) {
+    var openHistorianDatasource_1, openHistorianQuery_ctrl_1, openHistorianConfig_ctrl_1, openHistorianQueryOptions_ctrl_1, openHistorianAnnotations_ctrl_1, angular_1;
+    return {
+        setters:[
+            function (openHistorianDatasource_1_1) {
+                openHistorianDatasource_1 = openHistorianDatasource_1_1;
+            },
+            function (openHistorianQuery_ctrl_1_1) {
+                openHistorianQuery_ctrl_1 = openHistorianQuery_ctrl_1_1;
+            },
+            function (openHistorianConfig_ctrl_1_1) {
+                openHistorianConfig_ctrl_1 = openHistorianConfig_ctrl_1_1;
+            },
+            function (openHistorianQueryOptions_ctrl_1_1) {
+                openHistorianQueryOptions_ctrl_1 = openHistorianQueryOptions_ctrl_1_1;
+            },
+            function (openHistorianAnnotations_ctrl_1_1) {
+                openHistorianAnnotations_ctrl_1 = openHistorianAnnotations_ctrl_1_1;
+            },
+            function (angular_1_1) {
+                angular_1 = angular_1_1;
+            }],
+        execute: function() {
+            exports_1("Datasource", openHistorianDatasource_1.OpenHistorianDataSource);
+            exports_1("QueryCtrl", openHistorianQuery_ctrl_1.OpenHistorianDataSourceQueryCtrl);
+            exports_1("ConfigCtrl", openHistorianConfig_ctrl_1.OpenHistorianConfigCtrl);
+            exports_1("QueryOptionsCtrl", openHistorianQueryOptions_ctrl_1.OpenHistorianQueryOptionsCtrl);
+            exports_1("AnnotationsQueryCtrl", openHistorianAnnotations_ctrl_1.OpenHistorianAnnotationsQueryCtrl);
+            angular_1.default.module('grafana.directives').directive("queryOptions", function () {
+                return {
+                    templateUrl: 'public/plugins/gridprotectionalliance-openhistorian-datasource/partial/query.options.html',
+                    restrict: 'E',
+                    controller: openHistorianQueryOptions_ctrl_1.OpenHistorianQueryOptionsCtrl,
+                    controllerAs: 'queryOptionCtrl',
+                    scope: {
+                        flags: "=",
+                        return: "=",
+                    }
+                };
+            });
+        }
     }
-  };
 });
 //# sourceMappingURL=module.js.map

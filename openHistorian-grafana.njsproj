@@ -17,19 +17,16 @@
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
   <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
   <ItemGroup>
+    <Compile Include="src\controllers\openHistorianAnnotations_ctrl.ts" />
+    <Compile Include="src\controllers\openHistorianConfig_ctrl.ts" />
+    <Compile Include="src\controllers\openHistorianQueryOptions_ctrl.ts" />
+    <Compile Include="src\controllers\openHistorianQuery_ctrl.ts" />
+    <Compile Include="src\openHistorianDatasource.ts" />
+    <Compile Include="src\js\openHistorianConstants.ts" />
+    <Compile Include="src\module.ts" />
     <Content Include="package.json" />
     <Content Include="README.md" />
     <Compile Include="Gruntfile.js" />
-    <Content Include="src\plugin.json" />
-    <Content Include="src\query_help.md" />
-    <Content Include="src\README.md" />
-    <Compile Include="src\datasource.js" />
-    <Compile Include="src\js\constants.js" />
-    <Compile Include="src\module.js" />
-    <Compile Include="src\controllers\annotations_ctrl.js" />
-    <Compile Include="src\controllers\config_ctrl.js" />
-    <Compile Include="src\controllers\queryOptions_ctrl.js" />
-    <Compile Include="src\controllers\query_ctrl.js" />
     <Content Include="src\css\bootstrap-multiselect.css" />
     <Content Include="src\css\isteven-multi-select.css" />
     <Content Include="src\css\query-editor.css" />
@@ -38,14 +35,17 @@
     <Content Include="src\partial\config.html" />
     <Content Include="src\partial\query.editor.html" />
     <Content Include="src\partial\query.options.html" />
+    <Content Include="src\plugin.json" />
+    <Content Include="src\query_help.md" />
+    <Content Include="src\README.md" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="src" />
-    <Folder Include="src\controllers" />
-    <Folder Include="src\css" />
-    <Folder Include="src\img" />
-    <Folder Include="src\js" />
-    <Folder Include="src\partial" />
+    <Folder Include="src\" />
+    <Folder Include="src\controllers\" />
+    <Folder Include="src\css\" />
+    <Folder Include="src\img\" />
+    <Folder Include="src\js\" />
+    <Folder Include="src\partial\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <!--Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them.-->

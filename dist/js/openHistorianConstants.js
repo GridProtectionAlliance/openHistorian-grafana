@@ -1,13 +1,32 @@
-'use strict';
-
-System.register([], function (_export, _context) {
-    "use strict";
-
+//******************************************************************************************************
+//  constants.js - Gbtc
+//
+//  Copyright © 2017, Grid Protection Alliance.  All Rights Reserved.
+//
+//  Licensed to the Grid Protection Alliance (GPA) under one or more contributor license agreements. See
+//  the NOTICE file distributed with this work for additional information regarding copyright ownership.
+//  The GPA licenses this file to you under the MIT License (MIT), the "License"; you may not use this
+//  file except in compliance with the License. You may obtain a copy of the License at:
+//
+//      http://opensource.org/licenses/MIT
+//
+//  Unless agreed to in writing, the subject software distributed under the License is distributed on an
+//  "AS-IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. Refer to the
+//  License for the specific language governing permissions and limitations.
+//
+//  Code Modification History:
+//  ----------------------------------------------------------------------------------------------------
+//  11/01/2017 - Billy Ernest
+//       Generated original version of source code.
+//
+//******************************************************************************************************
+System.register([], function(exports_1) {
     var DefaultFlags, MeasurementStateFlags, FunctionList, WhereOperators, Booleans, AngleUnits, TimeUnits;
     return {
-        setters: [],
-        execute: function () {
-            _export('DefaultFlags', DefaultFlags = {
+        setters:[],
+        execute: function() {
+            // #region Constants
+            exports_1("DefaultFlags", DefaultFlags = {
                 'Select All': { Included: true, Excluded: false, Order: -1 },
                 Normal: { Included: true, Excluded: false, Order: 0 },
                 BadData: { Included: true, Excluded: false, Order: 1 },
@@ -43,10 +62,7 @@ System.register([], function (_export, _context) {
                 SystemWarning: { Included: true, Excluded: false, Order: 31 },
                 MeasurementError: { Included: true, Excluded: false, Order: 32 }
             });
-
-            _export('DefaultFlags', DefaultFlags);
-
-            _export('MeasurementStateFlags', MeasurementStateFlags = {
+            exports_1("MeasurementStateFlags", MeasurementStateFlags = {
                 Normal: 0,
                 BadData: Math.pow(2, 0),
                 SuspectData: Math.pow(2, 1),
@@ -81,10 +97,7 @@ System.register([], function (_export, _context) {
                 SystemWarning: Math.pow(2, 30),
                 MeasurementError: Math.pow(2, 31)
             });
-
-            _export('MeasurementStateFlags', MeasurementStateFlags);
-
-            _export('FunctionList', FunctionList = {
+            exports_1("FunctionList", FunctionList = {
                 Set: { Function: 'Set', Parameters: [] },
                 Slice: { Function: 'Slice', Parameters: [{ Default: 1, Type: 'double', Description: 'A floating-point value that must be greater than or equal to zero that represents the desired time tolerance, in seconds, for the time slice.' }] },
                 Average: { Function: 'Average', Parameters: [] },
@@ -122,27 +135,14 @@ System.register([], function (_export, _context) {
                 FilterNaN: { Function: 'FilterNaN', Parameters: [{ Default: true, Type: 'boolean', Description: 'A boolean flag that determines if infinite values should also be excluded - defaults to true.' }] },
                 UnwrapAngle: { Function: 'UnwrapAngle', Parameters: [{ Default: 'Degrees', Type: 'angleUnits', Description: 'Specifies the type of angle units and must be one of the following: Degrees, Radians, Grads, ArcMinutes, ArcSeconds or AngularMil - defaults to Degrees.' }] },
                 WrapAngle: { Function: 'WrapAngle', Parameters: [{ Default: 'Degrees', Type: 'angleUnits', Description: 'Specifies the type of angle units and must be one of the following: Degrees, Radians, Grads, ArcMinutes, ArcSeconds or AngularMil - defaults to Degrees.' }] },
-                Label: { Function: 'Label', Parameters: [{ Default: 'Name', Type: 'string', Description: 'Renames a series with the specified label value.' }] }
+                Label: { Function: 'Label', Parameters: [{ Default: 'Name', Type: 'string', Description: 'Renames a series with the specified label value.' }] },
             });
-
-            _export('FunctionList', FunctionList);
-
-            _export('WhereOperators', WhereOperators = ['=', '<>', '<', '<=', '>', '>=', 'LIKE', 'NOT LIKE', 'IN', 'NOT IN', 'IS', 'IS NOT']);
-
-            _export('WhereOperators', WhereOperators);
-
-            _export('Booleans', Booleans = ['true', 'false']);
-
-            _export('Booleans', Booleans);
-
-            _export('AngleUnits', AngleUnits = ['Degrees', 'Radians', 'Grads', 'ArcMinutes', 'ArcSeconds', 'AngularMil']);
-
-            _export('AngleUnits', AngleUnits);
-
-            _export('TimeUnits', TimeUnits = ['Weeks', 'Days', 'Hours', 'Minutes', 'Seconds', 'Milliseconds', 'Microseconds', 'Nanoseconds', 'Ticks', 'PlankTime', 'AtomicUnitsOfTime', 'Ke']);
-
-            _export('TimeUnits', TimeUnits);
+            exports_1("WhereOperators", WhereOperators = ['=', '<>', '<', '<=', '>', '>=', 'LIKE', 'NOT LIKE', 'IN', 'NOT IN', 'IS', 'IS NOT']);
+            exports_1("Booleans", Booleans = ['true', 'false']);
+            exports_1("AngleUnits", AngleUnits = ['Degrees', 'Radians', 'Grads', 'ArcMinutes', 'ArcSeconds', 'AngularMil']);
+            exports_1("TimeUnits", TimeUnits = ['Weeks', 'Days', 'Hours', 'Minutes', 'Seconds', 'Milliseconds', 'Microseconds', 'Nanoseconds', 'Ticks', 'PlankTime', 'AtomicUnitsOfTime', 'Ke']);
         }
-    };
+    }
 });
-//# sourceMappingURL=constants.js.map
+// #endregion
+//# sourceMappingURL=openHistorianConstants.js.map

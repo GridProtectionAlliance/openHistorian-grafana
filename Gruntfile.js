@@ -14,7 +14,7 @@ module.exports = function (grunt) {
       src_to_dist: {
         cwd: 'src',
         expand: true,
-        src: ['**/*', '!**/*.js', '!**/*.ts', '!**/*.scss', '!img/*', "!docs/*"],
+        src: ['**/*', '!**/*.js', '!**/*.scss', '!img/*', "!docs/*"],
         dest: 'dist/'
       },
       img_to_dist: {
@@ -58,8 +58,24 @@ module.exports = function (grunt) {
           ext: '.js'
         }]
       }
-    }
+    },
+    typescript: {
+        build: {
+            src: ['dist/**/*.ts', '!**/*.d.ts'],
+            dest: 'dist',
+            options: {
+                module: 'system',
+                target: 'es5',
+                rootDir: 'dist/',
+                declaration: true,
+                emitDecoratorMetadata: true,
+                experimentalDecorators: true,
+                sourceMap: true,
+                noImplicitAny: false,
+            }
+        }
+    },
   })
 
-  grunt.registerTask('default', ['clean', 'copy:src_to_dist', 'copy:img_to_dist', 'copy:docs_to_dist', 'copy:pluginDef', 'babel'])
+  grunt.registerTask('default', ['clean', 'copy:src_to_dist', 'copy:img_to_dist', 'copy:docs_to_dist', 'copy:pluginDef', 'typescript:build'])
 }

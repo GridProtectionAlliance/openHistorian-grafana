@@ -31,8 +31,8 @@ export class OpenHistorianConfigCtrl{
         var ctrl = this;
 
         ctrl.current.jsonData = ctrl.current.jsonData || {}
-        ctrl.current.jsonData.Included = (ctrl.current.jsonData.Included == undefined ? 0xFFFFFFF : ctrl.current.jsonData.Included);
-        ctrl.current.jsonData.Excluded = (ctrl.current.jsonData.Excluded == undefined ? 0x0000000 : ctrl.current.jsonData.Excluded);
+        ctrl.current.jsonData.Included = (ctrl.current.jsonData.Included == undefined ? '0xFFFFFFF' : ctrl.current.jsonData.Included);
+        ctrl.current.jsonData.Excluded = (ctrl.current.jsonData.Excluded == undefined ? '0x0000000' : ctrl.current.jsonData.Excluded);
         ctrl.current.jsonData.IncludeNormal = (ctrl.current.jsonData.IncludeNormal == undefined ? true : ctrl.current.jsonData.IncludeNormal);
 
 

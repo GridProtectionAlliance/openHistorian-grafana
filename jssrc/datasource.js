@@ -35,8 +35,8 @@ export class OpenHistorianDataSource {
 
     this.dataFlags = instanceSettings.jsonData.flags;
     this.options = {
-         includedDataFlags: (instanceSettings.jsonData.Included == undefined ? 0xFFFFFFFF : instanceSettings.jsonData.Included), 
-         excludedDataFlags: (instanceSettings.jsonData.Excluded == undefined ? 0x00000000 : instanceSettings.jsonData.Excluded),
+         includedDataFlags: (instanceSettings.jsonData.Included == undefined ? '0xFFFFFFFF' : instanceSettings.jsonData.Included), 
+         excludedDataFlags: (instanceSettings.jsonData.Excluded == undefined ? '0x00000000' : instanceSettings.jsonData.Excluded),
          includeNormalData: (instanceSettings.jsonData.IncludeNormal == undefined ? true : instanceSettings.jsonData.IncludeNormal)
     }
   }
