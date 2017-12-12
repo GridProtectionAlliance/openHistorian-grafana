@@ -22,6 +22,5 @@ export declare class OpenHistorianDataSource {
     phasorFindQuery(options: any): any;
     orderByFindQuery(options: any): any;
     getMetaData(options: any): any;
-    setTargetWithElements(target: any): void;
-    buildFunctionArray(target: any): any[];
+    fixTemplates(target: any): void;
 }

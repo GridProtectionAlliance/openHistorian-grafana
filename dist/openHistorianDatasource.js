@@ -50,10 +50,10 @@ System.register(["lodash"], function(exports_1) {
                     };
                 }
                 OpenHistorianDataSource.prototype.query = function (options) {
-                    //for(var element of options.targets){
-                    //     if (element.queryType == 'Element List')
-                    //         this.setTargetWithElements(element);
-                    // }
+                    for (var _i = 0, _a = options.targets; _i < _a.length; _i++) {
+                        var element = _a[_i];
+                        this.fixTemplates(element);
+                    }
                     var query = this.buildQueryParameters(options);
                     query.targets = query.targets.filter(function (t) {
                         return !t.hide;
@@ -190,98 +190,18 @@ System.register(["lodash"], function(exports_1) {
                         headers: { 'Content-Type': 'application/json' }
                     });
                 };
-                // #region Target Compilation
-                //setTargetWithQuery() {
-                //    if (this.wheres.length == 0) return;
-                //    var filter = this.filterSegment.value + ' ';
-                //    var topn = (this.topNSegment ? 'TOP ' + this.topNSegment + ' ' : '');
-                //    var where = 'WHERE ';
-                //    _.each(this.wheres, function (element, index, list) {
-                //        where += element.value + ' '
-                //    });
-                //    var orderby = '';
-                //    _.each(this.orderBys, function (element, index, list) {
-                //        orderby += (index == 0 ? 'ORDER BY ' : '') + element.value + (element.type == 'condition' && index < list.length - 1 ? ',' : '') + ' ';
-                //    });
-                //    var query = 'FILTER ' + topn + filter + where + orderby;
-                //    var functions = '';
-                //    _.each(this.functions, function (element, index, list) {
-                //        if (element.value == 'QUERY') functions += query;
-                //        else functions += element.value;
-                //    });
-                //    this.target.target = (functions != "" ? functions : query);
-                //    this.target.topNSegment = this.topNSegment;
-                //    this.target.filterSegment = this.filterSegment;
-                //    this.target.orderBys = this.orderBys;
-                //    this.target.wheres = this.wheres;
-                //    this.target.functionSegments = this.functionSegments;
-                //    this.target.queryType = this.queryType;
-                //    this.panelCtrl.refresh()
-                //}
-                OpenHistorianDataSource.prototype.setTargetWithElements = function (target) {
-                    var functions = this.buildFunctionArray(target);
-                    var functionsString = '';
+                OpenHistorianDataSource.prototype.fixTemplates = function (target) {
                     var ctrl = this;
-                    lodash_1.default.each(functions, function (element, index, list) {
-                        if (element.value == 'QUERY')
-                            functionsString += target.segments.map(function (a) {
-                                if (ctrl.templateSrv.variableExists(a.text)) {
-                                    return ctrl.templateSrv.replaceWithText(a.text);
-                                }
-                                else
-                                    return a.value;
-                            }).join(';');
-                        else if (ctrl.templateSrv.variableExists(element.value))
-                            functionsString += ctrl.templateSrv.replaceWithText(element.text);
-                        else
-                            functionsString += element.value;
-                    });
-                    target.target = (functionsString != "" ? functionsString : target.segments.map(function (a) {
-                        if (ctrl.templateSrv.variableExists(a.text)) {
-                            return ctrl.templateSrv.replaceWithText(a.text);
+                    var sep = ' ';
+                    if (target.queryType == 'Element List')
+                        sep = ';';
+                    target.target = target.target.split(sep).map(function (a) {
+                        if (ctrl.templateSrv.variableExists(a)) {
+                            return ctrl.templateSrv.replaceWithText(a);
                         }
                         else
-                            return a.value;
-                    }).join(';'));
-                };
-                OpenHistorianDataSource.prototype.buildFunctionArray = function (target) {
-                    var ctrl = this;
-                    var functions = [];
-                    if (target.functionSegments.length == 0)
-                        return;
-                    lodash_1.default.each(target.functionSegments, function (element, index, list) {
-                        var newElement = ctrl.uiSegmentSrv.newSegment(element.Function);
-                        newElement.Type = 'Function';
-                        newElement.Function = element.Function;
-                        functions.push(newElement);
-                        if (newElement.value == 'Set' || newElement.value == 'Slice')
-                            return;
-                        var operator = ctrl.uiSegmentSrv.newOperator('(');
-                        operator.Type = 'Operator';
-                        functions.push(operator);
-                        lodash_1.default.each(element.Parameters, function (param, i, j) {
-                            var d = ctrl.uiSegmentSrv.newFake(param.Default.toString());
-                            d.Type = param.Type;
-                            d.Function = element.Function;
-                            d.Description = param.Description;
-                            d.Index = i;
-                            functions.push(d);
-                            var operator = ctrl.uiSegmentSrv.newOperator(',');
-                            operator.Type = 'Operator';
-                            functions.push(operator);
-                        });
-                    });
-                    var query = ctrl.uiSegmentSrv.newCondition('QUERY');
-                    query.Type = 'Query';
-                    functions.push(query);
-                    for (var i in target.functionSegments) {
-                        if (target.functionSegments[i].Function != 'Set' && target.functionSegments[i].Function != 'Slice') {
-                            var operator = ctrl.uiSegmentSrv.newOperator(')');
-                            operator.Type = 'Operator';
-                            functions.push(operator);
-                        }
-                    }
-                    return functions;
+                            return a;
+                    }).join(sep);
                 };
                 return OpenHistorianDataSource;
             })();
