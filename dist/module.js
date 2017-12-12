@@ -20,8 +20,8 @@
 //       Generated original version of source code.
 //
 //******************************************************************************************************
-System.register(['./openHistorianDatasource', './controllers/openHistorianQuery_ctrl', './controllers/openHistorianConfig_ctrl', './controllers/openHistorianQueryOptions_ctrl', './controllers/openHistorianAnnotations_ctrl', "angular"], function(exports_1) {
-    var openHistorianDatasource_1, openHistorianQuery_ctrl_1, openHistorianConfig_ctrl_1, openHistorianQueryOptions_ctrl_1, openHistorianAnnotations_ctrl_1, angular_1;
+System.register(['./openHistorianDatasource', './controllers/openHistorianQuery_ctrl', './controllers/openHistorianConfig_ctrl', './controllers/openHistorianQueryOptions_ctrl', './controllers/openHistorianAnnotations_ctrl', './controllers/openHistorianElementPicker_ctrl', './controllers/openHistorianTextEditor_ctrl', './controllers/openHistorianFilterExpression_ctrl', "angular"], function(exports_1) {
+    var openHistorianDatasource_1, openHistorianQuery_ctrl_1, openHistorianConfig_ctrl_1, openHistorianQueryOptions_ctrl_1, openHistorianAnnotations_ctrl_1, openHistorianElementPicker_ctrl_1, openHistorianTextEditor_ctrl_1, openHistorianFilterExpression_ctrl_1, angular_1;
     return {
         setters:[
             function (openHistorianDatasource_1_1) {
@@ -38,6 +38,15 @@ System.register(['./openHistorianDatasource', './controllers/openHistorianQuery_
             },
             function (openHistorianAnnotations_ctrl_1_1) {
                 openHistorianAnnotations_ctrl_1 = openHistorianAnnotations_ctrl_1_1;
+            },
+            function (openHistorianElementPicker_ctrl_1_1) {
+                openHistorianElementPicker_ctrl_1 = openHistorianElementPicker_ctrl_1_1;
+            },
+            function (openHistorianTextEditor_ctrl_1_1) {
+                openHistorianTextEditor_ctrl_1 = openHistorianTextEditor_ctrl_1_1;
+            },
+            function (openHistorianFilterExpression_ctrl_1_1) {
+                openHistorianFilterExpression_ctrl_1 = openHistorianFilterExpression_ctrl_1_1;
             },
             function (angular_1_1) {
                 angular_1 = angular_1_1;
@@ -57,6 +66,45 @@ System.register(['./openHistorianDatasource', './controllers/openHistorianQuery_
                     scope: {
                         flags: "=",
                         return: "=",
+                    }
+                };
+            });
+            angular_1.default.module('grafana.directives').directive("elementPicker", function () {
+                return {
+                    templateUrl: 'public/plugins/gridprotectionalliance-openhistorian-datasource/partial/query.elementPicker.html',
+                    restrict: 'E',
+                    controller: openHistorianElementPicker_ctrl_1.OpenHistorianElementPickerCtrl,
+                    controllerAs: 'openHistorianElementPickerCtrl',
+                    scope: {
+                        target: "=",
+                        datasource: "=",
+                        panel: "="
+                    }
+                };
+            });
+            angular_1.default.module('grafana.directives').directive("textEditor", function () {
+                return {
+                    templateUrl: 'public/plugins/gridprotectionalliance-openhistorian-datasource/partial/query.textEditor.html',
+                    restrict: 'E',
+                    controller: openHistorianTextEditor_ctrl_1.OpenHistorianTextEditorCtrl,
+                    controllerAs: 'openHistorianTextEditorCtrl',
+                    scope: {
+                        target: "=",
+                        datasource: "=",
+                        panel: "="
+                    }
+                };
+            });
+            angular_1.default.module('grafana.directives').directive("filterExpression", function () {
+                return {
+                    templateUrl: 'public/plugins/gridprotectionalliance-openhistorian-datasource/partial/query.filterExpression.html',
+                    restrict: 'E',
+                    controller: openHistorianFilterExpression_ctrl_1.OpenHistorianFilterExpressionCtrl,
+                    controllerAs: 'openHistorianFilterExpressionCtrl',
+                    scope: {
+                        target: "=",
+                        datasource: "=",
+                        panel: "="
                     }
                 };
             });

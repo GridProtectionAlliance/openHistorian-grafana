@@ -53,10 +53,10 @@ export class OpenHistorianDataSource {
 
   query(options) {
 
-     for(var element of options.targets){
-          if (element.queryType == 'Element List')
-              this.setTargetWithElements(element);
-      }
+     //for(var element of options.targets){
+     //     if (element.queryType == 'Element List')
+     //         this.setTargetWithElements(element);
+     // }
 
     var query = this.buildQueryParameters(options);
     query.targets = query.targets.filter(function (t) {

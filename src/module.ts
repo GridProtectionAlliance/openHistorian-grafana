@@ -21,11 +21,15 @@
 //
 //******************************************************************************************************
 
-import {OpenHistorianDataSource} from './openHistorianDatasource'
-import {OpenHistorianDataSourceQueryCtrl} from './controllers/openHistorianQuery_ctrl'
-import {OpenHistorianConfigCtrl} from './controllers/openHistorianConfig_ctrl'
-import {OpenHistorianQueryOptionsCtrl} from './controllers/openHistorianQueryOptions_ctrl'
-import { OpenHistorianAnnotationsQueryCtrl} from './controllers/openHistorianAnnotations_ctrl'
+import { OpenHistorianDataSource } from './openHistorianDatasource'
+import { OpenHistorianDataSourceQueryCtrl } from './controllers/openHistorianQuery_ctrl'
+import { OpenHistorianConfigCtrl } from './controllers/openHistorianConfig_ctrl'
+import { OpenHistorianQueryOptionsCtrl } from './controllers/openHistorianQueryOptions_ctrl'
+import { OpenHistorianAnnotationsQueryCtrl } from './controllers/openHistorianAnnotations_ctrl'
+import { OpenHistorianElementPickerCtrl } from './controllers/openHistorianElementPicker_ctrl'
+import { OpenHistorianTextEditorCtrl } from './controllers/openHistorianTextEditor_ctrl'
+import { OpenHistorianFilterExpressionCtrl } from './controllers/openHistorianFilterExpression_ctrl'
+
 import angular from "angular"
 
 export {
@@ -47,4 +51,46 @@ angular.module('grafana.directives').directive("queryOptions", function() {
       return: "=",
     }
   };
+});
+
+angular.module('grafana.directives').directive("elementPicker", function () {
+    return {
+        templateUrl: 'public/plugins/gridprotectionalliance-openhistorian-datasource/partial/query.elementPicker.html',
+        restrict: 'E',
+        controller: OpenHistorianElementPickerCtrl,
+        controllerAs: 'openHistorianElementPickerCtrl',
+        scope: {
+            target: "=",
+            datasource: "=",
+            panel: "="
+        }
+    };
+});
+
+angular.module('grafana.directives').directive("textEditor", function () {
+    return {
+        templateUrl: 'public/plugins/gridprotectionalliance-openhistorian-datasource/partial/query.textEditor.html',
+        restrict: 'E',
+        controller: OpenHistorianTextEditorCtrl,
+        controllerAs: 'openHistorianTextEditorCtrl',
+        scope: {
+            target: "=",
+            datasource: "=",
+            panel: "="
+        }
+    };
+});
+
+angular.module('grafana.directives').directive("filterExpression", function () {
+    return {
+        templateUrl: 'public/plugins/gridprotectionalliance-openhistorian-datasource/partial/query.filterExpression.html',
+        restrict: 'E',
+        controller: OpenHistorianFilterExpressionCtrl,
+        controllerAs: 'openHistorianFilterExpressionCtrl',
+        scope: {
+            target: "=",
+            datasource: "=",
+            panel: "="
+        }
+    };
 });
