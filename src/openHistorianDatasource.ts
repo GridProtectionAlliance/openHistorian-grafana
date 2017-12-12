@@ -53,10 +53,6 @@ export class OpenHistorianDataSource {
 
   query(options) {
 
-    for(var element of options.targets){
-             this.fixTemplates(element);
-    }
-
     var query = this.buildQueryParameters(options);
     query.targets = query.targets.filter(function (t) {
       return !t.hide;
@@ -162,7 +158,7 @@ export class OpenHistorianDataSource {
 
     var targets = _.map(options.targets, function (target) {
       return {
-        target: _this.templateSrv.replace(target.target),
+        target: _this.fixTemplates(target),
         refId: target.refId,
         hide: target.hide, 
         queryType: target.queryType,
@@ -232,7 +228,7 @@ export class OpenHistorianDataSource {
       if(target.queryType == 'Element List')
           sep = ';'
 
-      target.target = target.target.split(sep).map(function (a) {
+      return target.target.split(sep).map(function (a) {
           if (ctrl.templateSrv.variableExists(a)) {
               return ctrl.templateSrv.replaceWithText(a);
           }

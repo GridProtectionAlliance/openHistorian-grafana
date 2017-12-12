@@ -92,24 +92,12 @@ System.register(['./../js/openHistorianConstants', 'lodash'], function(exports_1
                     var ctrl = this;
                     lodash_1.default.each(ctrl.functions, function (element, index, list) {
                         if (element.value == 'QUERY')
-                            functions += ctrl.segments.map(function (a) {
-                                if (ctrl.$scope.datasource.templateSrv.variableExists(a.text)) {
-                                    return ctrl.$scope.datasource.templateSrv.replaceWithText(a.text);
-                                }
-                                else
-                                    return a.value;
-                            }).join(';');
-                        else if (ctrl.$scope.datasource.templateSrv.variableExists(element.value))
-                            functions += ctrl.$scope.datasource.templateSrv.replaceWithText(element.text);
+                            functions += ctrl.segments.map(function (a) { return a.value; }).join(';');
                         else
                             functions += element.value;
                     });
                     ctrl.$scope.target.target = (functions != "" ? functions : ctrl.segments.map(function (a) {
-                        if (ctrl.$scope.datasource.templateSrv.variableExists(a.text)) {
-                            return ctrl.$scope.datasource.templateSrv.replaceWithText(a.text);
-                        }
-                        else
-                            return a.value;
+                        return a.value;
                     }).join(';'));
                     ctrl.$scope.target.functionSegments = ctrl.functionSegments;
                     ctrl.$scope.target.segments = ctrl.segments;

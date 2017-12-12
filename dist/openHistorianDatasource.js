@@ -50,10 +50,6 @@ System.register(["lodash"], function(exports_1) {
                     };
                 }
                 OpenHistorianDataSource.prototype.query = function (options) {
-                    for (var _i = 0, _a = options.targets; _i < _a.length; _i++) {
-                        var element = _a[_i];
-                        this.fixTemplates(element);
-                    }
                     var query = this.buildQueryParameters(options);
                     query.targets = query.targets.filter(function (t) {
                         return !t.hide;
@@ -140,7 +136,7 @@ System.register(["lodash"], function(exports_1) {
                     });
                     var targets = lodash_1.default.map(options.targets, function (target) {
                         return {
-                            target: _this.templateSrv.replace(target.target),
+                            target: _this.fixTemplates(target),
                             refId: target.refId,
                             hide: target.hide,
                             queryType: target.queryType,
@@ -195,7 +191,7 @@ System.register(["lodash"], function(exports_1) {
                     var sep = ' ';
                     if (target.queryType == 'Element List')
                         sep = ';';
-                    target.target = target.target.split(sep).map(function (a) {
+                    return target.target.split(sep).map(function (a) {
                         if (ctrl.templateSrv.variableExists(a)) {
                             return ctrl.templateSrv.replaceWithText(a);
                         }

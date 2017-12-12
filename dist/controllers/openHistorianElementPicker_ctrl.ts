@@ -130,22 +130,11 @@ export class OpenHistorianElementPickerCtrl {
         var functions = '';
         var ctrl = this;
         _.each(ctrl.functions, function (element, index, list) {
-            if (element.value == 'QUERY') functions += ctrl.segments.map(function (a) {
-                if (ctrl.$scope.datasource.templateSrv.variableExists(a.text)) {
-                    return ctrl.$scope.datasource.templateSrv.replaceWithText(a.text);
-                }
-                else
-                    return a.value
-            }).join(';')
-            else if (ctrl.$scope.datasource.templateSrv.variableExists(element.value)) functions += ctrl.$scope.datasource.templateSrv.replaceWithText(element.text);
+            if (element.value == 'QUERY') functions += ctrl.segments.map(function (a) { return a.value }).join(';')
             else functions += element.value;
         });
 
         ctrl.$scope.target.target = (functions != "" ? functions : ctrl.segments.map(function (a) {
-            if (ctrl.$scope.datasource.templateSrv.variableExists(a.text)) {
-                return ctrl.$scope.datasource.templateSrv.replaceWithText(a.text);
-            }
-            else
                 return a.value
         }).join(';'));
 
