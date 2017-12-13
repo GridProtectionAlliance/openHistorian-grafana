@@ -207,7 +207,9 @@ export class OpenHistorianDataSource {
 
   }
 
-  fixTemplates(target){
+  fixTemplates(target) {
+      if (target.target == undefined) return '';
+
       var ctrl = this;
 
       var sep = ' ';

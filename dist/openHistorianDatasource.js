@@ -176,6 +176,8 @@ System.register(["lodash"], function(exports_1) {
                     });
                 };
                 OpenHistorianDataSource.prototype.fixTemplates = function (target) {
+                    if (target.target == undefined)
+                        return '';
                     var ctrl = this;
                     var sep = ' ';
                     if (target.queryType == 'Element List')
