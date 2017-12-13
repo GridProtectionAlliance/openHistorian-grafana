@@ -72,6 +72,10 @@ System.register(['app/plugins/sdk', './../css/query-editor.css!', 'jquery'], fun
                     if (this.queryType == 'Text Editor') {
                         this.target.targetText = this.target.target;
                     }
+                    else {
+                        this.target.target = '';
+                        delete this.target.functionSegments;
+                    }
                 };
                 OpenHistorianDataSourceQueryCtrl.templateUrl = 'partial/query.editor.html';
                 return OpenHistorianDataSourceQueryCtrl;

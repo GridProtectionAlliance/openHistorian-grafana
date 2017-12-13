@@ -72,6 +72,10 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
       if (this.queryType == 'Text Editor') {
           this.target.targetText = this.target.target;
       }
+      else{
+          this.target.target = '';
+          delete this.target.functionSegments
+      }
   }
 
 }

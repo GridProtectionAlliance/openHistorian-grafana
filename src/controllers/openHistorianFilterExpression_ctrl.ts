@@ -68,10 +68,9 @@ export class OpenHistorianFilterExpressionCtrl {
         this.functionSegment = this.uiSegmentSrv.newPlusButton();
         this.typingTimer;
 
-
         delete $scope.target.segments;
         delete $scope.target.targetText;
-
+        this.setTargetWithQuery()
     }
 
     setTargetWithQuery() {
@@ -170,7 +169,7 @@ export class OpenHistorianFilterExpressionCtrl {
             this.wheres[index] = this.uiSegmentSrv.newOperator(where.value)
         else if (where.type == 'condition')
             this.wheres[index] = this.uiSegmentSrv.newCondition(where.value)
-        else if (where.type == 'value' && !$.isNumeric(where.value))
+        else if (where.type == 'value' && !$.isNumeric(where.value) && where.value.toUpperCase() != 'NULL')
             this.wheres[index] = this.uiSegmentSrv.newSegment("'" + where.value + "'");
 
         this.setTargetWithQuery();

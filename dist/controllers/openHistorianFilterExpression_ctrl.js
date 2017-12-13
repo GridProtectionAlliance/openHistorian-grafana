@@ -47,6 +47,7 @@ System.register(['./../js/openHistorianConstants', 'lodash', 'jquery'], function
                     this.typingTimer;
                     delete $scope.target.segments;
                     delete $scope.target.targetText;
+                    this.setTargetWithQuery();
                 }
                 OpenHistorianFilterExpressionCtrl.prototype.setTargetWithQuery = function () {
                     if (this.wheres.length == 0) {
@@ -131,7 +132,7 @@ System.register(['./../js/openHistorianConstants', 'lodash', 'jquery'], function
                         this.wheres[index] = this.uiSegmentSrv.newOperator(where.value);
                     else if (where.type == 'condition')
                         this.wheres[index] = this.uiSegmentSrv.newCondition(where.value);
-                    else if (where.type == 'value' && !jquery_1.default.isNumeric(where.value))
+                    else if (where.type == 'value' && !jquery_1.default.isNumeric(where.value) && where.value.toUpperCase() != 'NULL')
                         this.wheres[index] = this.uiSegmentSrv.newSegment("'" + where.value + "'");
                     this.setTargetWithQuery();
                 };

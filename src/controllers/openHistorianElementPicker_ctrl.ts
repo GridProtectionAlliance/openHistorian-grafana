@@ -111,19 +111,13 @@ export class OpenHistorianElementPickerCtrl {
 
     segmentValueChanged(segment, index) {
         if (segment.value == "-REMOVE-") {
-            var targets = this.$scope.target.target.split(';');
             this.segments.splice(index, 1);
-            targets.splice(index, 1);
-            this.$scope.target.target = targets.join(';');
         }
         else {
-            var targets = this.$scope.target.target.split(';');
             this.segments[index] = segment;
-            targets[index] = segment.value;
-            this.$scope.target.target = targets.join(';');
         }
 
-        this.$scope.panel.refresh()
+        this.setTargetWithElements()
     }
 
     setTargetWithElements() {
