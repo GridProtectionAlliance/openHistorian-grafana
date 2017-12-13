@@ -18,7 +18,7 @@
 
 
   "info": {
-    "description": "datasource plugin for openHistorian",
+    "description": "Datasource plugin for openHistorian",
     "author": {
       "name": "Grid Protection Alliance",
       "url": "https://www.gridprotectionalliance.org"

@@ -4,6 +4,9 @@ When adding metric queries from Grafana for the openHistorian, you can enter poi
 ```
 FILTER TOP 5 ActiveMeasurements WHERE SignalType LIKE '%PHA' AND Device LIKE 'SHELBY%' ORDER BY DeviceID
 ```
-This expression would trend 5 phase angles, voltages or currents, for any device with a name that starts with "SHELBY".
+This expression would trend the first 5 phase angles, voltages or currents for any device with a name that starts with "SHELBY". See [Filter Expressions](https://github.com/GridProtectionAlliance/gsf/blob/master/Source/Documentation/FilterExpressions.md) for more information.
 
-See [syntax documentation](https://github.com/GridProtectionAlliance/openPDC/blob/master/Source/Documentation/wiki/Connection_Strings.md#input_and_output_syntax) for time-series framework input measurement keys more information.
+### Functions
+
+The Grafana interfaces defined in the [Grid Solutions Framework](https://github.com/GridProtectionAlliance/gsf/) define various aggregation and operational functions, e.g., [Average](https://github.com/GridProtectionAlliance/gsf/blob/master/Source/Documentation/GrafanaFunctions.md#average) or [StandardDeviation](https://github.com/GridProtectionAlliance/gsf/blob/master/Source/Documentation/GrafanaFunctions.md#standarddeviation), which can be applied on a per-series and per-group basis. Functions applied to the group of available series can operate either on the entire set, end-to-end, or by time-slice. See [Grafana Functions](https://github.com/GridProtectionAlliance/gsf/blob/master/Source/Documentation/GrafanaFunctions.md) for more information.
+

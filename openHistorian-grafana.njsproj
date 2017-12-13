@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{20a8edc6-2d61-4b3f-ae70-03bf6f29e0f4}</ProjectGuid>
     <ProjectHome />
-    <ProjectView>ShowAllFiles</ProjectView>
+    <ProjectView>ProjectFiles</ProjectView>
     <StartupFile>
     </StartupFile>
     <WorkingDirectory>.</WorkingDirectory>
@@ -16,6 +16,7 @@
     <EnableTypeScript>true</EnableTypeScript>
     <TypeScriptSourceMap>true</TypeScriptSourceMap>
     <TypeScriptModuleKind>CommonJS</TypeScriptModuleKind>
+    <ToolsVersionPromptShown>0.0</ToolsVersionPromptShown>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
   <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
@@ -27,6 +28,7 @@
     <Compile Include="src\openHistorianDatasource.ts" />
     <Compile Include="src\js\openHistorianConstants.ts" />
     <Compile Include="src\module.ts" />
+    <Content Include="LICENSE" />
     <Content Include="package.json" />
     <Content Include="README.md" />
     <Compile Include="Gruntfile.js" />
@@ -49,7 +51,6 @@
     </Content>
     <Content Include="src\plugin.json" />
     <Content Include="src\query_help.md" />
-    <Content Include="src\README.md" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="src\" />
