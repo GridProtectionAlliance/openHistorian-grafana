@@ -71,7 +71,6 @@ export class OpenHistorianFilterExpressionCtrl {
         delete $scope.target.segments;
         delete $scope.target.targetText;
         this.setTargetWithQuery()
-
     }
 
     setTargetWithQuery() {
