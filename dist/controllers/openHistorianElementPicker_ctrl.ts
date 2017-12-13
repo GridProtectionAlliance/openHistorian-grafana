@@ -123,6 +123,7 @@ export class OpenHistorianElementPickerCtrl {
             this.$scope.target.target = targets.join(';');
         }
 
+        this.$scope.panel.refresh()
 
     }
 

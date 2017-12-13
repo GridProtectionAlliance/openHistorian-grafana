@@ -49,8 +49,11 @@ System.register(['./../js/openHistorianConstants', 'lodash', 'jquery'], function
                     delete $scope.target.targetText;
                 }
                 OpenHistorianFilterExpressionCtrl.prototype.setTargetWithQuery = function () {
-                    if (this.wheres.length == 0)
+                    if (this.wheres.length == 0) {
+                        this.target.target = '';
+                        this.panelCtrl.refresh();
                         return;
+                    }
                     var filter = this.filterSegment.value + ' ';
                     var topn = (this.topNSegment ? 'TOP ' + this.topNSegment + ' ' : '');
                     var where = 'WHERE ';

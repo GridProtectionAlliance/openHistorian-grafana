@@ -75,7 +75,12 @@ export class OpenHistorianFilterExpressionCtrl {
     }
 
     setTargetWithQuery() {
-        if (this.wheres.length == 0) return;
+        if (this.wheres.length == 0) {
+            this.target.target = '';
+            this.panelCtrl.refresh()
+            return;
+        }
+
         var filter = this.filterSegment.value + ' ';
         var topn = (this.topNSegment ? 'TOP ' + this.topNSegment + ' ' : '');
         var where = 'WHERE ';

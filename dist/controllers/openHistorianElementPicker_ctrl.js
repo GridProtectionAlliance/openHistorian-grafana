@@ -86,6 +86,7 @@ System.register(['./../js/openHistorianConstants', 'lodash'], function(exports_1
                         targets[index] = segment.value;
                         this.$scope.target.target = targets.join(';');
                     }
+                    this.$scope.panel.refresh();
                 };
                 OpenHistorianElementPickerCtrl.prototype.setTargetWithElements = function () {
                     var functions = '';
