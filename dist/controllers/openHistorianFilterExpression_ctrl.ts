@@ -165,6 +165,8 @@ export class OpenHistorianFilterExpressionCtrl {
             this.wheres[index] = this.uiSegmentSrv.newOperator(where.value)
         else if (where.type == 'condition')
             this.wheres[index] = this.uiSegmentSrv.newCondition(where.value)
+        else if (where.type == 'value' && !$.isNumeric(where.value))
+            this.wheres[index] = this.uiSegmentSrv.newSegment("'" + where.value + "'");
 
         this.setTargetWithQuery();
     }

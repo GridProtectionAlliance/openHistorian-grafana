@@ -1,5 +1,5 @@
-System.register(['./../js/openHistorianConstants', 'lodash'], function(exports_1) {
-    var openHistorianConstants_1, lodash_1;
+System.register(['./../js/openHistorianConstants', 'lodash', 'jquery'], function(exports_1) {
+    var openHistorianConstants_1, lodash_1, jquery_1;
     var OpenHistorianFilterExpressionCtrl;
     return {
         setters:[
@@ -8,6 +8,9 @@ System.register(['./../js/openHistorianConstants', 'lodash'], function(exports_1
             },
             function (lodash_1_1) {
                 lodash_1 = lodash_1_1;
+            },
+            function (jquery_1_1) {
+                jquery_1 = jquery_1_1;
             }],
         execute: function() {
             OpenHistorianFilterExpressionCtrl = (function () {
@@ -125,6 +128,8 @@ System.register(['./../js/openHistorianConstants', 'lodash'], function(exports_1
                         this.wheres[index] = this.uiSegmentSrv.newOperator(where.value);
                     else if (where.type == 'condition')
                         this.wheres[index] = this.uiSegmentSrv.newCondition(where.value);
+                    else if (where.type == 'value' && !jquery_1.default.isNumeric(where.value))
+                        this.wheres[index] = this.uiSegmentSrv.newSegment("'" + where.value + "'");
                     this.setTargetWithQuery();
                 };
                 OpenHistorianFilterExpressionCtrl.prototype.getWheresToAddNew = function () {
