@@ -113,6 +113,18 @@ System.register(['./../js/openHistorianConstants', 'lodash'], function(exports_1
                     });
                     if (this.functions.length == 0)
                         array = array.slice(2, array.length);
+                    array.sort(function (a, b) {
+                        var nameA = a.value.toUpperCase(); // ignore upper and lowercase
+                        var nameB = b.value.toUpperCase(); // ignore upper and lowercase
+                        if (nameA < nameB) {
+                            return -1;
+                        }
+                        if (nameA > nameB) {
+                            return 1;
+                        }
+                        // names must be equal
+                        return 0;
+                    });
                     return Promise.resolve(lodash_1.default.filter(array, function (segment) {
                         return lodash_1.default.find(_this.functions, function (x) {
                             return x.value == segment.value;

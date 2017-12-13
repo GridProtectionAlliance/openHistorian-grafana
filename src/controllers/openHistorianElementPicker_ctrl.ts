@@ -152,7 +152,22 @@ export class OpenHistorianElementPickerCtrl {
             array.push(ctrl.uiSegmentSrv.newSegment(element));
         });
 
+
         if (this.functions.length == 0) array = array.slice(2, array.length);
+
+        array.sort(function(a, b) {
+            var nameA = a.value.toUpperCase(); // ignore upper and lowercase
+            var nameB = b.value.toUpperCase(); // ignore upper and lowercase
+            if(nameA < nameB) {
+                return -1;
+            }
+              if (nameA > nameB) {
+                return 1;
+            }
+
+              // names must be equal
+              return 0;        
+        });
 
         return Promise.resolve(_.filter(array, segment => {
             return _.find(this.functions, x => {
