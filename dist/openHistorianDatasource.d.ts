@@ -19,7 +19,6 @@ export declare class OpenHistorianDataSource {
     mapToTextValue(result: any): any;
     buildQueryParameters(options: any): any;
     filterFindQuery(): any;
-    phasorFindQuery(options: any): any;
     orderByFindQuery(options: any): any;
     getMetaData(options: any): any;
     fixTemplates(target: any): any;

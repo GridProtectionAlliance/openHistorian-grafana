@@ -179,20 +179,6 @@ export class OpenHistorianDataSource {
       }).then(this.mapToTextValue);
   }
 
-  phasorFindQuery(options) {
-
-      var interpolated = {
-          target: this.templateSrv.replace(options, null, 'regex')
-      };
-
-      return this.backendSrv.datasourceRequest({
-          url: this.url + '/SearchPhasors',
-          data: interpolated,
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' }
-      }).then(this.mapToTextValue);
-  }
-
 
   orderByFindQuery(options) {
       var interpolated = {

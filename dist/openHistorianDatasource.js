@@ -153,17 +153,6 @@ System.register(["lodash"], function(exports_1) {
                         headers: { 'Content-Type': 'application/json' }
                     }).then(this.mapToTextValue);
                 };
-                OpenHistorianDataSource.prototype.phasorFindQuery = function (options) {
-                    var interpolated = {
-                        target: this.templateSrv.replace(options, null, 'regex')
-                    };
-                    return this.backendSrv.datasourceRequest({
-                        url: this.url + '/SearchPhasors',
-                        data: interpolated,
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' }
-                    }).then(this.mapToTextValue);
-                };
                 OpenHistorianDataSource.prototype.orderByFindQuery = function (options) {
                     var interpolated = {
                         target: this.templateSrv.replace(options, null, 'regex')

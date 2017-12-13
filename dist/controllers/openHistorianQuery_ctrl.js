@@ -52,7 +52,7 @@ System.register(['app/plugins/sdk', './../css/query-editor.css!', 'jquery'], fun
                     var ctrl = this;
                     this.uiSegmentSrv = uiSegmentSrv;
                     this.queryTypes = [
-                        "Element List", "Filter Expression", "Text Editor" /*, "Phasor List"*/
+                        "Element List", "Filter Expression", "Text Editor"
                     ];
                     this.queryType = (this.target.queryType == undefined ? "Element List" : this.target.queryType);
                     ctrl.target.overriddenDataFlags = (ctrl.target.overriddenDataFlags != undefined ? ctrl.target.overriddenDataFlags : ctrl.datasource.dataFlags);

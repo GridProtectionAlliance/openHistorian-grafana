@@ -43,7 +43,7 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
         this.uiSegmentSrv = uiSegmentSrv;
 
         this.queryTypes = [
-            "Element List", "Filter Expression", "Text Editor"/*, "Phasor List"*/
+            "Element List", "Filter Expression", "Text Editor"
         ];
 
         this.queryType = (this.target.queryType == undefined ? "Element List" : this.target.queryType);
