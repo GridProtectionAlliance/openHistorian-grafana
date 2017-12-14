@@ -1,209 +1,174 @@
 export declare const DefaultFlags: {
     'Select All': {
-        Included: boolean;
-        Excluded: boolean;
+        Value: boolean;
         Order: number;
+        Flag: number;
     };
     Normal: {
-        Included: boolean;
-        Excluded: boolean;
+        Value: boolean;
         Order: number;
+        Flag: number;
     };
     BadData: {
-        Included: boolean;
-        Excluded: boolean;
+        Value: boolean;
         Order: number;
+        Flag: number;
     };
     SuspectData: {
-        Included: boolean;
-        Excluded: boolean;
+        Value: boolean;
         Order: number;
+        Flag: number;
     };
     OverRangeError: {
-        Included: boolean;
-        Excluded: boolean;
+        Value: boolean;
         Order: number;
+        Flag: number;
     };
     UnderRangeError: {
-        Included: boolean;
-        Excluded: boolean;
+        Value: boolean;
         Order: number;
+        Flag: number;
     };
     AlarmHigh: {
-        Included: boolean;
-        Excluded: boolean;
+        Value: boolean;
         Order: number;
+        Flag: number;
     };
     AlarmLow: {
-        Included: boolean;
-        Excluded: boolean;
+        Value: boolean;
         Order: number;
+        Flag: number;
     };
     WarningHigh: {
-        Included: boolean;
-        Excluded: boolean;
+        Value: boolean;
         Order: number;
+        Flag: number;
     };
     WarningLow: {
-        Included: boolean;
-        Excluded: boolean;
+        Value: boolean;
         Order: number;
+        Flag: number;
     };
     FlatlineAlarm: {
-        Included: boolean;
-        Excluded: boolean;
+        Value: boolean;
         Order: number;
+        Flag: number;
     };
     ComparisonAlarm: {
-        Included: boolean;
-        Excluded: boolean;
+        Value: boolean;
         Order: number;
+        Flag: number;
     };
     ROCAlarm: {
-        Included: boolean;
-        Excluded: boolean;
+        Value: boolean;
         Order: number;
+        Flag: number;
     };
     ReceivedAsBad: {
-        Included: boolean;
-        Excluded: boolean;
+        Value: boolean;
         Order: number;
+        Flag: number;
     };
     CalculatedValue: {
-        Included: boolean;
-        Excluded: boolean;
+        Value: boolean;
         Order: number;
+        Flag: number;
     };
     CalculationError: {
-        Included: boolean;
-        Excluded: boolean;
+        Value: boolean;
         Order: number;
+        Flag: number;
     };
     CalculationWarning: {
-        Included: boolean;
-        Excluded: boolean;
+        Value: boolean;
         Order: number;
+        Flag: number;
     };
     ReservedQualityFlag: {
-        Included: boolean;
-        Excluded: boolean;
+        Value: boolean;
         Order: number;
+        Flag: number;
     };
     BadTime: {
-        Included: boolean;
-        Excluded: boolean;
+        Value: boolean;
         Order: number;
+        Flag: number;
     };
     SuspectTime: {
-        Included: boolean;
-        Excluded: boolean;
+        Value: boolean;
         Order: number;
+        Flag: number;
     };
     LateTimeAlarm: {
-        Included: boolean;
-        Excluded: boolean;
+        Value: boolean;
         Order: number;
+        Flag: number;
     };
     FutureTimeAlarm: {
-        Included: boolean;
-        Excluded: boolean;
+        Value: boolean;
         Order: number;
+        Flag: number;
     };
     UpSampled: {
-        Included: boolean;
-        Excluded: boolean;
+        Value: boolean;
         Order: number;
+        Flag: number;
     };
     DownSampled: {
-        Included: boolean;
-        Excluded: boolean;
+        Value: boolean;
         Order: number;
+        Flag: number;
     };
     DiscardedValue: {
-        Included: boolean;
-        Excluded: boolean;
+        Value: boolean;
         Order: number;
+        Flag: number;
     };
     ReservedTimeFlag: {
-        Included: boolean;
-        Excluded: boolean;
+        Value: boolean;
         Order: number;
+        Flag: number;
     };
     UserDefinedFlag1: {
-        Included: boolean;
-        Excluded: boolean;
+        Value: boolean;
         Order: number;
+        Flag: number;
     };
     UserDefinedFlag2: {
-        Included: boolean;
-        Excluded: boolean;
+        Value: boolean;
         Order: number;
+        Flag: number;
     };
     UserDefinedFlag3: {
-        Included: boolean;
-        Excluded: boolean;
+        Value: boolean;
         Order: number;
+        Flag: number;
     };
     UserDefinedFlag4: {
-        Included: boolean;
-        Excluded: boolean;
+        Value: boolean;
         Order: number;
+        Flag: number;
     };
     UserDefinedFlag5: {
-        Included: boolean;
-        Excluded: boolean;
+        Value: boolean;
         Order: number;
+        Flag: number;
     };
     SystemError: {
-        Included: boolean;
-        Excluded: boolean;
+        Value: boolean;
         Order: number;
+        Flag: number;
     };
     SystemWarning: {
-        Included: boolean;
-        Excluded: boolean;
+        Value: boolean;
         Order: number;
+        Flag: number;
     };
     MeasurementError: {
-        Included: boolean;
-        Excluded: boolean;
+        Value: boolean;
         Order: number;
+        Flag: number;
     };
-};
-export declare const MeasurementStateFlags: {
-    Normal: number;
-    BadData: number;
-    SuspectData: number;
-    OverRangeError: number;
-    UnderRangeError: number;
-    AlarmHigh: number;
-    AlarmLow: number;
-    WarningHigh: number;
-    WarningLow: number;
-    FlatlineAlarm: number;
-    ComparisonAlarm: number;
-    ROCAlarm: number;
-    ReceivedAsBad: number;
-    CalculatedValue: number;
-    CalculationError: number;
-    CalculationWarning: number;
-    ReservedQualityFlag: number;
-    BadTime: number;
-    SuspectTime: number;
-    LateTimeAlarm: number;
-    FutureTimeAlarm: number;
-    UpSampled: number;
-    DownSampled: number;
-    DiscardedValue: number;
-    ReservedTimeFlag: number;
-    UserDefinedFlag1: number;
-    UserDefinedFlag2: number;
-    UserDefinedFlag3: number;
-    UserDefinedFlag4: number;
-    UserDefinedFlag5: number;
-    SystemError: number;
-    SystemWarning: number;
-    MeasurementError: number;
 };
 export declare const FunctionList: {
     Set: {

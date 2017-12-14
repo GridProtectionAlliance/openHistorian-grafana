@@ -21,7 +21,7 @@
         </div>
     </div>
     <div ng-show="ctrl.queryOptionsOpen">
-        <query-options flags="ctrl.target.overriddenDataFlags" return="ctrl.target.queryOptions"></query-options>
+        <query-options return="ctrl.target.queryOptions"></query-options>
     </div>
 
     <element-picker target="ctrl.target" datasource="ctrl.datasource" style="width: 100%" panel="ctrl.panelCtrl" ng-if="ctrl.queryType == 'Element List'"></element-picker>

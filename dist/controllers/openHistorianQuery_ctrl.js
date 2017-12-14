@@ -53,8 +53,10 @@ System.register(['app/plugins/sdk', './../css/query-editor.css!'], function(expo
                     ];
                     this.queryType = (this.target.queryType == undefined ? "Element List" : this.target.queryType);
                     this.queryOptionsOpen = false;
-                    ctrl.target.overriddenDataFlags = JSON.parse(JSON.stringify((ctrl.target.overriddenDataFlags != undefined ? ctrl.target.overriddenDataFlags : ctrl.datasource.dataFlags)));
-                    ctrl.target.queryOptions = {};
+                    ctrl.target.queryOptions = {
+                        Excluded: ctrl.target.queryOptions.Excluded || ctrl.datasource.options.excludedDataFlags,
+                        Normal: ctrl.target.queryOptions.Normal || ctrl.datasource.options.excludeNormalData
+                    };
                 }
                 OpenHistorianDataSourceQueryCtrl.prototype.toggleQueryOptions = function () {
                     this.queryOptionsOpen = !this.queryOptionsOpen;

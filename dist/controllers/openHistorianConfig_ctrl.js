@@ -20,23 +20,16 @@
 //       Generated original version of source code.
 //
 //******************************************************************************************************
-System.register(["lodash", './../js/openHistorianConstants'], function(exports_1) {
-    var lodash_1, openHistorianConstants_1;
+System.register([], function(exports_1) {
     var OpenHistorianConfigCtrl;
     return {
-        setters:[
-            function (lodash_1_1) {
-                lodash_1 = lodash_1_1;
-            },
-            function (openHistorianConstants_1_1) {
-                openHistorianConstants_1 = openHistorianConstants_1_1;
-            }],
+        setters:[],
         execute: function() {
             OpenHistorianConfigCtrl = (function () {
                 function OpenHistorianConfigCtrl($scope) {
                     var ctrl = this;
-                    ctrl.current.jsonData = this.current.jsonData || {};
-                    ctrl.current.jsonData.flags = (ctrl.current.jsonData.flags == undefined ? openHistorianConstants_1.DefaultFlags : lodash_1.default.merge(openHistorianConstants_1.DefaultFlags, ctrl.current.jsonData.flags));
+                    ctrl.current.jsonData.Excluded = this.current.jsonData.Excluded || 0;
+                    ctrl.current.jsonData.Normal = this.current.jsonData.Normal || false;
                 }
                 OpenHistorianConfigCtrl.templateUrl = 'partial/config.html';
                 return OpenHistorianConfigCtrl;

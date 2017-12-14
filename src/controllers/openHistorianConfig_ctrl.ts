@@ -22,18 +22,18 @@
 //******************************************************************************************************
 
 import _ from "lodash";
-import { DefaultFlags, MeasurementStateFlags } from './../js/openHistorianConstants'
+import { DefaultFlags } from './../js/openHistorianConstants'
 
 export class OpenHistorianConfigCtrl{
     static templateUrl:string = 'partial/config.html';
     current: any;
     flagArray: Array<any>;
     constructor($scope) {
-
         var ctrl = this;
 
-        ctrl.current.jsonData = this.current.jsonData || {}
-        ctrl.current.jsonData.flags = (ctrl.current.jsonData.flags == undefined ? DefaultFlags : _.merge(DefaultFlags, ctrl.current.jsonData.flags));
+        ctrl.current.jsonData.Excluded = this.current.jsonData.Excluded || 0;
+        ctrl.current.jsonData.Normal = this.current.jsonData.Normal || false;
+
     }
 }
 

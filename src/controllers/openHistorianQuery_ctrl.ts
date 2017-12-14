@@ -51,9 +51,10 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
         
         this.queryOptionsOpen = false;
 
-        ctrl.target.overriddenDataFlags = JSON.parse(JSON.stringify((ctrl.target.overriddenDataFlags != undefined ? ctrl.target.overriddenDataFlags : ctrl.datasource.dataFlags)));
-
-        ctrl.target.queryOptions = {};
+        ctrl.target.queryOptions = { 
+            Excluded: ctrl.target.queryOptions.Excluded || ctrl.datasource.options.excludedDataFlags,
+            Normal: ctrl.target.queryOptions.Normal ||ctrl.datasource.options.excludeNormalData
+        }
     }
 
     toggleQueryOptions(){

@@ -44,9 +44,8 @@ System.register(["lodash"], function(exports_1) {
                     this.uiSegmentSrv = uiSegmentSrv;
                     this.dataFlags = instanceSettings.jsonData.flags;
                     this.options = {
-                        includedDataFlags: (instanceSettings.jsonData.Included == undefined ? '0xFFFFFFFF' : instanceSettings.jsonData.Included),
-                        excludedDataFlags: (instanceSettings.jsonData.Excluded == undefined ? '0x00000000' : instanceSettings.jsonData.Excluded),
-                        includeNormalData: (instanceSettings.jsonData.IncludeNormal == undefined ? true : instanceSettings.jsonData.IncludeNormal)
+                        excludedDataFlags: (instanceSettings.jsonData.Excluded == undefined ? 0 : instanceSettings.jsonData.Excluded),
+                        excludeNormalData: (instanceSettings.jsonData.Normal == undefined ? false : instanceSettings.jsonData.Normal)
                     };
                 }
                 OpenHistorianDataSource.prototype.query = function (options) {
@@ -134,9 +133,8 @@ System.register(["lodash"], function(exports_1) {
                             target: _this.fixTemplates(target),
                             refId: target.refId,
                             hide: target.hide,
-                            includedFlags: target.queryOptions.Included,
-                            excludedFlags: target.queryOptions.Excluded,
-                            includeNormalFlags: target.queryOptions.Normal,
+                            excludedFlags: target.queryOptions.Excluded || 0,
+                            excludeNormalFlags: target.queryOptions.Normal || false,
                             queryType: target.queryType,
                             queryOptions: target.queryOptions
                         };

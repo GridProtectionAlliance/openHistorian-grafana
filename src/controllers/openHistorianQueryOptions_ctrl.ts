@@ -21,18 +21,24 @@
 //
 //******************************************************************************************************
 import _ from "lodash";
-import { DefaultFlags, MeasurementStateFlags } from './../js/openHistorianConstants'
+import { DefaultFlags } from './../js/openHistorianConstants'
 
 export class OpenHistorianQueryOptionsCtrl{
-    dataFlags: Array<any>;
+     // #region Members
+
+    dataFlags: any;
     return: any;
     flagArray: Array<any>;
+    // #endregion
 
     constructor(private $scope,private $compile) {
-        // #region Members
 
         this.$scope = $scope;
-        this.dataFlags = JSON.parse(JSON.stringify(($scope.flags == undefined ? DefaultFlags : _.merge(DefaultFlags, $scope.flags))));
+        var value = JSON.parse(JSON.stringify($scope.return));
+
+        this.dataFlags = this.hex2flags(parseInt(value.Excluded));
+        this.dataFlags['Normal'].Value = value.Normal;
+
         this.return = $scope.return;
 
         this.flagArray = _.map(Object.keys(this.dataFlags), a => {
@@ -41,93 +47,50 @@ export class OpenHistorianQueryOptionsCtrl{
             return a.order - b.order;
         });
 
-        this.calculateInitialFlags();
-    // #endregion
     }
 
     // #region Methods
-    calculateFlags(flag, type) {
+    calculateFlags(flag) {
         var ctrl = this;
-
-        var flagVarIncluded = 0;
-        var flagVarExcluded = 0;
+        var flagVarExcluded = ctrl.return.Excluded;
 
         if (flag == 'Select All') {
             _.each(Object.keys(ctrl.dataFlags), function (key, index, list) {
-                if (type == 'Included') {
-                    ctrl.dataFlags[key].Excluded = false;
-                    ctrl.dataFlags[key].Included = true;
-                }
-                else if (type == 'Excluded') {
-                    ctrl.dataFlags[key].Included = false;
-                    ctrl.dataFlags[key].Excluded = true;
-                }
+
+                if(key == "Normal") 
+                    ctrl.dataFlags[key].Value = false;
+                else 
+                    ctrl.dataFlags[key].Value = ctrl.dataFlags['Select All'].Value;
             });
 
-            if (type == 'Included') {
-                flagVarIncluded = 0xFFFFFFFF;
-                flagVarExcluded = 0x00000000;
-            }
-            else if (type == 'Excluded') {
+            if (ctrl.dataFlags['Select All'].Value) 
                 flagVarExcluded = 0xFFFFFFFF;
-                flagVarIncluded = 0x00000000;
-            }
-
+            else
+                flagVarExcluded = 0;
         }
         else {
-            ctrl.dataFlags['Select All'].Included = false;
-            ctrl.dataFlags['Select All'].Excluded = false;
+            ctrl.dataFlags['Select All'].Value = false;
 
-            _.each(Object.keys(ctrl.dataFlags), function (key, index, list) {
-                if (key == 'Select All') return;
-
-                if (type == 'Included') {
-                    ctrl.dataFlags[key].Excluded = !ctrl.dataFlags[key].Included
-                }
-                else if (type == 'Excluded') {
-                    ctrl.dataFlags[key].Included = !ctrl.dataFlags[key].Excluded
-                }
-
-
-                flagVarIncluded = flagVarIncluded | (ctrl.dataFlags[key].Included ? MeasurementStateFlags[key] : 0);
-                flagVarExcluded = flagVarExcluded | (ctrl.dataFlags[key].Excluded ? MeasurementStateFlags[key] : 0);
-            });
+            flagVarExcluded ^= (ctrl.dataFlags[flag].Value ? ctrl.dataFlags[flag].Flag : 0);
         }
 
-        ctrl.return.Included = '0x' + ctrl.padDigits(this.dec2hex(flagVarIncluded), 8);
-        ctrl.return.Excluded = '0x' + ctrl.padDigits(this.dec2hex(flagVarExcluded), 8);
-        ctrl.return.Normal = ctrl.dataFlags['Normal'].Included
-        ctrl.$scope.flags = ctrl.dataFlags;
+        ctrl.return.Excluded = flagVarExcluded;
+        ctrl.return.Normal = ctrl.dataFlags['Normal'].Value;
     }
 
-    calculateInitialFlags(){
+    
+    hex2flags(hex){
         var ctrl = this;
-        var flagVarIncluded = 0;
-        var flagVarExcluded = 0;
+        var flag = hex;
+        var flags = JSON.parse(JSON.stringify(DefaultFlags));
 
-        _.each(Object.keys(ctrl.dataFlags), function (key, index, list) {
+        _.each(Object.keys(flags), function (key, index, list) {
             if (key == 'Select All') return;
-
-            flagVarIncluded = flagVarIncluded | (ctrl.dataFlags[key].Included ? MeasurementStateFlags[key] : 0);
-            flagVarExcluded = flagVarExcluded | (ctrl.dataFlags[key].Excluded ? MeasurementStateFlags[key] : 0);
+            
+            flags[key].Value = (flags[key].Flag & flag) != 0
         });
-
-        ctrl.return.Included = '0x' + ctrl.padDigits(this.dec2hex(flagVarIncluded), 8);
-        ctrl.return.Excluded = '0x' + ctrl.padDigits(this.dec2hex(flagVarExcluded), 8);
-        ctrl.return.Normal = ctrl.dataFlags['Normal'].Included
-
-    }
-
-    dec2hex(number) {
-        if (number < 0) {
-            number = 0xFFFFFFFF + number + 1;
-        }
-
-        return number.toString(16).toUpperCase();
-    }
-
-    padDigits(number, digits) {
-        return Array(Math.max(digits - String(number).length + 1, 0)).join('0') + number;
+        
+        return flags;
     }
 
     // #endregion
