@@ -85,6 +85,7 @@ System.register(["lodash", './../js/openHistorianConstants'], function(exports_1
                     });
                     ctrl.return.Included = '0x' + ctrl.padDigits(this.dec2hex(flagVarIncluded), 8);
                     ctrl.return.Excluded = '0x' + ctrl.padDigits(this.dec2hex(flagVarExcluded), 8);
+                    ctrl.return.Normal = ctrl.dataFlags['Normal'].Included;
                 };
                 OpenHistorianQueryOptionsCtrl.prototype.dec2hex = function (number) {
                     if (number < 0) {

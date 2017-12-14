@@ -60,14 +60,6 @@ export class OpenHistorianDataSource {
 
     query.options = JSON.parse(JSON.stringify(this.options));
 
-    if(options.targets[0].queryOptions != undefined){
-        query.options.includedDataFlags = (options.targets[0].queryOptions.Included != undefined ? options.targets[0].queryOptions.Included : query.options.includedDataFlags );
-        query.options.excludedDataFlags = (options.targets[0].queryOptions.Excluded != undefined ? options.targets[0].queryOptions.Excluded : query.options.excludedDataFlags );
-        query.options.includeNormalData = (options.targets[0].queryOptions.Normal != undefined ? options.targets[0].queryOptions.Normal : query.options.includeNormalData );
-
-    }
-
-
     if (query.targets.length <= 0) {
       return Promise.resolve({ data: [] });
     }
@@ -161,6 +153,9 @@ export class OpenHistorianDataSource {
         target: _this.fixTemplates(target),
         refId: target.refId,
         hide: target.hide, 
+        includedFlags: target.queryOptions.Included,
+        excludedFlags: target.queryOptions.Excluded,
+        includeNormalFlags: target.queryOptions.Normal,
         queryType: target.queryType,
         queryOptions: target.queryOptions
       };
