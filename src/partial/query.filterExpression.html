@@ -90,7 +90,7 @@
                 <span>EXPRESSION</span>
             </label>
             <label class="gf-form-label">
-                <span>{{openHistorianFilterExpressionCtrl.$scope.target.target}}</span>
+                <span>{{(target.target.length == 0 ? '&nbsp;&nbsp;&nbsp;' : target.target)}}</span>
             </label>
         </div>
         <div class="gf-form gf-form--grow">
