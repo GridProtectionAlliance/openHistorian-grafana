@@ -32,6 +32,7 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
 
     queryTypes: Array<string>;
     queryType: string;
+    queryOptionsOpen: boolean;
 
     constructor(private $scope,private $injector, private uiSegmentSrv,private templateSrv,private $compile) {
         super($scope, $injector);
@@ -48,19 +49,15 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
 
         this.queryType = (this.target.queryType == undefined ? "Element List" : this.target.queryType);
         
-        ctrl.target.overriddenDataFlags = (ctrl.target.overriddenDataFlags != undefined ? ctrl.target.overriddenDataFlags : ctrl.datasource.dataFlags);
+        this.queryOptionsOpen = false;
+
+        ctrl.target.overriddenDataFlags = JSON.parse(JSON.stringify((ctrl.target.overriddenDataFlags != undefined ? ctrl.target.overriddenDataFlags : ctrl.datasource.dataFlags)));
 
         ctrl.target.queryOptions = {};
+    }
 
-
-        $('panel-editor-tab .gf-form-group .gf-form-inline a.gf-form-label:contains("Options")').on('click', function (event) {
-            if ($($('panel-editor-tab .gf-form-group div')[6]).children().first()[0] != $('query-troubleshooter')[0]) {
-                var string = '<query-options flags="ctrl.target.overriddenDataFlags" return="ctrl.target.queryOptions"></query-options>';
-                $($('panel-editor-tab .gf-form-group div')[6]).children().first().append(ctrl.$compile(string)(ctrl.$scope))
-            }
-
-        });
-
+    toggleQueryOptions(){
+        this.queryOptionsOpen = !this.queryOptionsOpen;
     }
 
   onChangeInternal() {

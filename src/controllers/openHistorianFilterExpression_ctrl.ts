@@ -73,6 +73,7 @@ export class OpenHistorianFilterExpressionCtrl {
         this.setTargetWithQuery()
     }
 
+
     setTargetWithQuery() {
         if (this.wheres.length == 0) {
             this.target.target = '';

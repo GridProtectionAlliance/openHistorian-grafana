@@ -32,7 +32,7 @@ export class OpenHistorianQueryOptionsCtrl{
         // #region Members
 
         this.$scope = $scope;
-        this.dataFlags = ($scope.flags == undefined ? DefaultFlags : _.merge(DefaultFlags, $scope.flags));
+        this.dataFlags = JSON.parse(JSON.stringify(($scope.flags == undefined ? DefaultFlags : _.merge(DefaultFlags, $scope.flags))));
         this.return = $scope.return;
 
         this.flagArray = _.map(Object.keys(this.dataFlags), a => {

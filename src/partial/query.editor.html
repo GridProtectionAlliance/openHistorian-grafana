@@ -12,6 +12,16 @@
         <div class="gf-form gf-form--grow">
             <div class="gf-form-label gf-form-label--grow"></div>
         </div>
+        <div class="gf-form">
+            <a class="gf-form-label" ng-click="ctrl.toggleQueryOptions()">
+                <i class="fa fa-fw fa-caret-right" ng-hide="ctrl.queryOptionsOpen"></i>
+                <i class="fa fa-fw fa-caret-down ng-hide" ng-show="ctrl.queryOptionsOpen"></i>
+                Query Options
+            </a>
+        </div>
+    </div>
+    <div ng-show="ctrl.queryOptionsOpen">
+        <query-options flags="ctrl.target.overriddenDataFlags" return="ctrl.target.queryOptions"></query-options>
     </div>
 
     <element-picker target="ctrl.target" datasource="ctrl.datasource" style="width: 100%" panel="ctrl.panelCtrl" ng-if="ctrl.queryType == 'Element List'"></element-picker>

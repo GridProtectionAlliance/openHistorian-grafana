@@ -17,7 +17,7 @@ System.register(["lodash", './../js/openHistorianConstants'], function(exports_1
                     this.$scope = $scope;
                     this.$compile = $compile;
                     this.$scope = $scope;
-                    this.dataFlags = ($scope.flags == undefined ? openHistorianConstants_1.DefaultFlags : lodash_1.default.merge(openHistorianConstants_1.DefaultFlags, $scope.flags));
+                    this.dataFlags = JSON.parse(JSON.stringify(($scope.flags == undefined ? openHistorianConstants_1.DefaultFlags : lodash_1.default.merge(openHistorianConstants_1.DefaultFlags, $scope.flags))));
                     this.return = $scope.return;
                     this.flagArray = lodash_1.default.map(Object.keys(this.dataFlags), function (a) {
                         return { key: a, order: _this.dataFlags[a].Order };

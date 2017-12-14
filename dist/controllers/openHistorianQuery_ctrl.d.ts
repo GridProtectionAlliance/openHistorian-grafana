@@ -8,7 +8,9 @@ export declare class OpenHistorianDataSourceQueryCtrl extends QueryCtrl {
     static templateUrl: string;
     queryTypes: Array<string>;
     queryType: string;
+    queryOptionsOpen: boolean;
     constructor($scope: any, $injector: any, uiSegmentSrv: any, templateSrv: any, $compile: any);
+    toggleQueryOptions(): void;
     onChangeInternal(): void;
     changeQueryType(): void;
 }

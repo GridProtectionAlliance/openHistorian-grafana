@@ -3,10 +3,6 @@
   "name": "openHistorian",
   "id": "gridprotectionalliance-openhistorian-datasource",
 
-  "queryOptions": {
-    "OpenHistorianQueryOptionsCtrl": true
-  },
-
   "info": {
     "description": "Datasource plugin for openHistorian",
     "author": {

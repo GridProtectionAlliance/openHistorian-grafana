@@ -20,23 +20,20 @@
 //       Generated original version of source code.
 //
 //******************************************************************************************************
-System.register(['app/plugins/sdk', './../css/query-editor.css!', 'jquery'], function(exports_1) {
+System.register(['app/plugins/sdk', './../css/query-editor.css!'], function(exports_1) {
     var __extends = (this && this.__extends) || function (d, b) {
         for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
-    var sdk_1, jquery_1;
+    var sdk_1;
     var OpenHistorianDataSourceQueryCtrl;
     return {
         setters:[
             function (sdk_1_1) {
                 sdk_1 = sdk_1_1;
             },
-            function (_1) {},
-            function (jquery_1_1) {
-                jquery_1 = jquery_1_1;
-            }],
+            function (_1) {}],
         execute: function() {
             OpenHistorianDataSourceQueryCtrl = (function (_super) {
                 __extends(OpenHistorianDataSourceQueryCtrl, _super);
@@ -55,15 +52,13 @@ System.register(['app/plugins/sdk', './../css/query-editor.css!', 'jquery'], fun
                         "Element List", "Filter Expression", "Text Editor"
                     ];
                     this.queryType = (this.target.queryType == undefined ? "Element List" : this.target.queryType);
-                    ctrl.target.overriddenDataFlags = (ctrl.target.overriddenDataFlags != undefined ? ctrl.target.overriddenDataFlags : ctrl.datasource.dataFlags);
+                    this.queryOptionsOpen = false;
+                    ctrl.target.overriddenDataFlags = JSON.parse(JSON.stringify((ctrl.target.overriddenDataFlags != undefined ? ctrl.target.overriddenDataFlags : ctrl.datasource.dataFlags)));
                     ctrl.target.queryOptions = {};
-                    jquery_1.default('panel-editor-tab .gf-form-group .gf-form-inline a.gf-form-label:contains("Options")').on('click', function (event) {
-                        if (jquery_1.default(jquery_1.default('panel-editor-tab .gf-form-group div')[6]).children().first()[0] != jquery_1.default('query-troubleshooter')[0]) {
-                            var string = '<query-options flags="ctrl.target.overriddenDataFlags" return="ctrl.target.queryOptions"></query-options>';
-                            jquery_1.default(jquery_1.default('panel-editor-tab .gf-form-group div')[6]).children().first().append(ctrl.$compile(string)(ctrl.$scope));
-                        }
-                    });
                 }
+                OpenHistorianDataSourceQueryCtrl.prototype.toggleQueryOptions = function () {
+                    this.queryOptionsOpen = !this.queryOptionsOpen;
+                };
                 OpenHistorianDataSourceQueryCtrl.prototype.onChangeInternal = function () {
                     this.panelCtrl.refresh(); // Asks the panel to refresh data.
                 };
