@@ -45,7 +45,7 @@ System.register(["lodash", './../js/openHistorianConstants'], function(exports_1
                     }
                     else {
                         ctrl.dataFlags['Select All'].Value = false;
-                        flagVarExcluded ^= (ctrl.dataFlags[flag].Value ? ctrl.dataFlags[flag].Flag : 0);
+                        flagVarExcluded ^= ctrl.dataFlags[flag].Flag;
                     }
                     ctrl.return.Excluded = flagVarExcluded;
                     ctrl.return.Normal = ctrl.dataFlags['Normal'].Value;

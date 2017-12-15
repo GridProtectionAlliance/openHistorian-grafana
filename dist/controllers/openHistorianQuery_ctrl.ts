@@ -51,10 +51,8 @@ export class OpenHistorianDataSourceQueryCtrl extends QueryCtrl{
         
         this.queryOptionsOpen = false;
 
-        ctrl.target.queryOptions = { 
-            Excluded: ctrl.target.queryOptions.Excluded || ctrl.datasource.options.excludedDataFlags,
-            Normal: ctrl.target.queryOptions.Normal ||ctrl.datasource.options.excludeNormalData
-        }
+        if(ctrl.target.queryOptions == undefined) 
+            ctrl.target.queryOptions = {Excluded: ctrl.datasource.options.excludedDataFlags, Normal: ctrl.datasource.options.excludeNormalData};
     }
 
     toggleQueryOptions(){

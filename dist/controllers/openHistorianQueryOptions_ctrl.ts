@@ -71,7 +71,7 @@ export class OpenHistorianQueryOptionsCtrl{
         else {
             ctrl.dataFlags['Select All'].Value = false;
 
-            flagVarExcluded ^= (ctrl.dataFlags[flag].Value ? ctrl.dataFlags[flag].Flag : 0);
+            flagVarExcluded ^= ctrl.dataFlags[flag].Flag;
         }
 
         ctrl.return.Excluded = flagVarExcluded;
