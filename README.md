@@ -21,15 +21,13 @@ The _Element List_ query builder can be used to directly select the series to tr
 
 ### Filter Expression Query Builder
 
-The _Filter Expression_ query builder can be used to define an expression to select the series to trend. Complex expressions can be created that will query data series whose results will mutate as the availability of the source point data changes. See filter expression [syntax documentation](https://github.com/GridProtectionAlliance/gsf/blob/master/Source/Documentation/FilterExpressions.md) for more information.
+The _Filter Expression_ query builder can be used to define an expression ([syntax documentation](https://github.com/GridProtectionAlliance/gsf/blob/master/Source/Documentation/FilterExpressions.md)) to select the series to trend. Complex expressions can be created that will query data series whose results will mutate as the availability of the source point data changes.
 
 ![Filter Expression Query Type](https://github.com/GridProtectionAlliance/openHistorian-grafana/blob/master/src/img/FilterExpression.png)
 
 ### Text Editor Query Builder
 
-A text based query expression for the openHistorian Grafana data source query can be a direct specification of point tag names, Guid identifiers or measurement keys separated by semi-colons - _or_ - a filter expression that will select several series at once.
-
-![Text Editor Query Type](https://github.com/GridProtectionAlliance/openHistorian-grafana/blob/master/src/img/TextEditor.png)
+The _Text Editor_ query builder can be used to manually specify a text based query expression for the openHistorian Grafana data source query. The expression can be a direct specification of point tag names, Guid identifiers or measurement keys separated by semi-colons - _or_ - a filter expression that will select several series at once.
 
 #### Direct Tag Specification
 
@@ -53,6 +51,8 @@ PPA:15; STAT:20; SetSum(Count(PPA:8; PPA:9; PPA:10));
 FILTER ActiveMeasurements WHERE SignalType IN ('IPHA', 'VPHA');
 Range(PPA:99; Sum(FILTER ActiveMeasurements WHERE SignalType = 'FREQ'; STAT:12))
 ```
+
+![Text Editor Query Type](https://github.com/GridProtectionAlliance/openHistorian-grafana/blob/master/src/img/TextEditor.png)
 
 ### Series Functions
 
