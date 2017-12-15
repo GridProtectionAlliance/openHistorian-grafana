@@ -468,7 +468,7 @@ export class OpenHistorianFilterExpressionCtrl {
     inputChange(func, index) {
         var ctrl = this;
         clearTimeout(this.typingTimer);
-        this.typingTimer = setTimeout(function () { ctrl.functionValueChanged(func, index) }, 1000);
+        this.typingTimer = setTimeout(function () { ctrl.functionValueChanged(func, index) }, 3000);
         event.target['focus']();
 
     }
