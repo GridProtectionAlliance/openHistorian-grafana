@@ -1,4 +1,4 @@
-## openHistorian Grafana Data Source
+# Grafana Data Source Plugin for openHistorian
 
 This repository defines a Grafana [data source](http://docs.grafana.org/datasources/overview/) plug-in for the [openHistorian](https://github.com/GridProtectionAlliance/openHistorian).
 
@@ -6,7 +6,79 @@ The openHistorian is a back office system developed by the [GridProtectionAllian
 
 The openHistorian is optimized to store and retrieve large volumes of time-series data quickly and efficiently, including high-resolution sub-second information that is measured very rapidly, e.g., many thousands of times per second.
 
-### Configuration for openHistorian 2.0
+---
+
+## Usage
+
+Building a query using the openHistorian Grafana data source begins with the selection of the query type, one of: `Element List`, `Filter Expression` or `Text Editor`. The `Element List` and `Filter Expression` types are query builder screens that assist with the selection of the desired series. The `Text Editor` screen allows for manual entry of a query expression that will select the desired series.
+
+
+### Element List Query Builder
+
+You can use 
+
+### Filter Expression Query Builder
+
+### Text Editor Query Builder
+
+A text based query expression for the openHistorian Grafana data source query can be an direct specification of point tag names, Guid identifiers or measurement keys separated by semi-colons - _or_ - a filter expression that will select several series at once.
+
+#### Direct Tag Specification
+
+When adding metric queries from Grafana for the openHistorian, you can enter point information in a variery of forms including direct lists, e.g., measurement IDs `PPA:4; PPA:2`, Guids `538A47B0-F10B-4143-9A0A-0DBC4FFEF1E8; E4BBFE6A-35BD-4E5B-92C9-11FF913E7877`, or point tag names `GPA_TESTDEVICE:FREQ; GPA_TESTDEVICE:FLAG`.
+
+#### Filter Expressions
+
+Filter expressions are also supported, e.g.:
+```
+FILTER TOP 5 ActiveMeasurements WHERE SignalType LIKE '%PHA' AND Device LIKE 'SHELBY%' ORDER BY DeviceID
+```
+This expression would trend 5 phase angles, voltages or currents, for any device with a name that starts with "SHELBY". See filter expression [syntax documentation](https://github.com/GridProtectionAlliance/gsf/blob/master/Source/Documentation/FilterExpressions.md) for more information.
+
+See the [ActiveMeasurements table definition](https://github.com/GridProtectionAlliance/gsf/blob/master/Source/Documentation/FilterExpressions.md#activemeasurements) for available query fields.
+
+#### Combined Expressions
+
+When using the `Text Editor` to build a query, both filter expressions and directly specified tags, with or without functions, may be selected simultaneously when separated with semi-colons, for example:
+```
+PPA:15; STAT:20; SetSum(Count(PPA:8; PPA:9; PPA:10));
+FILTER ActiveMeasurements WHERE SignalType IN ('IPHA', 'VPHA');
+Range(PPA:99; Sum(FILTER ActiveMeasurements WHERE SignalType = 'FREQ'; STAT:12))
+```
+
+### Series Functions
+
+The openHistorian Grafana data source includes various aggregation and operational functions, e.g., [Average](https://github.com/GridProtectionAlliance/gsf/blob/master/Source/Documentation/GrafanaFunctions.md#average) or [StandardDeviation](https://github.com/GridProtectionAlliance/gsf/blob/master/Source/Documentation/GrafanaFunctions.md#standarddeviation), which can be applied on a per-series and per-group basis. Functions applied to the group of available series can operate either on the entire set, end-to-end, or by time-slice.
+
+Many series functions have parameters that can be required or optional. Optional values will always define a default state. Parameter values must be a constant value or, where applicable, a named target available from the expression. Named targets only work with group operations, i.e., [Set](https://github.com/GridProtectionAlliance/gsf/blob/master/Source/Documentation/GrafanaFunctions.md#set) or [Slice](https://github.com/GridProtectionAlliance/gsf/blob/master/Source/Documentation/GrafanaFunctions.md#slice), since group operations provide access to multiple series values from within a single series. The actual value used for a named target parameter will be the first encountered value for the target series - in the case of slice group operations, this will be the first value encountered in each slice.
+
+See the full list of **[Grafana Functions](https://github.com/GridProtectionAlliance/gsf/blob/master/Source/Documentation/GrafanaFunctions.md)** for more information.
+
+### Alarm Annotations
+
+The openHistorian Grafana interface supports “annotations” for Alarms. If any alarms are configured for a host system, then they can be accessed from the associated Grafana data source. Note that alarm measurements are stored in the local statistics archive by default.
+
+Supported queries include `#ClearedAlarms` and `#RaisedAlarms`, which will return all alarms for queried time period as well as filter expressions of these data sets, e.g.:
+
+```
+FILTER TOP 10 ClearedAlarms WHERE Severity >= 500 AND TagName LIKE '%TESTDEVICE%'
+```
+
+or
+
+```
+FILTER RaisedAlarms WHERE Description LIKE '%High Frequency%'
+```
+
+See [Alarm table defintion](https://github.com/GridProtectionAlliance/gsf/blob/master/Source/Documentation/FilterExpressions.md#alarms) for available query fields.
+
+---
+
+## Configuration
+
+The openHistorian Grafana data source works both for the standalone [openHistorian 2.0](http://www.openHistorian.com/) and the openHistorian 1.0 which is embedded into products like the [openPDC](http://www.openPDC.com/). Configuration options for each of the target openHistorian versions are defined below.
+
+### openHistorian 2.0 Configuration
 
 The openHistorian 2.0 automatically includes Grafana web service interfaces starting with [version 2.0.410](https://github.com/GridProtectionAlliance/openHistorian/releases).
 
@@ -18,7 +90,7 @@ The openHistorian 2.0 also includes a pre-configured local statistics archive we
 
 Statistical information is archived every ten seconds for a variety of data source and system parameters.
 
-### Configuration for openHistorian 1.0 and Statistics Archives
+### openHistorian 1.0 Configuration
 
 The openHistorian 1.0 is a core component of the [Grid Solutions Framework Time-series Library](https://www.gridprotectionalliance.org/technology.asp#TSL) and is used for archival of statistics and other time-series data. Applications built using the openHistorian 1.0 can also be integrated with Grafana. 
 
@@ -37,9 +109,9 @@ Recent versions of the following Time-series Library (TSL) applications now incl
 
 #### Enabling Grafana Services with Custom Time-series Library Applications
 
-If the “[GrafanaAdapters.dll](https://www.gridprotectionalliance.org/NightlyBuilds/GridSolutionsFramework/Beta/Libraries/)” is deployed with an existing Time-series Library based project, e.g., [Project Alpha](https://github.com/GridProtectionAlliance/projectalpha), the 1.0 openHistorian Grafana interfaces will be available per configured openHistorian instance. For Grafana support, the time-series project needs to use [Grid Solutions Framework](https://github.com/GridProtectionAlliance/gsf) dependencies for version 2.1.332 or beyond &mdash; or to be built with Project Alpha starting from version 0.1.159.
+If the assembly [`GrafanaAdapters.dll`](https://www.gridprotectionalliance.org/NightlyBuilds/GridSolutionsFramework/Beta/Libraries/) is deployed with an existing Time-series Library based project, e.g., [Project Alpha](https://github.com/GridProtectionAlliance/projectalpha), the 1.0 openHistorian Grafana interfaces will be available per configured openHistorian instance. For Grafana support, the time-series project needs to use [Grid Solutions Framework](https://github.com/GridProtectionAlliance/gsf) dependencies for version 2.1.332 or beyond &mdash; or to be built with Project Alpha starting from version 0.1.159.
 
-When the GrafanaAdapters.dll is deployed in the time-series project installation folder, a new Grafana data service entry will be added in the local configuration file for each configured historian when the new DLL is detected and loaded. Each historian web service instance for Grafana will need to be enabled and configured with a unique port:
+When the `GrafanaAdapters.dll` is deployed in the time-series project installation folder, a new Grafana data service entry will be added in the local configuration file for each configured historian when the new DLL is detected and loaded. Each historian web service instance for Grafana will need to be enabled and configured with a unique port:
 ```xml
     <statGrafanaDataService>
       <add name="Endpoints" value="http.rest://+:6357/api/grafana" description="Semicolon delimited list of URIs where the web service can be accessed." encrypted="false" />
@@ -53,58 +125,24 @@ When the GrafanaAdapters.dll is deployed in the time-series project installation
       <add name="Enabled" value="True" description="Determines if web service should be enabled at startup." encrypted="false" />
     </statGrafanaDataService>
 ```
-If the service is using the default NT SERVICE account, the service will likely not have rights to start the web service on a new port and will need to be registered. As an example, to register a new Grafana web service end-point on port 6357 for the ProjectAlpha service, you would use the following command:
+If the service is using the default `NT SERVICE` account, the service will likely not have rights to start the web service on a new port and will need to be registered. As an example, to register a new Grafana web service end-point on port 6357 for the ProjectAlpha service, you would use the following command:
 ```
 netsh http add urlacl url=http://+:6357/api/grafana user="NT SERVICE\ProjectAlpha"
 ```
 This command must be run with administrative privileges.
 
-\* _Replace "localhost" as needed with the IP or DNS name of system hosting the archive._
+<a name="localhost" id="localhost" />
 
-### Tag Selection
+\* _Replace `localhost` as needed with the IP or DNS name of system hosting the archive._
 
-When adding metric queries from Grafana for the openHistorian, you can enter point information in a variery of forms including direct lists, e.g., measurement IDs "PPA:4; PPA:2", Guids "538A47B0-F10B-4143-9A0A-0DBC4FFEF1E8; E4BBFE6A-35BD-4E5B-92C9-11FF913E7877", or point tag names "GPA_TESTDEVICE:FREQ; GPA_TESTDEVICE:FLAG". Filter expressions are also supported, e.g.:
-```
-FILTER TOP 5 ActiveMeasurements WHERE SignalType LIKE '%PHA' AND Device LIKE 'SHELBY%' ORDER BY DeviceID
-```
-This expression would trend 5 phase angles, voltages or currents, for any device with a name that starts with "SHELBY". See filter expression [syntax documentation](https://github.com/GridProtectionAlliance/gsf/blob/master/Source/Documentation/FilterExpressions.md) for more information.
+---
 
-See [ActiveMeasurements table definition](https://github.com/GridProtectionAlliance/gsf/blob/master/Source/Documentation/FilterExpressions.md#activemeasurements) for available query fields.
+## Installation
 
-### Alarm Annotations
+See [offical instructions](https://grafana.com/plugins/gridprotectionalliance-openhistorian-datasource/installation) for suggested installation of the openHistorian Grafana data source using the [Grafana CLI tool](http://docs.grafana.org/plugins/installation/). Note that you need to use Grafana 3.0 or better to enable plugin support.
 
-The openHistorian Grafana interface supports “annotations” for Alarms. If any alarms are configured for a host system, then they can be accessed from the associated Grafana data source. Note that alarm measurements are stored in the local statistics archive by default.
+Alternately the openHistorian Grafana data source can be installed by cloning this repository directly into the Grafana plugins directory. After cloning, restart the grafana-server and the plugin should be automatically detected and be available for use, e.g.:
 
-Supported queries include “#ClearedAlarms” and “#RaisedAlarms”, which will return all alarms for queried time period. Filter expressions of these data sets are also supported, e.g.:
-```
-FILTER TOP 10 ClearedAlarms WHERE Severity >= 500 AND TagName LIKE '%TESTDEVICE%'
-```
-or
-```
-FILTER RaisedAlarms WHERE Description LIKE '%High Frequency%'
-```
-
-See [Alarm table defintion](https://github.com/GridProtectionAlliance/gsf/blob/master/Source/Documentation/FilterExpressions.md#alarms) for available query fields.
-
-### Suggested Installation Method
-
-Use the grafana-cli tool to install the openHistorian data source from the command line:
-
-```
-grafana-cli plugins install gridprotectionalliance-openhistorian-datasource
-```
-
-The plugin will be installed into the grafana plugins directory.
-
-More instructions on the cli tool can be found here: [http://docs.grafana.org/v3.0/plugins/installation/](http://docs.grafana.org/v3.0/plugins/installation/)
-
-You need to use Grafana 3.0 or better to enable plugin support: [http://grafana.org/download/builds.html](http://grafana.org/download/builds.html)
-
-### Alternate Installation Method
-
-It is also possible to clone this repository directly into the Grafana plugins directory.
-
-After cloning, restart the grafana-server and the plugin should be automatically detected and be available for use:
 ```
 git clone https://github.com/GridProtectionAlliance/openHistorian-grafana.git
 sudo service grafana-server restart
