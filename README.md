@@ -1,4 +1,4 @@
-# Grafana Data Source Plugin for openHistorian
+# Grafana Data Source Plug-in for openHistorian
 
 This repository defines a Grafana [data source](http://docs.grafana.org/datasources/overview/) plug-in for the [openHistorian](https://github.com/GridProtectionAlliance/openHistorian).
 
@@ -15,21 +15,29 @@ Building a query using the openHistorian Grafana data source begins with the sel
 
 ### Element List Query Builder
 
-You can use 
+The _Element List_ query builder can be used to directly select the series to trend. New elements can be selected and searched by clicking the `+` button. Typing text into the drop-down box will start filtering the available data points for selection.
+
+![Element List Query Type](https://github.com/GridProtectionAlliance/openHistorian-grafana/blob/master/src/img/ElementList.png)
 
 ### Filter Expression Query Builder
 
+The _Filter Expression_ query builder can be used to define an expression to select the series to trend. Complex expressions can be created that will query data series whose results will mutate as the availability of the source point data changes. See filter expression [syntax documentation](https://github.com/GridProtectionAlliance/gsf/blob/master/Source/Documentation/FilterExpressions.md) for more information.
+
+![Filter Expression Query Type](https://github.com/GridProtectionAlliance/openHistorian-grafana/blob/master/src/img/FilterExpression.png)
+
 ### Text Editor Query Builder
 
-A text based query expression for the openHistorian Grafana data source query can be an direct specification of point tag names, Guid identifiers or measurement keys separated by semi-colons - _or_ - a filter expression that will select several series at once.
+A text based query expression for the openHistorian Grafana data source query can be a direct specification of point tag names, Guid identifiers or measurement keys separated by semi-colons - _or_ - a filter expression that will select several series at once.
+
+![Text Editor Query Type](https://github.com/GridProtectionAlliance/openHistorian-grafana/blob/master/src/img/TextEditor.png)
 
 #### Direct Tag Specification
 
-When adding metric queries from Grafana for the openHistorian, you can enter point information in a variery of forms including direct lists, e.g., measurement IDs `PPA:4; PPA:2`, Guids `538A47B0-F10B-4143-9A0A-0DBC4FFEF1E8; E4BBFE6A-35BD-4E5B-92C9-11FF913E7877`, or point tag names `GPA_TESTDEVICE:FREQ; GPA_TESTDEVICE:FLAG`.
+When directly adding metric queries, e.g., a specific point tag, to the Grafana data source for the openHistorian, you can enter semi-colon separated point information in a variety of forms, e.g., measurement key identifiers: `PPA:4; PPA:2` - formatted as `{instance}:{id}`, unique Guid based signal identifiers: `538A47B0-F10B-4143-9A0A-0DBC4FFEF1E8; E4BBFE6A-35BD-4E5B-92C9-11FF913E7877`, or point tag names: `GPA_TESTDEVICE:FREQ; GPA_TESTDEVICE:FLAG`.
 
 #### Filter Expressions
 
-Filter expressions are also supported, e.g.:
+Filter expressions that use a syntax that is similar to SQL are also supported, e.g.:
 ```
 FILTER TOP 5 ActiveMeasurements WHERE SignalType LIKE '%PHA' AND Device LIKE 'SHELBY%' ORDER BY DeviceID
 ```
@@ -78,17 +86,25 @@ See [Alarm table defintion](https://github.com/GridProtectionAlliance/gsf/blob/m
 
 The openHistorian Grafana data source works both for the standalone [openHistorian 2.0](http://www.openHistorian.com/) and the openHistorian 1.0 which is embedded into products like the [openPDC](http://www.openPDC.com/). Configuration options for each of the target openHistorian versions are defined below.
 
+Starting with openHistorian 2.4, Grafana can be seamlessly integrated with the openHistorian such that the openHistorian primary web site can act as a reverse proxy to an instance of Grafana accessible from: [http://localhost:8180/grafana/](http://localhost:8180/grafana/). Deployments of the openHistorian with hosted Grafana integration include pre-configured data sources for the primary data and statistics archives named `OHDATA` and `OHSTAT` respectively.
+
+Configuration of an openHistorian Grafana data source is normally as simple as specification of a URL and proper authentication options. The required authentication options depend on the configuration of the openHistorian web API which can be set as anonymous or require authentication and/or SSL. If you are connecting to the openHistorian web API remotely, you will always set `Access` to _`proxy`_, however, if you are using a hosted Grafana instance that is integrated with the openHistorian via reverse proxy, the `Access` will need to be set to _`direct`_ such that authentication headers can properly flow through the openHistorian for user security validation:
+
+![Direct Data Source Configuration](https://github.com/GridProtectionAlliance/openHistorian-grafana/blob/master/src/img/DataSourceConfiguration.png)
+
 ### openHistorian 2.0 Configuration
 
 The openHistorian 2.0 automatically includes Grafana web service interfaces starting with [version 2.0.410](https://github.com/GridProtectionAlliance/openHistorian/releases).
 
-For archived time-series data, the Grafana web service is hosted within the existing MVC based web server architecture and is just “on” with nothing extra to configure. To use the interface, simply register a new openHistorian Grafana data source using the path “/api/grafana/” from the existing web based user interface URL, typically: [http://localhost:8180/api/grafana/](http://localhost:8180/api/grafana/) [\*](#localhost).
+For archived time-series data, the Grafana web service is hosted within the existing MVC based web server architecture and is just “on” with nothing extra to configure. To use the interface, simply register a new openHistorian Grafana data source using the path `/api/grafana/` from the existing web based user interface URL, typically: [http://localhost:8180/api/grafana/](http://localhost:8180/api/grafana/) [\*](#localhost).
 
-When the openHistorian service is hosting multitple historian instances, you can reference a specific historian instance using a path like "/instance/{instanceName}/grafana/", e.g.: [http://localhost:8180/instance/ppa/grafana/](http://localhost:8180/instance/ppa/grafana/) [\*](#localhost).
+When the openHistorian service is hosting multiple historian instances, you can reference a specific historian instance using a path like `/instance/{instanceName}/grafana/`, e.g.: [http://localhost:8180/instance/ppa/grafana/](http://localhost:8180/instance/ppa/grafana/) [\*](#localhost).
 
 The openHistorian 2.0 also includes a pre-configured local statistics archive web service interface that can be accessed from [http://localhost:6356/api/grafana/](http://localhost:6356/api/grafana/) [\*](#localhost) &mdash; note that the trailing slash is relevant.
 
 Statistical information is archived every ten seconds for a variety of data source and system parameters.
+
+Note that typically you should select `
 
 ### openHistorian 1.0 Configuration
 
@@ -139,9 +155,11 @@ This command must be run with administrative privileges.
 
 ## Installation
 
-See [offical instructions](https://grafana.com/plugins/gridprotectionalliance-openhistorian-datasource/installation) for suggested installation of the openHistorian Grafana data source using the [Grafana CLI tool](http://docs.grafana.org/plugins/installation/). Note that you need to use Grafana 3.0 or better to enable plugin support.
+Starting with openHistorian 2.4, Grafana can be installed along with the openHistorian such that the openHistorian's primary self-hosted web site can act as a reverse proxy to Grafana. When configured in this mode, the openHistorian can auto-launch the `grafana-server.exe` and act as a front-end server for Grafana and additionally maintain user security synchronization such that a user with an `Administrator` role in openHistorian will also have an `Admin` role in Grafana, or if a user has an `Editor` role in openHistorian they will have an `Editor` role in Grafana, and so on. 
 
-Alternately the openHistorian Grafana data source can be installed by cloning this repository directly into the Grafana plugins directory. After cloning, restart the grafana-server and the plugin should be automatically detected and be available for use, e.g.:
+For installation within a stand-alone instance of Grafana, see the [offical instructions](https://grafana.com/plugins/gridprotectionalliance-openhistorian-datasource/installation) for steps to install the openHistorian Grafana data source using the [Grafana CLI tool](http://docs.grafana.org/plugins/installation/). Note that you need to use Grafana 3.0 or better to enable plug-in support.
+
+Alternately the openHistorian Grafana data source can be installed into a Grafana instance by cloning this repository directly into the Grafana plug-ins directory, i.e., `data/plugins/`. After cloning, restart the grafana-server and the plug-in should be automatically detected and be available for use, e.g.:
 
 ```
 git clone https://github.com/GridProtectionAlliance/openHistorian-grafana.git

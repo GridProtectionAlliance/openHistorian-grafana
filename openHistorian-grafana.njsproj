@@ -35,7 +35,11 @@
     <Content Include="src\css\bootstrap-multiselect.css" />
     <Content Include="src\css\isteven-multi-select.css" />
     <Content Include="src\css\query-editor.css" />
+    <Content Include="src\img\DataSourceConfiguration.png" />
+    <Content Include="src\img\ElementList.png" />
+    <Content Include="src\img\FilterExpression.png" />
     <Content Include="src\img\openHistorian.png" />
+    <Content Include="src\img\TextEditor.png" />
     <Content Include="src\partial\annotations.editor.html" />
     <Content Include="src\partial\config.html" />
     <Content Include="src\partial\query.editor.html" />
