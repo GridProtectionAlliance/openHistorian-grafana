@@ -152,8 +152,8 @@ export class OpenHistorianDataSource {
         target: _this.fixTemplates(target),
         refId: target.refId,
         hide: target.hide, 
-        excludedFlags: target.queryOptions.Excluded || 0,
-        excludeNormalFlags: target.queryOptions.Normal || false,
+        excludedFlags: ((target||{}).queryOptions||{}).Excluded || 0,
+        excludeNormalFlags: ((target||{}).queryOptions||{}).Normal || false,
         queryType: target.queryType,
         queryOptions: target.queryOptions
       };
@@ -193,6 +193,20 @@ export class OpenHistorianDataSource {
 
       return this.backendSrv.datasourceRequest({
           url: this.url + '/GetMetadata',
+          data: interpolated,
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+      });
+
+  }
+
+  getAlarmStates(options) {
+      var interpolated = {
+          target: this.templateSrv.replace(options, null, 'regex')
+      };
+
+      return this.backendSrv.datasourceRequest({
+          url: this.url + '/GetAlarmState',
           data: interpolated,
           method: 'POST',
           headers: { 'Content-Type': 'application/json' }
