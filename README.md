@@ -155,7 +155,8 @@ If the service is using the default `NT SERVICE` account, the service will not h
 ```
 netsh http add urlacl url=http://+:6357/api/grafana user="NT SERVICE\ProjectAlpha"
 ```
-This command must be run with administrative privileges.
+
+> The `netsh` command must be run with administrative privileges.
 
 <a name="localhost" id="localhost" />
 
