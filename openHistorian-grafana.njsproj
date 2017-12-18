@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{20a8edc6-2d61-4b3f-ae70-03bf6f29e0f4}</ProjectGuid>
     <ProjectHome />
-    <ProjectView>ShowAllFiles</ProjectView>
+    <ProjectView>ProjectFiles</ProjectView>
     <StartupFile>
     </StartupFile>
     <WorkingDirectory>.</WorkingDirectory>
@@ -35,9 +35,12 @@
     <Content Include="src\css\bootstrap-multiselect.css" />
     <Content Include="src\css\isteven-multi-select.css" />
     <Content Include="src\css\query-editor.css" />
+    <Content Include="src\img\AlarmAnnotations.png" />
     <Content Include="src\img\DataSourceConfiguration.png" />
     <Content Include="src\img\ElementList.png" />
+    <Content Include="src\img\ExcludedDataFlags.png" />
     <Content Include="src\img\FilterExpression.png" />
+    <Content Include="src\img\FilterExpressionWithFunctions.png" />
     <Content Include="src\img\openHistorian.png" />
     <Content Include="src\img\TextEditor.png" />
     <Content Include="src\partial\annotations.editor.html" />
