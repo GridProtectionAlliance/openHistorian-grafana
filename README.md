@@ -10,7 +10,7 @@ The openHistorian is optimized to store and retrieve large volumes of time-serie
 
 ## Usage
 
-Building a metric query using the openHistorian Grafana data source begins with the selection of a query type, one of: `Element List`, `Filter Expression` or `Text Editor`. The `Element List` and `Filter Expression` types are query builder screens that assist with the selection of the desired series. The `Text Editor` screen allows for manual entry of a query expression that will select the desired series.
+Building a metric query using the openHistorian Grafana data source begins with the selection of a query type, one of: _Element List_, _Filter Expression_ or _Text Editor_. The _Element List_ and _Filter Expression_ types are query builder screens that assist with the selection of the desired series. The _Text Editor_ screen allows for manual entry of a query expression that will select the desired series.
 
 ### Element List Query Builder
 
@@ -30,7 +30,7 @@ The _Text Editor_ query builder is used to manually specify a text based query e
 
 ![Text Editor Query Type](https://raw.githubusercontent.com/GridProtectionAlliance/openHistorian-grafana/master/src/img/TextEditor.png)
 
-> Note that switching from the `Element List` or `Filter Expression` query builder screens to the `Text Editor` will keep the expression as built so far to allow further manual updates to the expression. However, any manual changes made to the filter expression while on the `Text Editor` query screen will not flow back to the `Element List` or `Filter Expression` query builder screens. Moreover, switching back to or between the `Element List` and `Filter Expression` query builder screens will automatically clear out any existing expression.
+> Note that switching from the _Element List_ or _Filter Expression_ query builder screens to the _Text Editor_ will keep the expression as built so far to allow further manual updates to the expression. However, any manual changes made to the filter expression while on the _Text Editor_ query screen will not flow back to the _Element List_ or _Filter Expression_ query builder screens. Moreover, switching back to or between the _Element List_ and _Filter Expression_ query builder screens will automatically clear out any existing expression.
 
 #### Direct Tag Specification
 
@@ -60,7 +60,7 @@ Range(PPA:99; Sum(FILTER ActiveMeasurements WHERE SignalType = 'FREQ'; STAT:12))
 
 The openHistorian Grafana data source includes various aggregation and operational functions, e.g., [Average](https://github.com/GridProtectionAlliance/gsf/blob/master/Source/Documentation/GrafanaFunctions.md#average) or [StandardDeviation](https://github.com/GridProtectionAlliance/gsf/blob/master/Source/Documentation/GrafanaFunctions.md#standarddeviation), which can be applied on a per-series and per-group basis. Functions applied to the group of available series can operate either on the entire set, end-to-end, or by time-slice. See [GSF Grafana Functions](https://github.com/GridProtectionAlliance/gsf/blob/master/Source/Documentation/GrafanaFunctions.md) for more detail and the full list of available functions.
 
-The `Element List` and `Filter Expression` query builder screens define the available functions as pick lists that get applied over the selected series by clicking the `+` button at the end of the `FUNCTIONS` row:
+The _Element List_ and _Filter Expression_ query builder screens define the available functions as pick lists that get applied over the selected series by clicking the `+` button at the end of the `FUNCTIONS` row:
 
 ![Filter Expression Query Type with Functions](https://raw.githubusercontent.com/GridProtectionAlliance/openHistorian-grafana/master/src/img/FilterExpressionWithFunctions.png)
 
@@ -68,7 +68,7 @@ Many series functions have parameters that are required or optional. Optional pa
 
 ### Alarm Annotations
 
-The openHistorian Grafana data source supports `Annotation` style queries for configured time-series alarms. If any alarms are configured for a host system, then they can be accessed from the associated openHistorian Grafana data source. Note that alarm measurements are stored in the local statistics archive by default, e.g., `OHSTAT`, so make sure this is the data source of the configured annotation query.
+The openHistorian Grafana data source supports _Annotation_ style queries for configured time-series alarms. If any alarms are configured for a host system, then they can be accessed from the associated openHistorian Grafana data source. Note that alarm measurements are stored in the local statistics archive by default, e.g., `OHSTAT`, so make sure this is the data source of the configured annotation query.
 
 Supported alarm annotation queries include `#ClearedAlarms` and `#RaisedAlarms`, which will return all alarms for the queried time period:
 
@@ -108,7 +108,7 @@ For archived time-series data, the Grafana web service is hosted within the exis
 
 When the openHistorian service is hosting multiple historian instances, a specific historian instance can be referenced using a path like `/instance/{instanceName}/grafana/`, e.g.: [http://localhost:8180/instance/ppa/grafana/](http://localhost:8180/instance/ppa/grafana/) [\*](#localhost).
 
-The typical HTTP setting for `Access` in any instance of the openHistorian Grafana data source is _`proxy`_. However, when referencing a hosted Grafana instance that is integrated with the openHistorian 2.0 via reverse proxy, the `Access` setting will need to be set to _`direct`_ such that authentication headers can properly flow back through the openHistorian for user security validation:
+The typical HTTP setting for `Access` in any instance of the openHistorian Grafana data source is _proxy_. However, when referencing a hosted Grafana instance that is integrated with the openHistorian 2.0 via reverse proxy, the `Access` setting will need to be set to _direct_ such that authentication headers can properly flow back through the openHistorian for user security validation:
 
 ![Direct Data Source Configuration](https://raw.githubusercontent.com/GridProtectionAlliance/openHistorian-grafana/master/src/img/DataSourceConfiguration.png)
 
@@ -118,13 +118,13 @@ The openHistorian 2.0 also includes a pre-configured local statistics archive th
 
 Statistical information is archived every ten seconds for a variety of data source and system parameters measured for the openHistorian 2.0 service.
 
-The HTTP setting for `Access` in an instance of the openHistorian Grafana data source that is connecting to the openHistorian 2.0 statistics archive should always be set to _`proxy`_.
+The HTTP setting for `Access` in an instance of the openHistorian Grafana data source that is connecting to the openHistorian 2.0 statistics archive should always be set to _proxy_.
 
 ### openHistorian 1.0 Configuration
 
 The openHistorian 1.0 is a core component of the [Grid Solutions Framework Time-series Library](https://www.gridprotectionalliance.org/technology.asp#TSL) and is used for archival of statistics and other time-series data. Applications built using the openHistorian 1.0 can also be integrated with Grafana. 
 
-The HTTP setting for `Access` in an instance of the openHistorian Grafana data source that is connecting to the openHistorian 1.0 should always be set to _`proxy`_.
+The HTTP setting for `Access` in an instance of the openHistorian Grafana data source that is connecting to the openHistorian 1.0 should always be set to _proxy_.
 
 #### Time-series Library Applications with Existing Grafana Support
 
