@@ -34,11 +34,11 @@ The _Text Editor_ query builder is used to manually specify a text based query e
 
 #### Direct Tag Specification
 
-Direct specification of metric queries can be entered as semi-colon separated point tag references in a variety of forms, e.g., measurement key identifiers: `PPA:4; PPA:2` - formatted as `{instance}:{id}`, unique Guid based signal identifiers: `538A47B0-F10B-4143-9A0A-0DBC4FFEF1E8; E4BBFE6A-35BD-4E5B-92C9-11FF913E7877`, or point tag names: `GPA_TESTDEVICE:FREQ; GPA_TESTDEVICE:FLAG`.
+Direct specification of metric queries can be entered using the _Text Editor_ as semi-colon separated point tag references in a variety of forms, e.g., measurement key identifiers: `PPA:4; PPA:2` - formatted as `{instance}:{id}`, unique Guid based signal identifiers: `538A47B0-F10B-4143-9A0A-0DBC4FFEF1E8; E4BBFE6A-35BD-4E5B-92C9-11FF913E7877`, or point tag names: `GPA_TESTDEVICE:FREQ; GPA_TESTDEVICE:FLAG`.
 
 #### Filter Expressions
 
-Metric queries can also be specified as filter expressions that use a syntax that is similar to SQL. For example, the following expression would select the first 5 encountered series for any device with a name that starts with `SHELBY`:
+Metric queries using the _Text Editor_ can also be specified as filter expressions that use a syntax that is similar to SQL. For example, the following expression would select the first 5 encountered series for any device with a name that starts with `SHELBY`:
 ```
 FILTER TOP 5 ActiveMeasurements WHERE Device LIKE 'SHELBY%'
 ```
@@ -47,7 +47,7 @@ See [filter expression syntax](https://github.com/GridProtectionAlliance/gsf/blo
 
 #### Combined Expressions
 
-When using the _Text Editor_ to build a query, both filter expressions and directly specified tags, with or without functions, may be selected simultaneously when separated with semi-colons, for example:
+When using the _Text Editor_ to build a query, both filter expressions and directly specified tags, with or without series functions, may be selected simultaneously when separated with semi-colons, for example:
 ```
 PPA:15; STAT:20; SetSum(Count(PPA:8; PPA:9; PPA:10));
 FILTER ActiveMeasurements WHERE SignalType IN ('IPHA', 'VPHA');
@@ -100,10 +100,6 @@ Starting with openHistorian 2.4, Grafana can be seamlessly integrated with the o
 
 Configuration of an openHistorian Grafana data source is normally as simple as specification of a URL and proper authentication options. The required authentication options depend on the configuration of the openHistorian web API which can be set as anonymous or require authentication and/or SSL.
 
-The typical HTTP setting for `Access` in an instance of the openHistorian Grafana data source is _`proxy`_. However, when referencing a hosted Grafana instance that is integrated with the openHistorian via reverse proxy, the `Access` setting will need to be set to _`direct`_ such that authentication headers can properly flow back through the openHistorian for user security validation:
-
-![Direct Data Source Configuration](https://raw.githubusercontent.com/GridProtectionAlliance/openHistorian-grafana/master/src/img/DataSourceConfiguration.png)
-
 ### openHistorian 2.0 Configuration
 
 The openHistorian 2.0 automatically includes Grafana web service interfaces starting with [version 2.0.410](https://github.com/GridProtectionAlliance/openHistorian/releases).
@@ -112,17 +108,27 @@ For archived time-series data, the Grafana web service is hosted within the exis
 
 When the openHistorian service is hosting multiple historian instances, a specific historian instance can be referenced using a path like `/instance/{instanceName}/grafana/`, e.g.: [http://localhost:8180/instance/ppa/grafana/](http://localhost:8180/instance/ppa/grafana/) [\*](#localhost).
 
-The openHistorian 2.0 also includes a pre-configured local statistics archive web service interface that can be accessed from [http://localhost:6356/api/grafana/](http://localhost:6356/api/grafana/) [\*](#localhost) &mdash; note that the trailing slash is relevant.
+The typical HTTP setting for `Access` in any instance of the openHistorian Grafana data source is _`proxy`_. However, when referencing a hosted Grafana instance that is integrated with the openHistorian 2.0 via reverse proxy, the `Access` setting will need to be set to _`direct`_ such that authentication headers can properly flow back through the openHistorian for user security validation:
 
-Statistical information is archived every ten seconds for a variety of data source and system parameters.
+![Direct Data Source Configuration](https://raw.githubusercontent.com/GridProtectionAlliance/openHistorian-grafana/master/src/img/DataSourceConfiguration.png)
+
+#### openHistorian 2.0 Statistics Data
+
+The openHistorian 2.0 also includes a pre-configured local statistics archive that can be accessed using an instance of the openHistorian Grafana data source with the following URL: [http://localhost:6356/api/grafana/](http://localhost:6356/api/grafana/) [\*](#localhost) &ndash; note that the trailing slash is relevant.
+
+Statistical information is archived every ten seconds for a variety of data source and system parameters measured for the openHistorian 2.0 service.
+
+The HTTP setting for `Access` in an instance of the openHistorian Grafana data source that is connecting to the openHistorian 2.0 statistics archive should always be set to _`proxy`_.
 
 ### openHistorian 1.0 Configuration
 
 The openHistorian 1.0 is a core component of the [Grid Solutions Framework Time-series Library](https://www.gridprotectionalliance.org/technology.asp#TSL) and is used for archival of statistics and other time-series data. Applications built using the openHistorian 1.0 can also be integrated with Grafana. 
 
+The HTTP setting for `Access` in an instance of the openHistorian Grafana data source that is connecting to the openHistorian 1.0 should always be set to _`proxy`_.
+
 #### Time-series Library Applications with Existing Grafana Support
 
-Recent versions of the following Time-series Library (TSL) applications now include support for Grafana. To use the Grafana interface with an existing openHistorian 1.0 archive, simply register a new openHistorian Grafana data source using the appropriate interface URL as defined below [\*](#localhost):
+Recent versions of the following Time-series Library (TSL) applications now include support for Grafana. To use the Grafana interface with an existing openHistorian 1.0 archive, simply register a new openHistorian Grafana data source using the appropriate interface URL as defined below [\*](#localhost)  &ndash; note that the trailing slashes are relevant:
 
 | TSL Application (min version) | Statistics Interface | Archive Interface (if applicable) |
 | ----- |:-----:|:-----:|
@@ -137,7 +143,7 @@ Recent versions of the following Time-series Library (TSL) applications now incl
 
 If the assembly [`GrafanaAdapters.dll`](https://www.gridprotectionalliance.org/NightlyBuilds/GridSolutionsFramework/Beta/Libraries/) is deployed with an existing Time-series Library based project, e.g., [Project Alpha](https://github.com/GridProtectionAlliance/projectalpha), the 1.0 openHistorian Grafana interfaces will be available per configured openHistorian instance. For Grafana support, the time-series project needs to use [Grid Solutions Framework](https://github.com/GridProtectionAlliance/gsf) dependencies for version 2.1.332 or beyond &mdash; or to be built with Project Alpha starting from version 0.1.159.
 
-When the `GrafanaAdapters.dll` is deployed in the time-series project installation folder, a new Grafana data service entry will be added in the local configuration file for each configured historian when the new DLL is detected and loaded. Each historian web service instance for Grafana will need to be enabled and configured with a unique port:
+When the `GrafanaAdapters.dll` is deployed in the time-series project installation folder, a new Grafana data service entry will be added in the local configuration file, e.g., `ProjectAlpha.exe.config`, for each configured historian when the new DLL is detected and loaded. Each historian web service instance for Grafana will need to be enabled and configured with a unique port:
 ```xml
     <statGrafanaDataService>
       <add name="Endpoints" value="http.rest://+:6357/api/grafana" description="Semicolon delimited list of URIs where the web service can be accessed." encrypted="false" />
@@ -151,12 +157,12 @@ When the `GrafanaAdapters.dll` is deployed in the time-series project installati
       <add name="Enabled" value="True" description="Determines if web service should be enabled at startup." encrypted="false" />
     </statGrafanaDataService>
 ```
-If the service is using the default `NT SERVICE` account, the service will not have rights to start the web service on a new port and will need to be registered. As an example, the following command can be used to register a new Grafana web service end-point on port 6357 for the ProjectAlpha service:
+If the service is deployed on a Windows machine and is configured using the default `NT SERVICE` account, the service will not have rights to start the web service on a new port and will need to be registered. As an example, the following command can be used to register a new Grafana web service end-point on port 6357 for the `ProjectAlpha` service:
 ```
 netsh http add urlacl url=http://+:6357/api/grafana user="NT SERVICE\ProjectAlpha"
 ```
 
-> The `netsh` command must be run with administrative privileges.
+> The `netsh` command must be run with administrative privileges. The `+` host designation is used to bind to the URL and port to all local interfaces; otherwise, a specific IP must be provided.
 
 <a name="localhost" id="localhost" />
 
@@ -164,17 +170,17 @@ netsh http add urlacl url=http://+:6357/api/grafana user="NT SERVICE\ProjectAlph
 
 ### Excluded Data Flags
 
-All time-series data stored in the openHistorian includes [measurement state flags](https://github.com/GridProtectionAlliance/gsf/blob/master/Source/Libraries/GSF.TimeSeries/IMeasurement.cs#L46) that describe the data quality state of an archived value. The openHistorian Grafana data source includes the ability to filter queried data to only return the desired data quality states by excluding specified data flags. Excluded data flag filters can by applied at a data source level and at an individual metric query level. Any excluded data flags applied at the data source level become the _default flags_ for any new metric query &ndash; every individual metric query can then override the default flags that were defined at the data source level. To change the default flags for an individual metric query, click the `Query Options` button near the end of the query `TYPE` row. 
+All time-series data stored in the openHistorian includes [measurement state flags](https://github.com/GridProtectionAlliance/gsf/blob/master/Source/Libraries/GSF.TimeSeries/IMeasurement.cs#L46) that describe the data quality state of an archived value. The openHistorian Grafana data source includes the ability to filter queried data to the desired data quality states by excluding specified data flags. Default excluded data flag filters can by defined at a data source level and overridden at an individual metric query level. To change the default flags for an individual metric query, click the `Query Options` button near the end of the query `TYPE` row:
 
 ![Excluded Data Flags](https://raw.githubusercontent.com/GridProtectionAlliance/openHistorian-grafana/master/src/img/ExcludedDataFlags.png)
 
- > The initial default set of excluded data flag filters are established when an individual metric query is first created and will not be affected by any subsequent updates to the default flags at the data source level, i.e., any changes made to the excluded data flags at the data source level will only be used as defaults for new metric queries and will not affect any existing queries.
+ > The initial set of excluded data flags for an individual metric query is inherited from the flags defined for the associated data source and get established when the query is first created. The excluded data flags for an existing metric query will not be affected by any subsequent updates to the flags at the data source level, i.e., any changes made to the excluded data flags at the data source level will only be used as defaults for new metric queries and will not affect any existing queries.
 
 ---
 
 ## Installation
 
-Starting with openHistorian 2.4, Grafana can be installed along with the openHistorian such that the openHistorian's primary self-hosted web site can act as a reverse proxy to Grafana. When configured in this mode, the openHistorian can auto-launch the `grafana-server.exe` and act as a front-end server for Grafana and additionally maintain user security synchronization such that a user with an `Administrator` role in openHistorian will also have an `Admin` role in Grafana, or if a user has an `Editor` role in openHistorian they will have an `Editor` role in Grafana, and so on. 
+Starting with openHistorian 2.4, Grafana can be installed along with the openHistorian such that the openHistorian's primary self-hosted web site can act as a reverse proxy to Grafana. When configured in this mode, the openHistorian will auto-launch the `grafana-server` executable and act as a front-end server for Grafana. Additionally, the openHistorian will maintain user security synchronization such that a user with an `Administrator` role in openHistorian will also have an `Admin` role in Grafana, or if a user has an `Editor` role in openHistorian they will have an `Editor` role in Grafana, and so on. 
 
 For installation within a stand-alone instance of Grafana, see the [offical instructions](https://grafana.com/plugins/gridprotectionalliance-openhistorian-datasource/installation) for steps to install the openHistorian Grafana data source using the [Grafana CLI tool](http://docs.grafana.org/plugins/installation/). Note that Grafana 3.0 or better is required to enable plug-in support.
 
