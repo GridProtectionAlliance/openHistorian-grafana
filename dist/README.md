@@ -34,16 +34,16 @@ The _Text Editor_ query builder is used to manually specify a text based query e
 
 #### Direct Tag Specification
 
-Direct specification of metric queries can be entered using the _Text Editor_ as semi-colon separated point tag references in a variety of forms, e.g., measurement key identifiers: `PPA:4; PPA:2` - formatted as `{instance}:{id}`, unique Guid based signal identifiers: `538A47B0-F10B-4143-9A0A-0DBC4FFEF1E8; E4BBFE6A-35BD-4E5B-92C9-11FF913E7877`, or point tag names: `GPA_TESTDEVICE:FREQ; GPA_TESTDEVICE:FLAG`.
+Direct specification of metric queries can be entered using the _Text Editor_ as semi-colon separated point tag references in a variety of forms, e.g., measurement key identifiers: _PPA:4; PPA:2_ - formatted as `{instance}:{id}`, unique Guid based signal identifiers: _538A47B0-F10B-4143-9A0A-0DBC4FFEF1E8; E4BBFE6A-35BD-4E5B-92C9-11FF913E7877_, or point tag names: _GPA_TESTDEVICE:FREQ; GPA_TESTDEVICE:FLAG_.
 
 #### Filter Expressions
 
-Metric queries using the _Text Editor_ can also be specified as filter expressions that use a syntax that is similar to SQL. For example, the following expression would select the first 5 encountered series for any device with a name that starts with `SHELBY`:
+Metric queries using the _Text Editor_ can also be specified as filter expressions that use a syntax that is similar to SQL. For example, the following expression would select the first 5 encountered series for any device with a name that starts with _SHELBY_:
 ```
 FILTER TOP 5 ActiveMeasurements WHERE Device LIKE 'SHELBY%'
 ```
 
-See [filter expression syntax](https://github.com/GridProtectionAlliance/gsf/blob/master/Source/Documentation/FilterExpressions.md) and the [`ActiveMeasurements` table definition](https://github.com/GridProtectionAlliance/gsf/blob/master/Source/Documentation/FilterExpressions.md#activemeasurements) for more information.
+See [filter expression syntax](https://github.com/GridProtectionAlliance/gsf/blob/master/Source/Documentation/FilterExpressions.md) and the `ActiveMeasurements` [table definition](https://github.com/GridProtectionAlliance/gsf/blob/master/Source/Documentation/FilterExpressions.md#activemeasurements) for more information.
 
 #### Combined Expressions
 
@@ -51,7 +51,7 @@ When using the _Text Editor_ to build a query, both filter expressions and direc
 ```
 PPA:15; STAT:20; SetSum(Count(PPA:8; PPA:9; PPA:10));
 FILTER ActiveMeasurements WHERE SignalType IN ('IPHA', 'VPHA');
-Range(PPA:99; Sum(FILTER ActiveMeasurements WHERE SignalType = 'FREQ'; STAT:12))
+Range(PPA:9; Sum(FILTER ActiveMeasurements WHERE SignalType = 'FREQ'; STAT:2))
 ```
 
 > Complex combined expressions that contain both directly specified point tags and filter expressions are only available when using the _Text Editor_ query builder.
@@ -77,7 +77,7 @@ Supported alarm annotation queries include `#ClearedAlarms` and `#RaisedAlarms`,
 Filter expressions of the configured time-series alarms are also supported, e.g.:
 
 ```
-FILTER TOP 10 ClearedAlarms WHERE Severity >= 500 AND TagName LIKE '%TESTDEVICE%'
+FILTER TOP 10 ClearedAlarms WHERE Severity >= 500 AND TagName LIKE '%DEVICE1%'
 ```
 
 or
@@ -86,9 +86,9 @@ or
 FILTER RaisedAlarms WHERE Description LIKE '%High Frequency%'
 ```
 
-See [`Alarms` table defintion](https://github.com/GridProtectionAlliance/gsf/blob/master/Source/Documentation/FilterExpressions.md#alarms) for available query fields in the `ClearedAlarms` and `RaisedAlarms` datasets. Note that series functions are not currently supported on user specified alarm annotation queries.
+See `Alarms` [table definition](https://github.com/GridProtectionAlliance/gsf/blob/master/Source/Documentation/FilterExpressions.md#alarms) for available query fields in the _ClearedAlarms_ and _RaisedAlarms_ datasets. Note that series functions are not currently supported on user specified alarm annotation queries.
 
-> To make sure no alarm values are missed, all annotation queries are internally executed with the [`Interval`](https://github.com/GridProtectionAlliance/gsf/blob/master/Source/Documentation/GrafanaFunctions.md#interval) function using a time parameter of zero &ndash; a zero value time interval parameter requests non-decimated, full resolution data from the data source. Although this operation produces the most accurate query results, its use increases query burden on the data source &ndash; as a result, queries for long time ranges using alarm annotations could affect overall dashboard performance.
+> All annotation queries are internally executed using the [_Interval_](https://github.com/GridProtectionAlliance/gsf/blob/master/Source/Documentation/GrafanaFunctions.md#interval) function with a time parameter of zero to request non-decimated, full resolution data from the data source to make sure no alarm values are skipped for the specified query range. Although this operation produces the most accurate query results, its use increases query burden on the data source &ndash; as a result, queries for long time ranges using alarm annotations could affect overall dashboard performance.
 
 ---
 
@@ -104,9 +104,9 @@ Configuration of an openHistorian Grafana data source is normally as simple as s
 
 The openHistorian 2.0 automatically includes Grafana web service interfaces starting with [version 2.0.410](https://github.com/GridProtectionAlliance/openHistorian/releases).
 
-For archived time-series data, the Grafana web service is hosted within the existing MVC based web server architecture and is just “_on_” with nothing extra to configure. To use the interface, simply register a new openHistorian Grafana data source using the path `/api/grafana/` from the existing web based user interface URL, typically: [http://localhost:8180/api/grafana/](http://localhost:8180/api/grafana/) [\*](#localhost).
+For archived time-series data, the Grafana web service is hosted within the existing MVC based web server architecture and is just “_on_” with nothing extra to configure. To use the interface, simply register a new openHistorian Grafana data source using the path `/api/grafana/` from the existing web based user interface URL, typically: [http://localhost:8180/api/grafana/](http://localhost:8180/api/grafana/) [\*](#localhost-note).
 
-When the openHistorian service is hosting multiple historian instances, a specific historian instance can be referenced using a path like `/instance/{instanceName}/grafana/`, e.g.: [http://localhost:8180/instance/ppa/grafana/](http://localhost:8180/instance/ppa/grafana/) [\*](#localhost).
+When the openHistorian service is hosting multiple historian instances, a specific historian instance can be referenced using a path like `/instance/{instanceName}/grafana/`, e.g.: [http://localhost:8180/instance/ppa/grafana/](http://localhost:8180/instance/ppa/grafana/) [\*](#localhost-note).
 
 The typical HTTP setting for `Access` in any instance of the openHistorian Grafana data source is _proxy_. However, when referencing a hosted Grafana instance that is integrated with the openHistorian 2.0 via reverse proxy, the `Access` setting will need to be set to _direct_ such that authentication headers can properly flow back through the openHistorian for user security validation:
 
@@ -114,7 +114,7 @@ The typical HTTP setting for `Access` in any instance of the openHistorian Grafa
 
 #### openHistorian 2.0 Statistics Data
 
-The openHistorian 2.0 also includes a pre-configured local statistics archive that can be accessed using an instance of the openHistorian Grafana data source with the following URL: [http://localhost:6356/api/grafana/](http://localhost:6356/api/grafana/) [\*](#localhost) &ndash; note that the trailing slash is relevant.
+The openHistorian 2.0 also includes a pre-configured local statistics archive that can be accessed using an instance of the openHistorian Grafana data source with the following URL: [http://localhost:6356/api/grafana/](http://localhost:6356/api/grafana/) [\*](#localhost-note) &ndash; note that the trailing slash is relevant.
 
 Statistical information is archived every ten seconds for a variety of data source and system parameters measured for the openHistorian 2.0 service.
 
@@ -128,7 +128,7 @@ The HTTP setting for `Access` in an instance of the openHistorian Grafana data s
 
 #### Time-series Library Applications with Existing Grafana Support
 
-Recent versions of the following Time-series Library (TSL) applications now include support for Grafana. To use the Grafana interface with an existing openHistorian 1.0 archive, simply register a new openHistorian Grafana data source using the appropriate interface URL as defined below [\*](#localhost)  &ndash; note that the trailing slashes are relevant:
+Recent versions of the following Time-series Library (TSL) applications now include support for Grafana. To use the Grafana interface with an existing openHistorian 1.0 archive, simply register a new openHistorian Grafana data source using the appropriate interface URL as defined below [\*](#localhost-note)  &ndash; note that the trailing slashes are relevant:
 
 | TSL Application (min version) | Statistics Interface | Archive Interface (if applicable) |
 | ----- |:-----:|:-----:|
@@ -164,7 +164,7 @@ netsh http add urlacl url=http://+:6357/api/grafana user="NT SERVICE\ProjectAlph
 
 > The `netsh` command must be run with administrative privileges. The `+` host designation is used to bind to the URL and port to all local interfaces; otherwise, a specific IP must be provided.
 
-<a name="localhost" id="localhost" />
+###### LocalHost Note
 
 \* _Replace `localhost` as needed with the IP or DNS name of system hosting the archive._
 
