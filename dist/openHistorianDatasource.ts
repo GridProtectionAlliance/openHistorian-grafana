@@ -105,7 +105,7 @@ export class OpenHistorianDataSource {
     });
   }
 
-  metricFindQuery(options) {
+  metricFindQuery(options: string, optionalOptions: any) {
       var interpolated = {
           target: this.templateSrv.replace(options, null, 'regex')
       };
@@ -135,7 +135,7 @@ export class OpenHistorianDataSource {
 
   mapToTextValue(result) {
     return _.map(result.data, function (d, i) {
-      return { text: d, value: i };
+      return { text: d, value: d };
     });
   }
 
@@ -213,6 +213,21 @@ export class OpenHistorianDataSource {
       });
 
   }
+
+  getDataAvailability(options) {
+      var interpolated = {
+          target: this.templateSrv.replace(options, null, 'regex')
+      };
+
+      return this.backendSrv.datasourceRequest({
+          url: this.url + '/GetDataAvailability',
+          data: interpolated,
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+      });
+
+  }
+
 
   fixTemplates(target) {
       if (target.target == undefined) return '';

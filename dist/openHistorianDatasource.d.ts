@@ -14,7 +14,7 @@ export declare class OpenHistorianDataSource {
     query(options: any): any;
     testDatasource(): any;
     annotationQuery(options: any): any;
-    metricFindQuery(options: any): any;
+    metricFindQuery(options: string, optionalOptions: any): any;
     whereFindQuery(options: any): any;
     mapToTextValue(result: any): any;
     buildQueryParameters(options: any): any;
@@ -22,5 +22,6 @@ export declare class OpenHistorianDataSource {
     orderByFindQuery(options: any): any;
     getMetaData(options: any): any;
     getAlarmStates(options: any): any;
+    getDataAvailability(options: any): any;
     fixTemplates(target: any): any;
 }
