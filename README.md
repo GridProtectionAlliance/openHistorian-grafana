@@ -64,7 +64,7 @@ The _Element List_ and _Filter Expression_ query builder screens define the avai
 
 ![Filter Expression Query Type with Functions](https://raw.githubusercontent.com/GridProtectionAlliance/openHistorian-grafana/master/src/img/FilterExpressionWithFunctions.png)
 
-Many series functions have parameters that are required or optional. Optional parameter values will always define a default state. Parameter values must be a constant value or, where applicable, a named target available from the expression. Named targets only work with group operations, i.e., [Set](https://github.com/GridProtectionAlliance/gsf/blob/master/Source/Documentation/GrafanaFunctions.md#set) or [Slice](https://github.com/GridProtectionAlliance/gsf/blob/master/Source/Documentation/GrafanaFunctions.md#slice), since group operations provide access to multiple series values from within a single series. The actual value used for a named target parameter will be the first encountered value for the target series &ndash; in the case of _Slice_ group operations, this will be the first value encountered in each time-slice.
+Many series functions have parameters that are required or optional &ndash; optional parameter values will always define a default state. Parameter values must be a constant value or, where applicable, a named target available from the expression. Named targets are intended to work with group operations, i.e., [Set](https://github.com/GridProtectionAlliance/gsf/blob/master/Source/Documentation/GrafanaFunctions.md#set) or [Slice](https://github.com/GridProtectionAlliance/gsf/blob/master/Source/Documentation/GrafanaFunctions.md#slice), since group operations provide access to multiple series values from within a single series. The actual value used for a named target parameter will be the first encountered value for the target series &ndash; in the case of _Slice_ group operations, this will be the first value encountered in each time-slice. Named target parameters can optionally specify multiple fall-back series and one final default constant value each separated by a semi-colon to use when the named target series is not available, e.g.: `SliceSubtract(1, T1;T2;5.5, T1;T2;T3)`
 
 ### Alarm Annotations
 
@@ -108,9 +108,11 @@ For archived time-series data, the Grafana web service is hosted within the exis
 
 When the openHistorian service is hosting multiple historian instances, a specific historian instance can be referenced using a path like `/instance/{instanceName}/grafana/`, e.g.: [http://localhost:8180/instance/ppa/grafana/](http://localhost:8180/instance/ppa/grafana/) [\*](#localhost-note).
 
-The typical HTTP setting for `Access` in any instance of the openHistorian Grafana data source is _proxy_. However, when referencing a hosted Grafana instance that is integrated with the openHistorian 2.0 via reverse proxy, the `Access` setting will need to be set to _direct_ such that authentication headers can properly flow back through the openHistorian for user security validation:
+The typical HTTP setting for `Access` in any instance of the openHistorian Grafana data source is _proxy_. However, when referencing a hosted Grafana instance that is integrated with the openHistorian 2.0 via reverse proxy, the `Access` setting can be set to _direct_ such that the user's authentication headers can flow back through the openHistorian for user security validation:
 
 ![Direct Data Source Configuration](https://raw.githubusercontent.com/GridProtectionAlliance/openHistorian-grafana/master/src/img/DataSourceConfiguration.png)
+
+Using _direct_ access allows the openHistorian authenticated user to be the authenticated user in Grafana. Otherwise, _proxy_ access will also work but will require a user for Grafana to use for authenticating to the data source.
 
 #### openHistorian 2.0 Statistics Data
 
