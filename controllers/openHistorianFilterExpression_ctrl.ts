@@ -20,26 +20,32 @@
 //       Generated original version of source code.
 //
 //******************************************************************************************************
+/// <reference path="../module.d.ts"/>
+
 import { FunctionList, Booleans, AngleUnits, TimeUnits, WhereOperators } from './../js/openHistorianConstants'
+
+import OpenHistorianDataSource from '../openHistorianDatasource';
+import { PanelCtrl } from 'grafana-sdk-mocks/app/plugins/sdk';
+import { QueryCtrl } from 'grafana-sdk-mocks/app/plugins/sdk';
 declare var _: any;
 declare var $: any;
 
 export default class OpenHistorianFilterExpressionCtrl {
-    wheres: Array<any>;
-    functionSegments: Array<any>;
+    wheres: Array<iSegment>;
+    functionSegments: Array<iFunctionSegment>;
     topNSegment: number;
-    functions: Array<any>;
-    orderBys: Array<any>;
-    whereSegment: any;
-    filterSegment: any;
-    orderBySegment: any;
-    functionSegment: any;
-    typingTimer: any;
-    target: any;
-    datasource: any;
-    panelCtrl: any;
-
-    constructor(private $scope, private uiSegmentSrv) {
+    functions: Array<iFunctionSegment>;
+    orderBys: Array<iSegment>;
+    whereSegment: iSegment;
+    filterSegment: iSegment;
+    orderBySegment: iSegment;
+    functionSegment: iFunctionSegment;
+    typingTimer: NodeJS.Timeout;
+    target: iTarget;
+    datasource: OpenHistorianDataSource;
+    panelCtrl: PanelCtrl;
+    $scope: any;
+    constructor($scope, $injector, private uiSegmentSrv: any) {
         this.uiSegmentSrv = uiSegmentSrv;
         this.$scope = $scope;
         this.target = $scope.target;
@@ -410,7 +416,7 @@ export default class OpenHistorianFilterExpressionCtrl {
 
         if (this.functionSegments.length == 0) return;
 
-        _.each(ctrl.functionSegments, function (element, index, list) {
+        _.each(ctrl.functionSegments, function (element: iFunctionSegment, index, list) {
             var newElement = ctrl.uiSegmentSrv.newSegment(element.Function)
             newElement.Type = 'Function';
             newElement.Function = element.Function;

@@ -20,19 +20,21 @@
 //       Generated original version of source code.
 //
 //******************************************************************************************************
+/// <reference path="../module.d.ts"/>
+
 import { FunctionList, Booleans, AngleUnits, TimeUnits, WhereOperators } from './../js/openHistorianConstants'
+import OpenHistorianDataSource from '../openHistorianDatasource';
 declare var _: any;
 
 export default class OpenHistorianElementPickerCtrl{
-
-    elementSegment: any;
-    segments: Array<any>;
-    functionSegment: any;
-    functionSegments: Array<any>;
-    functions: Array<any>;
-    typingTimer: any;
-
-
+    elementSegment: iSegment;
+    segments: Array<iSegment>;
+    functionSegment: iFunctionSegment;
+    functionSegments: Array<iFunctionSegment>;
+    functions: Array<iFunctionSegment>;
+    typingTimer: NodeJS.Timeout;
+    target: iTarget;
+    datasource: OpenHistorianDataSource;
     constructor(private $scope, private uiSegmentSrv) {
         var ctrl = this;
 

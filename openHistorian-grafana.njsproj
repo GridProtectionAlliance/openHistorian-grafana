@@ -65,6 +65,7 @@
     <TypeScriptCompile Include="controllers\openHistorianQuery_ctrl.ts" />
     <TypeScriptCompile Include="controllers\openHistorianTextEditor_ctrl.ts" />
     <TypeScriptCompile Include="js\openHistorianConstants.ts" />
+    <TypeScriptCompile Include="module.d.ts" />
     <TypeScriptCompile Include="module.ts" />
     <TypeScriptCompile Include="openHistorianDatasource.ts" />
   </ItemGroup>

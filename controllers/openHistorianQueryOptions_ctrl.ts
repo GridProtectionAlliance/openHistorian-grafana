@@ -24,12 +24,9 @@ declare var _: any;
 import { DefaultFlags } from './../js/openHistorianConstants'
 
 export default class OpenHistorianQueryOptionsCtrl{
-     // #region Members
-
     dataFlags: any;
     return: any;
     flagArray: Array<any>;
-    // #endregion
 
     constructor(private $scope,private $compile) {
 
@@ -49,7 +46,6 @@ export default class OpenHistorianQueryOptionsCtrl{
 
     }
 
-    // #region Methods
     calculateFlags(flag) {
         var ctrl = this;
         var flagVarExcluded = ctrl.return.Excluded;
@@ -92,7 +88,4 @@ export default class OpenHistorianQueryOptionsCtrl{
         
         return flags;
     }
-
-    // #endregion
-
 }

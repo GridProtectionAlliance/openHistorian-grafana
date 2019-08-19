@@ -20,12 +20,14 @@
 //       Generated original version of source code.
 //
 //******************************************************************************************************
+import { PanelCtrl } from "grafana-sdk-mocks/app/plugins/sdk";
 
 declare var _: any;
 
 export default class OpenHistorianTextEditorCtrl{
     targetText: string;
-    constructor(private $scope, private templateSrv) {
+    target: iTarget;
+    constructor(private $scope: {target: iTarget, thistargetText: string, panel: PanelCtrl}, private templateSrv) {
 
         this.$scope = $scope;
         this.targetText = ($scope.target.targetText == undefined ? '' : $scope.target.targetText);

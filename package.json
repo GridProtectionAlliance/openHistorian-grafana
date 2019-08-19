@@ -11,12 +11,12 @@
   "repository": "https://github.com/GridProtectionAlliance/",
   "devDependencies": {},
   "dependencies": {
-    "@types/react": "^16.9.2",
+    "@types/node": "^12.7.2",
     "css-loader": "^3.2.0",
     "grafana-sdk-mocks": "github:grafana/grafana-sdk-mocks",
     "source-map-loader": "^0.2.4",
     "style-loader": "^1.0.0",
     "ts-loader": "^6.0.4",
-    "typescript": "^3.4.1"
+    "typescript": "^3.5.3"
   }
 }

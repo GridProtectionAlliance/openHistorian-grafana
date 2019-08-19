@@ -21,7 +21,6 @@
 //
 //******************************************************************************************************
 declare var angular: any;
-
 import OpenHistorianDataSource from './openHistorianDatasource'
 import OpenHistorianDataSourceQueryCtrl from './controllers/openHistorianQuery_ctrl'
 import OpenHistorianConfigCtrl from './controllers/openHistorianConfig_ctrl'
