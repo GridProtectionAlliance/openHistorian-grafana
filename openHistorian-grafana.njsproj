@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{20a8edc6-2d61-4b3f-ae70-03bf6f29e0f4}</ProjectGuid>
     <ProjectHome />
-    <ProjectView>ProjectFiles</ProjectView>
+    <ProjectView>ShowAllFiles</ProjectView>
     <StartupFile>
     </StartupFile>
     <WorkingDirectory>.</WorkingDirectory>
@@ -17,66 +17,56 @@
     <TypeScriptSourceMap>true</TypeScriptSourceMap>
     <TypeScriptModuleKind>CommonJS</TypeScriptModuleKind>
     <ToolsVersionPromptShown>0.0</ToolsVersionPromptShown>
+    <LastActiveSolutionConfig>Debug|Any CPU</LastActiveSolutionConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
   <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
   <ItemGroup>
-    <Compile Include="src\controllers\openHistorianAnnotations_ctrl.ts" />
-    <Compile Include="src\controllers\openHistorianConfig_ctrl.ts" />
-    <Compile Include="src\controllers\openHistorianQueryOptions_ctrl.ts" />
-    <Compile Include="src\controllers\openHistorianQuery_ctrl.ts" />
-    <Compile Include="src\openHistorianDatasource.ts" />
-    <Compile Include="src\js\openHistorianConstants.ts" />
-    <Compile Include="src\module.ts" />
+    <Compile Include="module.js" />
+    <Compile Include="webpack.config.js" />
+    <Content Include=".gitignore" />
+    <Content Include="css\query-editor.css" />
+    <Content Include="img\AlarmAnnotations.png" />
+    <Content Include="img\DataSourceConfiguration.png" />
+    <Content Include="img\ElementList.png" />
+    <Content Include="img\ExcludedDataFlags.png" />
+    <Content Include="img\FilterExpression.png" />
+    <Content Include="img\FilterExpressionWithFunctions.png" />
+    <Content Include="img\openHistorian.png" />
+    <Content Include="img\TextEditor.png" />
     <Content Include="LICENSE" />
     <Content Include="package.json" />
+    <Content Include="partial\annotations.editor.html" />
+    <Content Include="partial\config.html" />
+    <Content Include="partial\query.editor.html" />
+    <Content Include="partial\query.elementPicker.html" />
+    <Content Include="partial\query.filterExpression.html" />
+    <Content Include="partial\query.options.html" />
+    <Content Include="partial\query.textEditor.html" />
+    <Content Include="plugin.json" />
+    <Content Include="query_help.md" />
     <Content Include="README.md" />
     <Compile Include="Gruntfile.js" />
-    <Content Include="src\css\bootstrap-multiselect.css" />
-    <Content Include="src\css\isteven-multi-select.css" />
-    <Content Include="src\css\query-editor.css" />
-    <Content Include="src\img\AlarmAnnotations.png" />
-    <Content Include="src\img\DataSourceConfiguration.png" />
-    <Content Include="src\img\ElementList.png" />
-    <Content Include="src\img\ExcludedDataFlags.png" />
-    <Content Include="src\img\FilterExpression.png" />
-    <Content Include="src\img\FilterExpressionWithFunctions.png" />
-    <Content Include="src\img\openHistorian.png" />
-    <Content Include="src\img\TextEditor.png" />
-    <Content Include="src\partial\annotations.editor.html" />
-    <Content Include="src\partial\config.html" />
-    <Content Include="src\partial\query.editor.html" />
-    <Content Include="src\partial\query.elementPicker.html">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="src\partial\query.filterExpression.html">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="src\partial\query.options.html" />
-    <Content Include="src\partial\query.textEditor.html">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="src\plugin.json" />
-    <Content Include="src\query_help.md" />
+    <Content Include="tsconfig.json" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="src\" />
-    <Folder Include="src\controllers\" />
-    <Folder Include="src\css\" />
-    <Folder Include="src\img\" />
-    <Folder Include="src\js\" />
-    <Folder Include="src\partial\" />
+    <Folder Include="controllers\" />
+    <Folder Include="css\" />
+    <Folder Include="img\" />
+    <Folder Include="js\" />
+    <Folder Include="partial\" />
   </ItemGroup>
   <ItemGroup>
-    <TypeScriptCompile Include="src\controllers\openHistorianElementPicker_ctrl.ts">
-      <SubType>Code</SubType>
-    </TypeScriptCompile>
-    <TypeScriptCompile Include="src\controllers\openHistorianFilterExpression_ctrl.ts">
-      <SubType>Code</SubType>
-    </TypeScriptCompile>
-    <TypeScriptCompile Include="src\controllers\openHistorianTextEditor_ctrl.ts">
-      <SubType>Code</SubType>
-    </TypeScriptCompile>
+    <TypeScriptCompile Include="controllers\openHistorianAnnotations_ctrl.ts" />
+    <TypeScriptCompile Include="controllers\openHistorianConfig_ctrl.ts" />
+    <TypeScriptCompile Include="controllers\openHistorianElementPicker_ctrl.ts" />
+    <TypeScriptCompile Include="controllers\openHistorianFilterExpression_ctrl.ts" />
+    <TypeScriptCompile Include="controllers\openHistorianQueryOptions_ctrl.ts" />
+    <TypeScriptCompile Include="controllers\openHistorianQuery_ctrl.ts" />
+    <TypeScriptCompile Include="controllers\openHistorianTextEditor_ctrl.ts" />
+    <TypeScriptCompile Include="js\openHistorianConstants.ts" />
+    <TypeScriptCompile Include="module.ts" />
+    <TypeScriptCompile Include="openHistorianDatasource.ts" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <!--Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them.-->
