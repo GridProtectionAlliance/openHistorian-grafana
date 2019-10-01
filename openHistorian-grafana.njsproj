@@ -46,7 +46,6 @@
     <Content Include="plugin.json" />
     <Content Include="query_help.md" />
     <Content Include="README.md" />
-    <Compile Include="Gruntfile.js" />
     <Content Include="tsconfig.json" />
   </ItemGroup>
   <ItemGroup>
