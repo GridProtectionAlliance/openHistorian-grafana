@@ -14,7 +14,7 @@ module.exports = {
     output: {
         path: path.resolve(__dirname),
         filename: "[name].js",
-        libraryTarget: 'amd',
+        libraryTarget: 'amd'
     },
     // Enable sourcemaps for debugging webpack's output.
     devtool: "inline-source-map",
@@ -30,7 +30,7 @@ module.exports = {
                 use: ['style-loader','css-loader'],
                 include: [
                     path.resolve(__dirname)
-                ],
+                ]
             },
             // All files with a '.ts' or '.tsx' extension will be handled by 'ts-loader'.
             { test: /\.tsx?$/, loader: "ts-loader" },

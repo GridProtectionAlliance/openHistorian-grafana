@@ -18,6 +18,10 @@
     <TypeScriptModuleKind>CommonJS</TypeScriptModuleKind>
     <ToolsVersionPromptShown>0.0</ToolsVersionPromptShown>
     <LastActiveSolutionConfig>Debug|Any CPU</LastActiveSolutionConfig>
+    <StartWebBrowser>False</StartWebBrowser>
+    <SaveNodeJsSettingsInProjectFile>True</SaveNodeJsSettingsInProjectFile>
+    <TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
+    <TypeScriptBuildMode>true</TypeScriptBuildMode>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
   <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
