@@ -2,7 +2,7 @@
   "compilerOptions": {
     //"module": "es6",
     "jsx": "react",
-    "lib": [ "dom", "es5", "scripthost", "es2015" ],
+    "lib": [ "dom", "es5", "es6", "scripthost", "es2015" ],
     "noEmitOnError": true,
     "noImplicitAny": false,
     "removeComments": true,

@@ -124,7 +124,7 @@ export default class OpenHistorianFilterExpressionCtrl {
         var ctrl = this;
 
         clearTimeout(ctrl.typingTimer);
-        ctrl.typingTimer = setTimeout(function () { ctrl.setTargetWithQuery() }, 1000);
+        ctrl.typingTimer = global.setTimeout(function () { ctrl.setTargetWithQuery() }, 1000);
         event.target['focus']();
 
     }
@@ -474,7 +474,7 @@ export default class OpenHistorianFilterExpressionCtrl {
     inputChange(func, index) {
         var ctrl = this;
         clearTimeout(this.typingTimer);
-        this.typingTimer = setTimeout(function () { ctrl.functionValueChanged(func, index) }, 3000);
+        this.typingTimer = global.setTimeout(function () { ctrl.functionValueChanged(func, index) }, 3000);
         event.target['focus']();
 
     }

@@ -288,7 +288,7 @@ export default class OpenHistorianElementPickerCtrl{
     inputChange(func, index) {
         var ctrl = this;
         clearTimeout(this.typingTimer);
-        this.typingTimer = setTimeout(function () { ctrl.functionValueChanged(func, index) }, 3000);
+        this.typingTimer = global.setTimeout(function () { ctrl.functionValueChanged(func, index) }, 3000);
         event.target['focus']();
 
     }

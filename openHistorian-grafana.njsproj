@@ -21,7 +21,7 @@
     <StartWebBrowser>False</StartWebBrowser>
     <SaveNodeJsSettingsInProjectFile>True</SaveNodeJsSettingsInProjectFile>
     <TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
-    <TypeScriptBuildMode>true</TypeScriptBuildMode>
+    <TypeScriptBuildMode>false</TypeScriptBuildMode>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
   <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
