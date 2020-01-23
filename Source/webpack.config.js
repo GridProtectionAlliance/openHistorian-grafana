@@ -2,20 +2,22 @@
 "use strict";
 const webpack = require("webpack");
 const path = require("path");
+const CopyWebpackPlugin = require('copy-webpack-plugin')
+const CleanWebpackPlugin = require('clean-webpack-plugin');
 
-module.exports = {
-    mode: 'development',
+
+const conf = {
     context: path.resolve(__dirname),
     cache: true,
     entry: {
         module: "./module.ts"
-
     },
     output: {
-        path: path.resolve(__dirname),
+        path: path.join(__dirname,'../Build/Output/Debug/dist'),
         filename: "[name].js",
-        libraryTarget: 'amd'
+        libraryTarget: 'commonjs'
     },
+
     // Enable sourcemaps for debugging webpack's output.
     devtool: "inline-source-map",
 
@@ -27,7 +29,7 @@ module.exports = {
         rules: [
             {
                 test: /\.css$/,
-                use: ['style-loader','css-loader'],
+                use: ['style-loader', 'css-loader'],
                 include: [
                     path.resolve(__dirname)
                 ]
@@ -43,5 +45,35 @@ module.exports = {
         ]
     },
     externals: [
+    ],
+    plugins: [
+        new CleanWebpackPlugin('../Build/Output/Debug/dist', { allowExternal: true }),
+        new webpack.optimize.OccurrenceOrderPlugin(),
+        new CopyWebpackPlugin([
+            { from: 'plugin.json', to: '.' },
+            { from: 'README.md', to: '.' },
+            { from: 'img/*', to: '.' },
+            { from: 'partial/*', to: '.' },
+        ])
     ]
+};
+
+
+module.exports = (env, argv) => {
+    if (argv.mode === 'development')
+    {
+        return conf;
+    }
+    if (argv.mode === 'production') {
+
+        conf.output.path = path.join(__dirname, '../Build/Output/Release/dist');
+        conf.plugins[0] = new CleanWebpackPlugin('../Build/Output/Release/dist', { allowExternal: true });
+        conf.plugins.push(new ngAnnotatePlugin());
+        conf.devtool = [];
+
+        return conf;
+    }
+
+    return conf;
+
 };
