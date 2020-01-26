@@ -50,17 +50,7 @@ export default class OpenHistorianDataSource{
 
     query(options) {
 
-        /*let annotation = {
-            "dashboardId": 3,
-            "panelId": 4,
-            "time": new Date().getTime(),
-            "text": "Alarming Notification test"
-        }
-
-        this.backendSrv.post('/api/annotations', annotation)
-        */
-
-
+        
         var query = this.buildQueryParameters(options);
             query.targets = query.targets.filter(function (t) {
             return !t.hide;
@@ -83,10 +73,11 @@ export default class OpenHistorianDataSource{
         }).then(function (data) {
             ctrl.GetDashboard(data.data,query,ctrl)
         });
+
         //3 cases: If Alerts are empty and Alarms are not -> Create Alerts -> Save
-        // If Alrms are empty and Alerts are not -> Remove Alerts -> Save
-        // If Alarms and Alerts exist -> ensure each Alarm has corresponding Condition and remove all others
-        // -> sub
+        // If Alarms are empty and Alerts are not -> Remove Alerts -> Save
+        // If Alarms and Alerts exist -> ensure each Alarm has corresponding Condition and remove all others -> Save
+
         return this.backendSrv.datasourceRequest({
             url: this.url + '/query',
             data: query,
@@ -270,6 +261,34 @@ export default class OpenHistorianDataSource{
         }).join(sep);
     }
 
+    queryLocation(target) {
+
+        if ((target.target == null) || (target.target == undefined))
+        {
+            target.target = {};
+        }
+
+        if ((target.radius == null) || (target.radius == undefined) || (target.zoom == null) || (target.zoom == undefined)) {
+            return this.backendSrv.datasourceRequest({
+                method: "POST",
+                url: this.url + '/GetLocationData',
+                data: JSON.stringify(target.target),
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+        }
+
+        return this.backendSrv.datasourceRequest({
+            method: "POST",
+            url: this.url + '/GetLocationData?radius=' + target.radius + '&zoom=' + target.zoom,
+            data: JSON.stringify(target.target),
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+
+    }
+
+    // These Fuctions update the dashboard if an OH Alarm is neccesary.
     GetDashboard(alarms, query, ctrl) {
 
         ctrl.backendSrv.datasourceRequest({
@@ -278,9 +297,9 @@ export default class OpenHistorianDataSource{
             data: query,
             headers: { 'Content-Type': 'application/json' }
         }).then(function (data) {
-            console.log(data);
+            //console.log(data);
         }).catch(function (data) {
-            console.log(data);
+            //console.log(data);
         });
 
 
@@ -322,9 +341,18 @@ export default class OpenHistorianDataSource{
             ctrl.UpdateAlarms(alarms, dashboard.dashboard.uid, query, ctrl)
             return;
         }
-                    
-        // Last Check if every alarm has corresponding threshhold
-        let threshholds = alerts.map(item => item.value);
+
+        // make sure this is not a GPA PhasorMap Panel
+        let threshholds = []
+
+        try {
+            // Last Check if every alarm has corresponding threshhold
+            threshholds = alerts.map(item => item.value);
+        }
+        catch {
+            return;
+        }
+
         let needsUpdate = false;
 
         alarms.forEach(item => {
