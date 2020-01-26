@@ -50,6 +50,17 @@ export default class OpenHistorianDataSource{
 
     query(options) {
 
+        /*let annotation = {
+            "dashboardId": 3,
+            "panelId": 4,
+            "time": new Date().getTime(),
+            "text": "Alarming Notification test"
+        }
+
+        this.backendSrv.post('/api/annotations', annotation)
+        */
+
+
         var query = this.buildQueryParameters(options);
             query.targets = query.targets.filter(function (t) {
             return !t.hide;
@@ -61,6 +72,21 @@ export default class OpenHistorianDataSource{
             return Promise.resolve({ data: [] });
         }
 
+        let ctrl = this;
+
+        // Get Alerts and Dashboard Information
+        this.backendSrv.datasourceRequest({
+            url: this.url + '/GetAlarms',
+            data: query,
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        }).then(function (data) {
+            ctrl.GetDashboard(data.data,query,ctrl)
+        });
+        //3 cases: If Alerts are empty and Alarms are not -> Create Alerts -> Save
+        // If Alrms are empty and Alerts are not -> Remove Alerts -> Save
+        // If Alarms and Alerts exist -> ensure each Alarm has corresponding Condition and remove all others
+        // -> sub
         return this.backendSrv.datasourceRequest({
             url: this.url + '/query',
             data: query,
@@ -243,4 +269,112 @@ export default class OpenHistorianDataSource{
                 return a
         }).join(sep);
     }
+
+    GetDashboard(alarms, query, ctrl) {
+
+        ctrl.backendSrv.datasourceRequest({
+            url: ctrl.url + '/QueryAlarms',
+            method: 'POST',
+            data: query,
+            headers: { 'Content-Type': 'application/json' }
+        }).then(function (data) {
+            console.log(data);
+        }).catch(function (data) {
+            console.log(data);
+        });
+
+
+
+        ctrl.backendSrv.datasourceRequest({
+            url: 'api/search?dashboardIds=' + query.dashboardId,
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' }
+        }).then(function (data) {
+            ctrl.backendSrv.datasourceRequest({
+                url: 'api/dashboards/uid/' + data.data[0]["uid"],
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            }).then(function (data) {
+                ctrl.CheckPanel(alarms, query, data.data, ctrl)
+            });
+        });
+    }
+
+    CheckPanel(alarms, query, dashboard, ctrl)
+    {
+        //Get Alaerts from Panel
+        let alerts = dashboard.dashboard.panels;
+        if (alerts === undefined)
+            return;
+
+        alerts = alerts.find(item => item.id == query.panelId);
+        if (alerts == undefined || alerts == null)
+            return;
+
+        alerts = alerts.thresholds;
+
+        // Check Case No alerts and No Alarms in the OH
+        if ((alerts == undefined || alerts == null || alerts.length == 0) && (alarms.length == 0)) 
+            return
+
+        // Check case no Alerts but we have Alarms
+        if ((alerts == undefined || alerts == null || alerts.length == 0) && (alarms.length > 0)) {
+            ctrl.UpdateAlarms(alarms, dashboard.dashboard.uid, query, ctrl)
+            return;
+        }
+                    
+        // Last Check if every alarm has corresponding threshhold
+        let threshholds = alerts.map(item => item.value);
+        let needsUpdate = false;
+
+        alarms.forEach(item => {
+            if (!threshholds.includes(item.SetPoint))
+                needsUpdate = true;
+            });
+
+        if (needsUpdate) {
+            ctrl.UpdateAlarms(alarms, dashboard.dashboard.uid, query, ctrl)
+        }
+
+    }
+
+    UpdateAlarms(alarms, dashboardUid, query, ctrl) {
+
+        
+        ctrl.backendSrv.datasourceRequest({
+            url: 'api/dashboards/uid/' + dashboardUid,
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' }
+        }).then(function (data) {
+
+            let dashboard = data.data.dashboard;
+            let panelIndex = dashboard.panels.findIndex(item => item.id == query.panelId);
+            dashboard.panels[panelIndex].thresholds = alarms.map(item => {
+                let op = "gt";
+                if (item.Operation == 21 || item.Operation == 22)
+                    op = "lt"
+
+                let fill = true;
+                if (item.Operation == 1 || item.Operation == 2)
+                    fill = false;
+
+                return {
+                    colorMode: "critical",
+                    fill: fill,
+                    line: true,
+                    op: op,
+                    value: item.SetPoint
+                }
+            });
+
+            ctrl.backendSrv.datasourceRequest({
+                url: 'api/dashboards/db',
+                method: 'POST',
+                data: { overwrite: true, dashboard: dashboard},
+                headers: { 'Content-Type': 'application/json' }
+            }).catch(function (data) { console.log(data); })
+        });
+
+    }
+
 }

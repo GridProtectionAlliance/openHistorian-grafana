@@ -26,9 +26,7 @@
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
   <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
   <ItemGroup>
-    <Compile Include="module.js" />
     <Compile Include="webpack.config.js" />
-    <Content Include=".gitignore" />
     <Content Include="css\query-editor.css" />
     <Content Include="img\AlarmAnnotations.png" />
     <Content Include="img\DataSourceConfiguration.png" />
@@ -38,7 +36,6 @@
     <Content Include="img\FilterExpressionWithFunctions.png" />
     <Content Include="img\openHistorian.png" />
     <Content Include="img\TextEditor.png" />
-    <Content Include="LICENSE" />
     <Content Include="package.json" />
     <Content Include="partial\annotations.editor.html" />
     <Content Include="partial\config.html" />
