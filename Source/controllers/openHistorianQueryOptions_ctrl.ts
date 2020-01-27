@@ -27,6 +27,7 @@ export default class OpenHistorianQueryOptionsCtrl{
     dataFlags: any;
     return: any;
     flagArray: Array<any>;
+    includeAlarm: any;
 
     constructor(private $scope,private $compile) {
 
@@ -35,6 +36,7 @@ export default class OpenHistorianQueryOptionsCtrl{
 
         this.dataFlags = this.hex2flags(parseInt(value.Excluded));
         this.dataFlags['Normal'].Value = value.Normal;
+        this.includeAlarm = value.Alarms;
 
         this.return = $scope.return;
 
@@ -74,7 +76,11 @@ export default class OpenHistorianQueryOptionsCtrl{
         ctrl.return.Normal = ctrl.dataFlags['Normal'].Value;
     }
 
-    
+    changeAlarms() {
+        var ctrl = this;
+        ctrl.return.Alarms = ctrl.includeAlarm;
+    }
+
     hex2flags(hex){
         var ctrl = this;
         var flag = hex;

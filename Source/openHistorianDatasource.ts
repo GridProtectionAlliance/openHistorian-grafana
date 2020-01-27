@@ -43,9 +43,11 @@ export default class OpenHistorianDataSource{
 
         this.dataFlags = instanceSettings.jsonData.flags;
         this.options = {
-             excludedDataFlags: (instanceSettings.jsonData.Excluded == undefined ? 0 : instanceSettings.jsonData.Excluded),
-             excludeNormalData: (instanceSettings.jsonData.Normal == undefined ? false : instanceSettings.jsonData.Normal)
+            excludedDataFlags: (instanceSettings.jsonData.Excluded == undefined ? 0 : instanceSettings.jsonData.Excluded),
+            excludeNormalData: (instanceSettings.jsonData.Normal == undefined ? false : instanceSettings.jsonData.Normal),
+            updateAlarms: (instanceSettings.jsonData.Alarms == undefined ? false : instanceSettings.jsonData.Alarms),
         }
+
     }
 
     query(options) {
@@ -64,16 +66,18 @@ export default class OpenHistorianDataSource{
 
         let ctrl = this;
 
-        // Get Alerts and Dashboard Information
-        this.backendSrv.datasourceRequest({
-            url: this.url + '/GetAlarms',
-            data: query,
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' }
-        }).then(function (data) {
-            ctrl.GetDashboard(data.data,query,ctrl)
-        });
-
+        if (this.options.updateAlarms) {
+            // Get Alerts and Dashboard Information
+            this.backendSrv.datasourceRequest({
+                url: this.url + '/GetAlarms',
+                data: query,
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            }).then(function (data) {
+                ctrl.GetDashboard(data.data, query, ctrl)
+            }).catch(function (data) {
+            });
+        }
         //3 cases: If Alerts are empty and Alarms are not -> Create Alerts -> Save
         // If Alarms are empty and Alerts are not -> Remove Alerts -> Save
         // If Alarms and Alerts exist -> ensure each Alarm has corresponding Condition and remove all others -> Save

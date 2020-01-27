@@ -28,12 +28,15 @@ export default class OpenHistorianConfigCtrl{
     static templateUrl:string = 'partial/config.html';
     current: any;
     flagArray: Array<any>;
+
     constructor($scope) {
         var ctrl = this;
 
         ctrl.current.jsonData.Excluded = this.current.jsonData.Excluded || 0;
         ctrl.current.jsonData.Normal = this.current.jsonData.Normal || false;
-
+        ctrl.current.jsonData.Alarms = this.current.jsonData.Alarms || false;
     }
+
+    
 }
 
