@@ -68,8 +68,7 @@ module.exports = (env, argv) => {
 
         conf.output.path = path.join(__dirname, '../Build/Output/Release/dist');
         conf.plugins[0] = new CleanWebpackPlugin('../Build/Output/Release/dist', { allowExternal: true });
-        conf.plugins.push(new ngAnnotatePlugin());
-        conf.devtool = [];
+        conf.devtool = false;
 
         return conf;
     }
