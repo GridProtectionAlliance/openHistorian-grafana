@@ -18,6 +18,10 @@ const conf = {
         libraryTarget: 'commonjs'
     },
 
+    optimization: {
+        minimize: false
+    },
+
     // Enable sourcemaps for debugging webpack's output.
     devtool: "inline-source-map",
 
@@ -35,7 +39,15 @@ const conf = {
                 ]
             },
             // All files with a '.ts' or '.tsx' extension will be handled by 'ts-loader'.
-            { test: /\.tsx?$/, loader: "ts-loader" },
+            {
+                test: /\.tsx?$/,
+                loaders: [
+                    {
+                        loader: "babel-loader",
+                        options: { presets: ['env'] }
+                    }, "ts-loader"
+                ]
+            },
             {
                 test: /\.js$/,
                 enforce: "pre",
@@ -48,7 +60,7 @@ const conf = {
     ],
     plugins: [
         new CleanWebpackPlugin('../Build/Output/Debug/dist', { allowExternal: true }),
-        new webpack.optimize.OccurrenceOrderPlugin(),
+        //new webpack.optimize.OccurrenceOrderPlugin(),
         new CopyWebpackPlugin([
             { from: 'plugin.json', to: '.' },
             { from: 'README.md', to: '.' },
