@@ -233,6 +233,20 @@ export default class OpenHistorianDataSource{
 
     }
 
+    getPossibleAlarmStates(options) {
+        var interpolated = {
+            target: this.templateSrv.replace(options, null, 'regex')
+        };
+
+        return this.backendSrv.datasourceRequest({
+            url: this.url + '/GetDeviceAlarms',
+            data: interpolated,
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+    }
+
     getDataAvailability(options) {
         var interpolated = {
             target: this.templateSrv.replace(options, null, 'regex')
