@@ -247,6 +247,20 @@ export default class OpenHistorianDataSource{
 
     }
 
+    getDeviceGroups(options) {
+        var interpolated = {
+            target: this.templateSrv.replace(options, null, 'regex')
+        };
+
+        return this.backendSrv.datasourceRequest({
+            url: this.url + '/GetDeviceGroups',
+            data: interpolated,
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+    }
+
     getDataAvailability(options) {
         var interpolated = {
             target: this.templateSrv.replace(options, null, 'regex')
