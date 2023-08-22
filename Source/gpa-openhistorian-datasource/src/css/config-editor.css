@@ -1,0 +1,19 @@
+.dark-box {
+  background-color: rgba(32, 34, 38); 
+  padding: 8px; 
+  border-radius: 4px;
+  border-color: 1px darkgray;
+}
+
+.dark-box .switch {
+  background-color: blue; /* Change the background color */
+}
+
+.dark-box .switch::before {
+  background-color: white; /* Change the color of the switch thumb */
+}
+
+.dark-button {
+  background-color: rgb(34,37,43); 
+  color: rgb(199,204,220); 
+}

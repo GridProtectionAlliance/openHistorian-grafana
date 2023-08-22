@@ -1,0 +1,6 @@
+\\demoapp\c$\Program Files\openHistorian\Grafana\data\plugins
+
+Monitoring -> remote service console
+init 3
+
+https://developers.grafana.com/ui/latest/index.html?path=/docs/forms-fieldset--basic
