@@ -84,12 +84,13 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
   }
 
   //Information on specific elements
-  async dataQuery(query: QueryRequest) {
+  async dataQuery(query: QueryRequest, requestID: string) {
     return await getBackendSrv().datasourceRequest({
       url: this.url + "/query",
       data: query,
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      requestId: requestID
     });
   }
 
@@ -295,14 +296,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
     let query: QueryRequest = this.buildQueryParameters(options);
 
     // Get Data
-    let pointsData
-    try{
-      pointsData = await this.dataQuery(query);
-    }
-    catch(error) {
-      console.log(error)
-      return blankQuery
-    }
+    let pointsData = await this.dataQuery(query, options.requestId); 
 
     // Declare frames
     const frame = new MutableDataFrame({
