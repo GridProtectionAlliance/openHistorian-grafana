@@ -98,7 +98,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
   async tableOptionsQuery() {
     return await getBackendSrv().datasourceRequest({
       url: this.url + "/gettableoptions",
-      data: { IsPhasor: this.isPhasor },
+      data:  this.isPhasor,
       method: "POST",
       headers: { "Content-Type": "application/json" },
     });
