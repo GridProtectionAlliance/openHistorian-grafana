@@ -4,6 +4,7 @@
   "name": "Open Historian",
   "id": "gpa-openhistorianworking-datasource",
   "metrics": true,
+  "annotations": true,
   "info": {
     "description": "Data source plugin to transfer information from open historian to grafana in order to be displayed",
     "author": {
