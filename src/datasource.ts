@@ -11,7 +11,7 @@ import { MyQuery, MyDataSourceOptions, QueryRequest, Target, FunctionQuery, Pars
 import { getBackendSrv, getTemplateSrv } from "@grafana/runtime";
 import _ from "lodash";
 import { DefaultFlags } from "./js/constants";
-import { AnnotationEditor } from "components/AnnotationEditor";
+import { AnnotationEditor } from "./components/AnnotationEditor";
 
 
 export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
@@ -39,6 +39,10 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
     const postQuery = this.buildVariableQueryParameters(query);
     // Get Data
     let data = await getBackendSrv().post(this.url + "/getmetadata",postQuery)
+    if (data.length === 0) {
+      data = [];
+    }
+
     data = JSON.parse(data) as string[];
 
     return data.map((s: string) => ({text: s}));
@@ -62,7 +66,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
       return "";
     }
 
-    if (target.queryType === "Elements") {
+    if (target.queryType === "Elements" || target.queryType === undefined) {
       return this.parsedQueryToString(target.parsedQuery)
     }
     else if(target.queryType === "Text"){
@@ -154,7 +158,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
     mData[query.field.Table] = [query.field.Name];
  
     return ({
-      refId: query.refId,
+      refId: query.refId ?? "A",
       target: target,
       metadataSelection: mData,
       excludedFlags: excludedFlags,
