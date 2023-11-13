@@ -82,7 +82,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
       if (p.type.ParameterTypeName === 'IDataSourceValueGroup') {
         return this.parsedQueryToString(p.value as ParsedQuery)
       }
-      return p.toString()
+      return p.value.toString()
     }).join(',')
     return  `${fx.Function}(${parameter})`;
   }
