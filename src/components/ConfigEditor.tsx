@@ -4,20 +4,29 @@ import {
   InlineField,
   Switch,
   Tooltip,
+  Select,
+  Card,
+  TagList,
 } from "@grafana/ui";
 
 import React from "react";
-import { DataSourcePluginOptionsEditorProps, DataSourceSettings } from "@grafana/data";
-import { MyDataSourceOptions } from "../types";
+import { DataSourcePluginOptionsEditorProps, DataSourceSettings, SelectableValue } from "@grafana/data";
+import { DataSourceValueType, MyDataSourceOptions } from "../types";
 import { DefaultFlags } from "../js/constants";
 import "../css/config-editor.css";
+import { getBackendSrv } from "@grafana/runtime";
 
 interface Props
   extends DataSourcePluginOptionsEditorProps<MyDataSourceOptions> {}
 
 export function ConfigEditor(props: Props) {
   const { onOptionsChange, options } = props;
-  const { jsonData } = options;
+  const [dataSourceTypes, setDataSourceTypes] = React.useState<DataSourceValueType[]>([])
+  const dataSourceTypeOptions = React.useMemo(() => dataSourceTypes.map(s => ({value: s.index.toString(), label: s.name})), [dataSourceTypes]);
+
+  React.useEffect(() => {
+    getBackendSrv().post(options.jsonData.http.url + "/GetValueTypes", {}).then((d: DataSourceValueType[]) => setDataSourceTypes(d));
+  }, [options.jsonData.http.url])
 
   const onHttpChange = (config: DataSourceSettings<MyDataSourceOptions>) => {
     const jsonData = {
@@ -28,8 +37,6 @@ export function ConfigEditor(props: Props) {
 
     onOptionsChange({ ...options, jsonData });
   };
-
-
 
   const onFlagsChange = (event: React.FormEvent<HTMLInputElement>) => {
     const input = event.target as HTMLInputElement;
@@ -67,13 +74,11 @@ export function ConfigEditor(props: Props) {
     onOptionsChange({ ...options, jsonData });
   };
 
-  const onPhasorChange = (event: React.FormEvent<HTMLInputElement>) => {
-    const input = event.target as HTMLInputElement;
-    const { checked } = input;
-
+   const onTypeChange = (val: SelectableValue<string>) => {
+ 
     const jsonData = {
       ...options.jsonData,
-      phasor: checked,
+      valueType: (val.value ?? '1')
     };
 
     onOptionsChange({ ...options, jsonData });
@@ -83,51 +88,67 @@ export function ConfigEditor(props: Props) {
   return (
     <div className="gf-form-group">
       <DataSourceHttpSettings
-        defaultUrl={jsonData.http ? jsonData.http.url : ""}
-        dataSourceConfig={jsonData.http ? jsonData.http : options}
+        defaultUrl={options.jsonData.http ? options.jsonData.http.url : ""}
+        dataSourceConfig={options.jsonData.http ? options.jsonData.http : options}
         showAccessOptions={true}
         onChange={onHttpChange}
       />
-
-      <h4>
-        Excluded Data Flags
-        <Tooltip content="Mark flags which you want excluded">
-          <span style={{ cursor: "help" }}> 🛈</span>
-        </Tooltip>
-      </h4>
-      <InlineFieldRow>
-        {Object.keys(DefaultFlags).map((element, index) => (
-          <InlineField key={index} label={element} labelWidth={16}>
-            <div className="dark-box">
-              <Switch
-                name={element}
-                disabled={false}
-                value={
-                  jsonData.flags && jsonData.flags[element]
-                    ? jsonData.flags[element]
-                    : false
-                }
-                onChange={onFlagsChange}
-              />
-            </div>
-          </InlineField>
-        ))}
-      </InlineFieldRow>
-
-      <br></br>
-
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-        <h4>Phasor</h4>
-        <div className="dark-box">
-          <Switch
-            name="phasor"
-            disabled={false}
-            value={jsonData.phasor ?? false}
-            onChange={onPhasorChange}
-          />
+      <div className="gf-form-group">
+        <h3 className="page-heading">
+          Excluded Data Flags
+          <Tooltip content="Mark flags which you want excluded">
+            <span style={{ cursor: "help" }}> 🛈</span>
+          </Tooltip>
+        </h3>
+        <div className="gf-form-inline">
+          <InlineFieldRow>
+            {Object.keys(DefaultFlags).map((element, index) => (
+              <InlineField key={index} label={element} labelWidth={16}>
+                <div className="dark-box">
+                  <Switch
+                    name={element}
+                    disabled={false}
+                    value={
+                      options.jsonData.flags && options.jsonData.flags[element]
+                        ? options.jsonData.flags[element]
+                        : false
+                    }
+                    onChange={onFlagsChange}
+                  />
+                </div>
+              </InlineField>
+            ))}
+          </InlineFieldRow>
         </div>
       </div>
-      
+      <div className="gf-form-group">
+        <h3 className="page-heading">
+          Data Source Type
+          <Tooltip content="Determines the type of data that is being queried">
+            <span style={{ cursor: "help" }}> 🛈</span>
+          </Tooltip>
+        </h3>
+        <div className="gf-form-group">
+          <InlineFieldRow>
+            <InlineField label="Data Type" labelWidth={24}>
+              <Select  
+                value={options.jsonData.valueType}
+                options={dataSourceTypeOptions}
+                onChange={onTypeChange}
+                isLoading={dataSourceTypeOptions.length === 0}
+                invalid={options.jsonData.valueType === undefined}
+                />
+            </InlineField>
+          </InlineFieldRow>
+        </div>
+        <Card>
+          <Card.Heading>{dataSourceTypes.find(d => d.index.toString() === options.jsonData.valueType)?.name}</Card.Heading>
+          <Card.Description>
+            <p>This type includes the following elements: </p>
+            <TagList className="pull-left" tags={dataSourceTypes.find(d => d.index.toString() === options.jsonData.valueType)?.timeSeriesDefinition.split(',') ?? []}/>
+          </Card.Description>
+        </Card>
+      </div>
     </div>
   );
 }

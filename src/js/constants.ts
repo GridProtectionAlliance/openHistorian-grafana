@@ -1,5 +1,5 @@
 export const QuerySelectOptions = [
-    { label: 'Elements', value: 'Elements' },
+    { label: 'Query Wizard', value: 'Elements' },
     { label: 'Text Editor', value: 'Text' },
 ];
 

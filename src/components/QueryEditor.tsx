@@ -1,5 +1,5 @@
 import React from 'react';
-import {  InlineField, Select, Card, InlineSwitch } from '@grafana/ui';
+import {  InlineField, Select, InlineSwitch } from '@grafana/ui';
 import { SelectableValue, QueryEditorProps } from '@grafana/data';
 import { DataSource } from '../datasource';
 import { MyDataSourceOptions, MyQuery, QueryTypes} from '../types';
@@ -8,6 +8,7 @@ import "../css/query-editor.css";
 import { QueryEditorWizard } from './ElementQueryEditor';
 import { MetaDataSelector } from './MetaDataFieldSelector';
 import { TextQuery } from './TextQueryEditor';
+import { CommandLevelSelector } from './CommandLevelSelection';
 
 type Props = QueryEditorProps<DataSource, MyQuery, MyDataSourceOptions>;
 
@@ -40,38 +41,33 @@ export function QueryEditor({ query, onChange, datasource, onRunQuery }: Props) 
 
   return (
     <div className="gf-form" style={{ display: 'flex', flexDirection: 'column' }}>
-        <>
-        <Card>
-          <Card.Heading>General Settings</Card.Heading>
-          <Card.Description>
-            <InlineField label="Mode" labelWidth={12}>
-              <Select options={QuerySelectOptions} value={selectedMode} onChange={modeChange} allowCustomValue={false} />
-            </InlineField>
-            <InlineField label="Transpose Query" labelWidth={24}>
-              <InlineSwitch value={query.transpose ?? false}
-               onChange={(v) => OnChange({...query, transpose: !(query.transpose ?? false)})}
-               label='used for displaying single value per channel on geo displays etc.'
-               showLabel={true}
-               />
-            </InlineField>
-          </Card.Description>  
-        </Card>
-        <Card>
-          <Card.Heading>Meta Data</Card.Heading>
-          <Card.Description> 
-            <MetaDataSelector datasource={datasource} onChange={(flds) => OnChange({...query, metadataOptions: flds})} query={query.metadataOptions}/>
-          </Card.Description>  
-        </Card>
-        <Card>
-          <Card.Heading>Data Selection</Card.Heading>
-          <Card.Description> 
+        <div className='gf-form-group'>
+          <h3 className="page-heading">General Settings</h3>
+            <div className='gf-form-group'> 
+              <InlineField label="Data Selection Mode" labelWidth={24}>
+                <Select options={QuerySelectOptions} value={selectedMode} onChange={modeChange} allowCustomValue={false} />
+              </InlineField>
+              <InlineField label="Transpose Query" labelWidth={24}>
+                <InlineSwitch value={query.transpose ?? false}
+                onChange={(v) => OnChange({...query, transpose: !(query.transpose ?? false)})}
+                showLabel={true}
+                />
+              </InlineField>
+            </div>
+            {selectedMode === 'Elements'? <CommandLevelSelector query={query.commandLevel} onChange={(q) => OnChange({...query, commandLevel: q})}/> : null}
+        </div>
+        <div className='gf-form-group'>
+          <h3 className="page-heading">Meta Data</h3>
+          <MetaDataSelector datasource={datasource} onChange={(flds) => OnChange({...query, metadataOptions: flds})} query={query.metadataOptions}/>
+        </div>
+        <div className='gf-form-group'>  
+        <h3 className="page-heading">Data Selection</h3>
+          
           {query.queryType === 'Text'? <TextQuery onChange={(t) => OnChange({...query, queryText: t})} query={query.queryText}/> : null}
           {query.queryType === 'Elements' || query.queryType === undefined? <QueryEditorWizard 
               onChange={(q) => OnChange({...query, queryText: q.queryText, parsedQuery: q.parsedQuery})} query={query}
               datasource={datasource}/> : null}
-           </Card.Description>  
-        </Card>
-        </>
+        </div>
     </div>
   );
   

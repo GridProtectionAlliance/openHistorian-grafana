@@ -6,8 +6,7 @@ import {
   MutableDataFrame,
   FieldType,
 } from "@grafana/data";
-
-import { MyQuery, MyDataSourceOptions, QueryRequest, Target, FunctionQuery, ParsedQuery, MyVariableQuery, QueryBase } from "./types";
+import { MyQuery, MyDataSourceOptions, QueryRequest, Target, FunctionQuery, ParsedQuery, MyVariableQuery, QueryBase, MetaDataSelection, QueryResponse, DataSourceValueType } from "./types";
 import { getBackendSrv, getTemplateSrv } from "@grafana/runtime";
 import _ from "lodash";
 import { DefaultFlags } from "./js/constants";
@@ -19,7 +18,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
   flags: {
     [key: string]: boolean;
   };
-  isPhasor: boolean;
+  dataSourceValueType: number;
 
   constructor(
     instanceSettings: DataSourceInstanceSettings<MyDataSourceOptions>
@@ -31,14 +30,21 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
     }
     this.url = instanceSettings.jsonData.http.url || "";
     this.flags = instanceSettings.jsonData.flags || {};
-    this.isPhasor = instanceSettings.jsonData.phasor || false;
+    this.dataSourceValueType = parseInt(instanceSettings.jsonData.valueType || "1",10);
   }
 
+  // This builds the Variable Query
   async metricFindQuery(query: MyVariableQuery, options?: any) {
     // Retrieve DataQueryResponse based on query.
-    const postQuery = this.buildVariableQueryParameters(query);
-    // Get Data
-    let data = await getBackendSrv().post(this.url + "/getmetadata",postQuery)
+    if (query.tableName === undefined || query.fieldName === undefined) {return;}
+    if (query.tableName.length === 0 || query.fieldName.length === 0) {return;}
+
+    let data = await getBackendSrv().post(this.url + "/Search",{
+      dataTypeIndex: 	this.dataSourceValueType, 
+      expression: 	`SELECT DISTINCT ${query.fieldName} FROM ${query.tableName} ${query.condition?.length ?? 0 === 0? "" : `WHERE ${query.condition}`}`
+    })
+
+    console.log(data);
     if (data.length === 0) {
       data = [];
     }
@@ -78,8 +84,8 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
   }
 
   functionToString(fx: FunctionQuery) {
-    const parameter =fx.Parameters.map((p) => {
-      if (p.type.ParameterTypeName === 'IDataSourceValueGroup') {
+    const parameter = fx.Parameters.map((p) => {
+      if (p.type.type.includes('IAsyncEnumerable')) {
         return this.parsedQueryToString(p.value as ParsedQuery)
       }
       return p.value.toString()
@@ -108,181 +114,123 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
     const excludedFlags = this.calculateFlags();
     const excludeNormalFlags = this.flags["Normal"] ?? false;
     
-    const targets: Target[] = options.targets.map((t) => {
-      const mData: {[tableName: string]: string[]} = {};
+    const targets: Target[] = options.targets.filter( t=> !(t.hide ?? false)).map((t) => {
+
+      const mData: MetaDataSelection[] = [];
       if (t.metadataOptions !== undefined) {
         t.metadataOptions.forEach((m) => {
-          if (mData[m.Table] !== undefined) {
-            mData[m.Table].push(m.Name);
+          if (mData.find(t => t.tableName === m.Table) !== undefined) {
+            mData.find(t => t.tableName === m.Table)?.fieldNames.push(m.FieldName);
           }
           else {
-            mData[m.Table] = [m.Name]
+            mData.push({tableName: m.Table, fieldNames: [m.FieldName]})
           }
         })
       }
 
-      return ({
-      refId: t.refId,
-      target: getTemplateSrv().replace(this.targetToString(t), options.scopedVars) ,
-      metadataSelection: mData,
-      excludedFlags: excludedFlags,
-      excludeNormalFlags: excludeNormalFlags,
-      isPhasor: this.isPhasor,
+      let qstring = getTemplateSrv().replace(this.targetToString(t), options.scopedVars);
+      if (t.commandLevel?.DropEmpty ?? false) {
+        qstring = qstring + "; dropEmptySeries";
+      }
+      if (t.commandLevel?.IncludePeaks ?? false) {
+        qstring = qstring + "; includePeaks";
+      }
+      if (t.commandLevel?.FullResolution ?? false) {
+        qstring = qstring + "; fullResolutionQuery";
+      }
+      if (t.commandLevel?.RadialDistribution ?? false) {
+        qstring = qstring + `; radialDistribution={radius=${(t.commandLevel?.Radius ?? 1.5)}; zoom=${(t.commandLevel?.Zoom ?? 2)}}`;
+      }
+
+    return ({
+      refID: t.refId,
+      target: qstring,
+      metadataSelections: mData,
     })});
   
     return {
-      panelId: options.panelId ??  0,
-      dashboardId: options.dashboardId ?? 0,
-      range: options.range!,
-      rangeRaw: options.rangeRaw!,
-      interval: options.interval ?? "",
-      intervalMs: options.intervalMs ?? 0,
-      format: "json",
-      maxDataPoints: options.maxDataPoints ?? 0,
+      dataTypeIndex: this.dataSourceValueType, 
+      range: {from: options.range.from.toISOString(), to: options.range.to.toISOString()},
+      interval: options.interval,
+      maxDataPoints: 1000,
       targets: targets,
-      adhocFilters: [], 
-      isPhasor: this.isPhasor,
+      adhocFilters: [],
+      excludedFlags: excludedFlags, 
+      excludeNormalFlags: excludeNormalFlags 
     };
   }
 
-  buildVariableQueryParameters(query: MyVariableQuery) {
-    const excludedFlags = this.calculateFlags();
-    const excludeNormalFlags = this.flags["Normal"] ?? false;
-
-    let target = "";
-    if (query.queryType !== undefined && query.queryType !== 'All') {
-      target = this.targetToString(query);
-    }
-
-    const mData: {[tableName: string]: string[]} = {};
-    mData[query.field.Table] = [query.field.Name];
- 
-    return ({
-      refId: query.refId ?? "A",
-      target: target,
-      metadataSelection: mData,
-      excludedFlags: excludedFlags,
-      excludeNormalFlags: excludeNormalFlags,
-      isPhasor: this.isPhasor,
-    });    
-    }
+  async getTags(): Promise<string[]> {
+    const datasourceTypes: DataSourceValueType[] = await getBackendSrv().post(this.url + "/GetValueTypes", {});
+    return datasourceTypes.find(d => d.index === this.dataSourceValueType)?.timeSeriesDefinition?.split(",") ?? []
+  }
 
   async query(options: DataQueryRequest<MyQuery>): Promise<DataQueryResponse> {
-    const { range } = options;
-    const from = range!.from.valueOf();
-    const to = range!.to.valueOf();
-
     const target = options.targets[0];
 
-    const blankQuery = {
-      data: [
-        new MutableDataFrame({
-          refId: target.refId,
-          fields: [
-            { name: "Time", values: [from, to], type: FieldType.time },
-          ],
-        }),
-      ],
-    };
-
-    if (target.queryType === 'Elements' && !target.parsedQuery) {
-      return blankQuery
-    }
-    if (target.queryType === 'Text' && !target.queryText) {
-      return blankQuery
-    }
-
-    if (target.queryType === 'Annotations') {
-      return await this.queryAnnotations(options);
-    }
-
+     
     //Generate query
     let query: QueryRequest = this.buildQueryParameters(options);
 
     // Get Data
-    let pointsData = await getBackendSrv().post(this.url + "/query",query)
-
-    // Declare frames
-    const frame = new MutableDataFrame({
+    let pointsData: QueryResponse[] = await getBackendSrv().post(this.url + "/query",query);
+    console.log(pointsData)
+    const tags = await this.getTags();
+   
+    console.log(tags);
+    const transposeFrame = new MutableDataFrame({
       refId: target.refId,
-      fields: [{ name: "Time", type: FieldType.time}],
+      fields: tags.map((s,i) => ({
+        name: s, 
+        type: (i < (tags.length - 1)? FieldType.number : FieldType.time)
+      })),
     });
 
-    if ((target.transpose ?? false)) {
-      frame.addField({ name: 'name', type: FieldType.string });
-      if (!this.isPhasor) {
-        frame.addField({ name: 'value', type: FieldType.number });
-      } else {
-        frame.addField({ name: 'magnitude', type: FieldType.number });
-        frame.addField({ name: 'phase', type: FieldType.number });
-      }
-      if (target.metadataOptions !== undefined) {
-        for (let fld of target.metadataOptions) {
-          frame.addField({ name: fld.Name, type: FieldType.other});
-        } 
-      }
-
-      for (const entry of pointsData) {
-        const mObj: {[key: string]: [value: any]} = {};
-        if (target.metadataOptions !== undefined) {
-          for (let fld of target.metadataOptions) { 
-            if (entry["meta"][fld.Name] !== undefined) {
-              mObj[fld.Name] = entry["meta"][fld.Name]
-            }
+    //Add MetaData Fields.
+    const frames = pointsData.map((d) => {
+      const metaData: string[] = Object.keys(d.metadata);
+      
+      if (options.targets.find(item => item.refId === d.refID)?.transpose ?? false) {
+        const row: {[k: string]: any} = {};
+        tags.forEach((t,i) =>{ row[t] = d.datapoints[0][i]});
+        metaData.forEach((m) => {
+          if (!transposeFrame.fields.map(f => f.name).includes(m)) {
+            transposeFrame.addField({name: m, type: FieldType.other})
           }
-        }
-        if (!this.isPhasor) {
-          let [val, timestamp] = [NaN,NaN];
-          if (entry["datapoints"].length > 0) {
-            [val, timestamp] = entry["datapoints"][0];
-          }
-          frame.add({...mObj,'value': val ,'Time': timestamp, 'name': entry["target"]})
-        } else {
-          let [mag, ang, timestamp] = [NaN, NaN, NaN];
-          if (entry["datapoints"].length > 0) {
-            [mag, ang, timestamp] = entry["datapoints"][0];
-          }
-          
-          frame.add({...mObj, 'magnitude': mag, 'phase': ang ,'Time': timestamp, 'name': entry["target"].split(";")[0]})
-        }
-
-      }
-    } else {
-    //Add data & metadata fields 
-    for (const entry of pointsData) {
-      if(this.isPhasor){
-        const targetNames: string[] = entry["target"].split(";")
-        targetNames.map((targetName: string) => {
-          frame.addField({ name: targetName, type: FieldType.number });
-        })
+           row[m] = d.metadata[m]; })
+        transposeFrame.add(row);
+        return undefined;
       }
       else {
-        frame.addField({ name: entry["target"], type: FieldType.number });
-      }
 
-      const meta = entry["meta"];
-      for (const key in meta) {
-        frame.addField({ name: key + "/" + entry["target"] });
-      }    
+      const frame = new MutableDataFrame({
+        refId: target.refId,
+        fields: metaData.concat(tags).map((s,i) => ({
+          name: s, 
+          type: (i < metaData.length? FieldType.other : (i < (metaData.length + tags.length - 1)? FieldType.number : FieldType.time))
+        })),
+      });
+
+      frame.refId = d.refID;
+      frame.name = d.target;
+
+      d.datapoints.forEach((pt) => {
+        console.log(pt);
+        const row: {[k: string]: any} = {};
+        tags.forEach((t,i) =>{ row[t] = pt[i]});
+        metaData.forEach((m) => { row[m] = d.metadata[m] })
+        frame.add(row);
+      })
+
+      return frame;
+    }
+    })
+   
+    if (options.targets.some(t => t.transpose)) {
+      frames.push(transposeFrame);
     }
 
-    // if Transpose mode we do not group Points by Timestamp but group by 
-    // Intermediate object to group points by timestamp
-    let groupedPoints: {
-      [timestamp: number]: { [target: string]: number };
-    } = groupPoints(pointsData, this.isPhasor);
-
-    groupedPoints = addMetadata(groupedPoints, pointsData)
-
-    // Iterate through grouped points and add them to the frame
-    for (const timestamp in groupedPoints) {
-      const data: { [key: string]: any } = { Time: parseInt(timestamp, 10) };
-      Object.assign(data, groupedPoints[timestamp]);
-      frame.add(data);
-    }
-  }
-
-    return { data: [frame] };
+    return { data: frames.filter(f => f !== undefined) };
   }
 
   async testDatasource() {
@@ -337,53 +285,5 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
      
       return  { data: [frame] };
   }
-}
-
-//Groups data by time
-function groupPoints(pointsData: any[] , isPhasor: boolean) {
-  const groupedPoints: { [timestamp: number]: { [target: string]: number } } =
-    {};
-
-  //Iterate through each entry
-  for (const entry of pointsData) {
-    for (const points of entry["datapoints"]) {
-      if(isPhasor){
-        const [mag, ang, timestamp] = points;
-
-        //Check if timestamp already exists in groupedPoints
-        if (timestamp in groupedPoints) {
-          groupedPoints[timestamp][entry["target"].split(";")[0]] = mag;
-          groupedPoints[timestamp][entry["target"].split(";")[1]] = ang;
-        } else {
-          groupedPoints[timestamp] = 
-            { [entry["target"].split(";")[0]]: mag, [entry["target"].split(";")[1]]: ang, };
-        }
-      }else {
-        const [val, timestamp] = points;
-
-        //Check if timestamp already exists in groupedPoints
-        if (timestamp in groupedPoints) {
-          groupedPoints[timestamp][entry["target"]] = val;
-        } else {
-          groupedPoints[timestamp] = { [entry["target"]]: val };
-        }
-      }
-    }
-  }
-  return groupedPoints;
-}
-
-function addMetadata(groupedPoints: { [timestamp: number]: { [target: string]: number } }, pointsData: any[]) {
-  // Add metadata to all timestamps
-  for (const timestamp in groupedPoints) {
-    for(const entry of pointsData){
-      const meta = entry["meta"];
-      for (const key in meta) {
-        groupedPoints[timestamp][key + "/" + entry["target"]] = meta[key]
-      }
-    }
-  }
-
-  return groupedPoints
 }
 

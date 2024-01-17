@@ -1,58 +1,49 @@
-import { DataQuery, DataSourceJsonData, DataSourceSettings, TimeRange, RawTimeRange } from '@grafana/data';
+import { DataQuery, DataSourceJsonData, DataSourceSettings } from '@grafana/data';
 
 // Query
 export interface QueryBase extends DataQuery{
-  queryType: QueryTypes|VariableQueryTypes;
+  queryType: QueryTypes;
   queryText: string;
-  parsedQuery: ParsedQuery,
+  parsedQuery: ParsedQuery
 }
 
 export interface MyQuery extends QueryBase {
   metadataOptions: IMetaDataField[];
-  transpose: boolean
+  transpose: boolean,
+  commandLevel?: CommandLevelFlags
 }
 
 export type QueryTypes = 'Elements'|'Text'|'Annotations';
-export type VariableQueryTypes = QueryTypes|'All';
 
 export const DEFAULT_QUERY: Partial<MyQuery> = {
   queryType: "Elements",
   queryText: "",
-  metadataOptions: [{Table: 'ActiveMeasurements', Name: 'PointTag'}],
+  metadataOptions: [{Table: 'ActiveMeasurements', FieldName: 'PointTag'}],
   parsedQuery: { Elements: [], Functions: [], Filters: []}
 };
+
 // Config
 export interface MyDataSourceOptions extends DataSourceJsonData {
   http: DataSourceSettings<any, any>;
   flags: {
     [key: string]: boolean;
   };
-  phasor: boolean
+  valueType: string
 }
 
 
 /* Custom Interfaces below */
-export interface IFunctionParameter {
-  Description: string;
-  Required: boolean;
-  ParameterTypeName: string
-}
-
-export interface IFunction{
-    Description: string;
-    Name: string;
-    Parameters: IFunctionParameter[]
-};
 
 export interface IMetaDataField {
   Table: string,
-  Name: string,
+  FieldName: string,
 }
 
 export interface ParsedQuery {
   Elements: string[],
   Functions: FunctionQuery[],
   Filters: FilterQuery[],
+  
 }
 
 export interface FilterQuery {
@@ -69,7 +60,7 @@ export interface FunctionQuery {
 
 
 export type ParameterType = {
-  type: IFunctionParameter,
+  type: ParameterDescription,
   value: string|number|boolean|ParsedQuery
 };
 
@@ -78,38 +69,86 @@ export interface MetadataTarget {
   tables: string[];
 }
 
+interface Range {
+  from:	string,
+  to: 	string
+}
 
 export interface QueryRequest {
-  panelId: number;
-  dashboardId: number;
-  range: TimeRange;
-  rangeRaw: RawTimeRange;
-  interval: string;
-  intervalMs: number;
-  format: string;
-  maxDataPoints: number;
-  targets: Target[];
-  adhocFilters: AdHocFilter[];
-  isPhasor: boolean;
+  dataTypeIndex: number, 
+  range: Range,
+  interval: string,
+  maxDataPoints: number,
+  targets: Target[],
+  adhocFilters: AdHocFilter[],
+  excludedFlags: number, 
+  excludeNormalFlags: boolean 
 }
 
 export interface Target {
-  refId: string;
+  refID: string;
   target: string;
-  metadataSelection: {
-    [tableName: string]: string[]
-  }
-  excludedFlags: number;
-  excludeNormalFlags: boolean;
-  isPhasor: boolean;
+  metadataSelections: MetaDataSelection[]
 }
 
+export interface MetaDataSelection {
+  tableName: string,
+  fieldNames: string[]
+}
 export interface AdHocFilter {
   key: string;
   operator: string;
   value: string;
 }
 
-export interface MyVariableQuery extends QueryBase {
-  field: IMetaDataField;
+export interface MyVariableQuery {
+  fieldName: string;
+  tableName: string,
+  condition: string
+}
+
+export interface DataSourceValueType {
+  name: string, 
+  index: 	number, 
+  timeSeriesDefinition: string, 
+  metadataTableName: string 
+}
+
+export interface CommandLevelFlags {
+  DropEmpty: boolean;
+  IncludePeaks: boolean,
+  FullResolution: boolean,
+  RadialDistribution: boolean,
+  Radius?: number,
+  Zoom?: number
+}
+
+export interface FieldDescription { 
+      name:	string,
+      type: string, 
+      required: boolean
+}
+
+export interface FunctionDescription {
+  name:	string, 
+  description: string, 
+  aliases: string[], 
+  allowedGroupOperations: string[], 
+  parameters:	ParameterDescription[]
+};
+
+export interface ParameterDescription {
+  name:	string, 
+  description: string, 
+  type:	string, 
+  required:	boolean, 
+  default: string 
+}
+
+export interface QueryResponse {
+  target: string, 
+  rootTarget:	string,
+  refID: string, 
+  metadata: any, 
+  datapoints: number[][]
 }
