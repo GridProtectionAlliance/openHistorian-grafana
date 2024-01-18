@@ -41,16 +41,8 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
 
     let data = await getBackendSrv().post(this.url + "/Search",{
       dataTypeIndex: 	this.dataSourceValueType, 
-      expression: 	`SELECT DISTINCT ${query.fieldName} FROM ${query.tableName} ${query.condition?.length ?? 0 === 0? "" : `WHERE ${query.condition}`}`
+      expression: 	`SELECT DISTINCT ${query.fieldName} FROM ${query.tableName} ${query.condition?.length ?? 0 === 0? "" : ` WHERE ${query.condition}`}`
     })
-
-    console.log(data);
-    if (data.length === 0) {
-      data = [];
-    }
-
-    data = JSON.parse(data) as string[];
-
     return data.map((s: string) => ({text: s}));
   }
   
@@ -102,7 +94,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
       parts.push(query.Elements.join(";"));
     }
     if (query.Filters !== undefined) {
-      parts.push(query.Filters.map(f => `Filter ${f.NumberMode === '' ? '' : `${f.NumberMode} ${f.Number}`} ${f.Table} WHERE ${f.Condition}`).join(";"))
+      parts.push(query.Filters.map(f => `Filter ${f.NumberMode === '' ? '' : `${f.NumberMode} ${f.Number}`} ${f.Table}${f.Condition?.length > 0? ` WHERE ${f.Condition}` : ''}`).join(";"))
     }
     if (query.Functions !== undefined) {
       parts.push(query.Functions.map(f => this.functionToString(f)).join(';'))
@@ -114,7 +106,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
     const excludedFlags = this.calculateFlags();
     const excludeNormalFlags = this.flags["Normal"] ?? false;
     
-    const targets: Target[] = options.targets.filter( t=> !(t.hide ?? false)).map((t) => {
+    const targets: Target[] = options.targets.filter( t=> !(t.hide ?? false) && t.queryType !== 'Annotations').map((t) => {
 
       const mData: MetaDataSelection[] = [];
       if (t.metadataOptions !== undefined) {
@@ -152,11 +144,11 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
       dataTypeIndex: this.dataSourceValueType, 
       range: {from: options.range.from.toISOString(), to: options.range.to.toISOString()},
       interval: options.interval,
-      maxDataPoints: 1000,
       targets: targets,
       adhocFilters: [],
       excludedFlags: excludedFlags, 
-      excludeNormalFlags: excludeNormalFlags 
+      excludeNormalFlags: excludeNormalFlags ,
+      maxDataPoints: options.maxDataPoints ?? 1000
     };
   }
 
@@ -168,69 +160,77 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
   async query(options: DataQueryRequest<MyQuery>): Promise<DataQueryResponse> {
     const target = options.targets[0];
 
-     
+    const hasDataQuery = options.targets.some(t => t.queryType !== 'Annotations');
+    const hasAnnotationQuery =  options.targets.some(t => t.queryType === 'Annotations');;
+
+    let data: Array<(MutableDataFrame<any>|undefined)> = [];
     //Generate query
-    let query: QueryRequest = this.buildQueryParameters(options);
+    if (hasDataQuery) {
+      let query: QueryRequest = this.buildQueryParameters(options);
 
-    // Get Data
-    let pointsData: QueryResponse[] = await getBackendSrv().post(this.url + "/query",query);
-    console.log(pointsData)
-    const tags = await this.getTags();
-   
-    console.log(tags);
-    const transposeFrame = new MutableDataFrame({
-      refId: target.refId,
-      fields: tags.map((s,i) => ({
-        name: s, 
-        type: (i < (tags.length - 1)? FieldType.number : FieldType.time)
-      })),
-    });
+      // Get Data
+      let pointsData: QueryResponse[] = await getBackendSrv().post(this.url + "/query",query);
 
-    //Add MetaData Fields.
-    const frames = pointsData.map((d) => {
-      const metaData: string[] = Object.keys(d.metadata);
-      
-      if (options.targets.find(item => item.refId === d.refID)?.transpose ?? false) {
-        const row: {[k: string]: any} = {};
-        tags.forEach((t,i) =>{ row[t] = d.datapoints[0][i]});
-        metaData.forEach((m) => {
-          if (!transposeFrame.fields.map(f => f.name).includes(m)) {
-            transposeFrame.addField({name: m, type: FieldType.other})
-          }
-           row[m] = d.metadata[m]; })
-        transposeFrame.add(row);
-        return undefined;
-      }
-      else {
-
-      const frame = new MutableDataFrame({
+      const tags = await this.getTags();
+    
+      const transposeFrame = new MutableDataFrame({
         refId: target.refId,
-        fields: metaData.concat(tags).map((s,i) => ({
+        fields: tags.map((s,i) => ({
           name: s, 
-          type: (i < metaData.length? FieldType.other : (i < (metaData.length + tags.length - 1)? FieldType.number : FieldType.time))
+          type: (i < (tags.length - 1)? FieldType.number : FieldType.time)
         })),
       });
 
-      frame.refId = d.refID;
-      frame.name = d.target;
+      //Add MetaData Fields.
+      const frames = pointsData.map((d) => {
+        
+        const metaData: string[] = Object.keys(d.metadata);
+        
+        if (options.targets.find(item => item.refId === d.refID)?.transpose ?? false) {
+          const row: {[k: string]: any} = {};
+          tags.forEach((t,i) =>{ row[t] = d.datapoints[0][i]});
+          metaData.forEach((m) => {
+            if (!transposeFrame.fields.map(f => f.name).includes(m)) {
+              transposeFrame.addField({name: m, type: FieldType.other})
+            }
+            row[m] = d.metadata[m]; })
+          transposeFrame.add(row);
+          return undefined;
+        }
+        else {
 
-      d.datapoints.forEach((pt) => {
-        console.log(pt);
-        const row: {[k: string]: any} = {};
-        tags.forEach((t,i) =>{ row[t] = pt[i]});
-        metaData.forEach((m) => { row[m] = d.metadata[m] })
-        frame.add(row);
+        const frame = new MutableDataFrame({
+          refId: target.refId,
+          fields: metaData.concat(tags).map((s,i) => ({
+            name: s, 
+            type: (i < metaData.length? FieldType.other : (i < (metaData.length + tags.length - 1)? FieldType.number : FieldType.time))
+          })),
+        });
+
+        frame.refId = d.refID;
+        frame.name = d.target;
+
+        d.datapoints.forEach((pt) => {
+          const row: {[k: string]: any} = {};
+          tags.forEach((t,i) =>{ row[t] = pt[i]});
+          metaData.forEach((m) => { row[m] = d.metadata[m] })
+          frame.add(row);
+        })
+
+        return frame;
+      }
       })
-
-      return frame;
+    
+      if (options.targets.some(t => t.transpose)) {
+        frames.push(transposeFrame);
+      }
+      data = frames.filter(f => f !== undefined);
     }
-    })
-   
-    if (options.targets.some(t => t.transpose)) {
-      frames.push(transposeFrame);
+    if (hasAnnotationQuery) {
+      data.push(await this.queryAnnotations(options))
     }
 
-    return { data: frames.filter(f => f !== undefined) };
+    return { data };
   }
 
   async testDatasource() {
@@ -246,7 +246,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
       }))
   }
 
-  async queryAnnotations(options: DataQueryRequest<MyQuery>): Promise<DataQueryResponse> {
+  async queryAnnotations(options: DataQueryRequest<MyQuery>): Promise<MutableDataFrame<any>> {
 
       const queyText = options.targets
         .map((t) => getTemplateSrv().replace(t.queryText, options.scopedVars))
@@ -282,8 +282,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
             "tags": a["tags"]
           })
       })
-     
-      return  { data: [frame] };
+      return frame;
   }
 }
 

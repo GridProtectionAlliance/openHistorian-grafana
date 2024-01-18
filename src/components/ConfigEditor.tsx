@@ -24,9 +24,13 @@ export function ConfigEditor(props: Props) {
   const [dataSourceTypes, setDataSourceTypes] = React.useState<DataSourceValueType[]>([])
   const dataSourceTypeOptions = React.useMemo(() => dataSourceTypes.map(s => ({value: s.index.toString(), label: s.name})), [dataSourceTypes]);
 
+  const url = React.useMemo(() => (options?.jsonData?.http?.url ?? ''), [options])
   React.useEffect(() => {
-    getBackendSrv().post(options.jsonData.http.url + "/GetValueTypes", {}).then((d: DataSourceValueType[]) => setDataSourceTypes(d));
-  }, [options.jsonData.http.url])
+    if (url.length < 1) {
+      return;
+    }
+    getBackendSrv().post(url + "/GetValueTypes", {}).then((d: DataSourceValueType[]) => setDataSourceTypes(d));
+  }, [url])
 
   const onHttpChange = (config: DataSourceSettings<MyDataSourceOptions>) => {
     const jsonData = {

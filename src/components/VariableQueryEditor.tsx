@@ -58,7 +58,7 @@ export function VariableQueryEditor(props: VariableQueryProps) {
             onChange={onFieldChange}
             isSearchable
             invalid={(props.query?.fieldName?.length ?? 0) === 0}
-            width={80}
+            disabled={(props.query?.tableName?.length ?? 0) === 0}
           />
         </InlineField>
         <InlineField label="FROM" labelWidth={12}>
@@ -69,14 +69,16 @@ export function VariableQueryEditor(props: VariableQueryProps) {
             onChange={onTableChange}
             isSearchable
             invalid={(props.query?.tableName?.length ?? 0) === 0}
-            width={80}
           />
         </InlineField>
+        </InlineFieldRow>
+        <InlineFieldRow>
         <InlineField label="WHERE" labelWidth={12}>
           <Input  
           value={props.query?.condition}
           onChange={onConditionChange}
           />
+
         </InlineField>
       </InlineFieldRow>
     </div>

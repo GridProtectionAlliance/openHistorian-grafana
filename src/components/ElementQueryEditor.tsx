@@ -399,7 +399,7 @@ const ParameterUI = (props: ParameterQueryProps) => {
     onChange={onStringChange}
     width={20}
     /> : null}
-    {props.param.type.type === 'int'?  <Input type={'number'}
+    {props.param.type.type === 'Int32'?  <Input type={'number'}
     min={0} max={99999}
     value={(props.param?.value as string) ?? '1'}
     onChange={onStringChange}
