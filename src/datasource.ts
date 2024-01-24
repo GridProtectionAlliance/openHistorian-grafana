@@ -6,7 +6,7 @@ import {
   MutableDataFrame,
   FieldType,
 } from "@grafana/data";
-import { MyQuery, MyDataSourceOptions, QueryRequest, Target, FunctionQuery, ParsedQuery, MyVariableQuery, QueryBase, MetaDataSelection, QueryResponse, DataSourceValueType } from "./types";
+import { MyQuery, MyDataSourceOptions, QueryRequest, Target, FunctionQuery, ParsedQuery, MyVariableQuery, QueryBase, MetaDataSelection, QueryResponse } from "./types";
 import { getBackendSrv, getTemplateSrv } from "@grafana/runtime";
 import _ from "lodash";
 import { DefaultFlags } from "./js/constants";
@@ -18,7 +18,10 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
   flags: {
     [key: string]: boolean;
   };
-  dataSourceValueType: number;
+  valueTypeIndex: number;
+  valueTypeName: string;
+  timeSeriesDefinitions: string[];
+  metadataTableName: string;
 
   constructor(
     instanceSettings: DataSourceInstanceSettings<MyDataSourceOptions>
@@ -26,26 +29,40 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
     super(instanceSettings);
 
     this.annotations = {
-        QueryEditor: AnnotationEditor
+      QueryEditor: AnnotationEditor
     }
     this.url = instanceSettings.jsonData.http.url || "";
     this.flags = instanceSettings.jsonData.flags || {};
-    this.dataSourceValueType = parseInt(instanceSettings.jsonData.valueType || "1",10);
+    this.valueTypeIndex = parseInt(instanceSettings.jsonData.valueTypeIndex || "0", 10);
+    this.valueTypeName = instanceSettings.jsonData.valueTypeName || "";
+    this.timeSeriesDefinitions = instanceSettings.jsonData.timeSeriesDefinitions ?? [''];
+    this.metadataTableName = instanceSettings.jsonData.metadataTableName || "";
   }
 
   // This builds the Variable Query
   async metricFindQuery(query: MyVariableQuery, options?: any) {
     // Retrieve DataQueryResponse based on query.
-    if (query.tableName === undefined || query.fieldName === undefined) {return;}
-    if (query.tableName.length === 0 || query.fieldName.length === 0) {return;}
+    if (query.tableName === undefined || query.fieldNames === undefined) { return; }
 
-    let data = await getBackendSrv().post(this.url + "/Search",{
-      dataTypeIndex: 	this.dataSourceValueType, 
-      expression: 	`SELECT DISTINCT ${query.fieldName} FROM ${query.tableName} ${query.condition?.length ?? 0 === 0? "" : ` WHERE ${query.condition}`}`
+    if (query.tableName.length === 0) {
+      query.tableName = "ActiveMeasurements";
+
+      if (query.fieldNames.length === 0 || query.fieldNames[0] === '*') {
+        query.fieldNames = ["PointTag"];
+      }
+    }
+
+    if (query.fieldNames.length === 0) {
+      query.fieldNames = ["*"];
+    }
+
+    let data = await getBackendSrv().post(this.url + "/Search", {
+      dataTypeIndex: -1 /* unrestricted search */,
+      expression: `SELECT DISTINCT ${query.fieldNames} FROM ${query.tableName} ${query.condition?.length ?? 0 === 0 ? "" : ` WHERE ${query.condition}`}`
     })
-    return data.map((s: string) => ({text: s}));
+    return data.map((s: string) => ({ text: s }));
   }
-  
+
   //Generate value of excluded flags
   calculateFlags() {
     let excludedValue = 0;
@@ -67,10 +84,10 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
     if (target.queryType === "Elements" || target.queryType === undefined) {
       return this.parsedQueryToString(target.parsedQuery)
     }
-    else if(target.queryType === "Text"){
+    else if (target.queryType === "Text") {
       return target.queryText
     }
-    else{
+    else {
       return ""
     }
   }
@@ -82,7 +99,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
       }
       return p.value.toString()
     }).join(',')
-    return  `${fx.Function}(${parameter})`;
+    return `${fx.Function}(${parameter})`;
   }
 
   parsedQueryToString(query: ParsedQuery) {
@@ -94,7 +111,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
       parts.push(query.Elements.join(";"));
     }
     if (query.Filters !== undefined) {
-      parts.push(query.Filters.map(f => `Filter ${f.NumberMode === '' ? '' : `${f.NumberMode} ${f.Number}`} ${f.Table}${f.Condition?.length > 0? ` WHERE ${f.Condition}` : ''}`).join(";"))
+      parts.push(query.Filters.map(f => `Filter ${f.NumberMode === '' ? '' : `${f.NumberMode} ${f.Number}`} ${f.Table}${f.Condition?.length > 0 ? ` WHERE ${f.Condition}` : ''}`).join(";"))
     }
     if (query.Functions !== undefined) {
       parts.push(query.Functions.map(f => this.functionToString(f)).join(';'))
@@ -105,8 +122,8 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
   buildQueryParameters(options: DataQueryRequest<MyQuery>): QueryRequest {
     const excludedFlags = this.calculateFlags();
     const excludeNormalFlags = this.flags["Normal"] ?? false;
-    
-    const targets: Target[] = options.targets.filter( t=> !(t.hide ?? false) && t.queryType !== 'Annotations').map((t) => {
+
+    const targets: Target[] = options.targets.filter(t => !(t.hide ?? false) && t.queryType !== 'Annotations').map((t) => {
 
       const mData: MetaDataSelection[] = [];
       if (t.metadataOptions !== undefined) {
@@ -115,7 +132,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
             mData.find(t => t.tableName === m.Table)?.fieldNames.push(m.FieldName);
           }
           else {
-            mData.push({tableName: m.Table, fieldNames: [m.FieldName]})
+            mData.push({ tableName: m.Table, fieldNames: [m.FieldName] })
           }
         })
       }
@@ -134,93 +151,90 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
         qstring = qstring + `; radialDistribution={radius=${(t.commandLevel?.Radius ?? 1.5)}; zoom=${(t.commandLevel?.Zoom ?? 2)}}`;
       }
 
-    return ({
-      refID: t.refId,
-      target: qstring,
-      metadataSelections: mData,
-    })});
-  
+      return ({
+        refID: t.refId,
+        target: qstring,
+        metadataSelections: mData,
+      })
+    });
+
     return {
-      dataTypeIndex: this.dataSourceValueType, 
-      range: {from: options.range.from.toISOString(), to: options.range.to.toISOString()},
+      dataTypeIndex: this.valueTypeIndex,
+      range: { from: options.range.from.toISOString(), to: options.range.to.toISOString() },
       interval: options.interval,
       targets: targets,
       adhocFilters: [],
-      excludedFlags: excludedFlags, 
-      excludeNormalFlags: excludeNormalFlags ,
+      excludedFlags: excludedFlags,
+      excludeNormalFlags: excludeNormalFlags,
       maxDataPoints: options.maxDataPoints ?? 1000
     };
-  }
-
-  async getTags(): Promise<string[]> {
-    const datasourceTypes: DataSourceValueType[] = await getBackendSrv().post(this.url + "/GetValueTypes", {});
-    return datasourceTypes.find(d => d.index === this.dataSourceValueType)?.timeSeriesDefinition?.split(",") ?? []
   }
 
   async query(options: DataQueryRequest<MyQuery>): Promise<DataQueryResponse> {
     const target = options.targets[0];
 
     const hasDataQuery = options.targets.some(t => t.queryType !== 'Annotations');
-    const hasAnnotationQuery =  options.targets.some(t => t.queryType === 'Annotations');;
+    const hasAnnotationQuery = options.targets.some(t => t.queryType === 'Annotations');;
 
-    let data: Array<(MutableDataFrame<any>|undefined)> = [];
+    let data: Array<(MutableDataFrame<any> | undefined)> = [];
     //Generate query
     if (hasDataQuery) {
       let query: QueryRequest = this.buildQueryParameters(options);
 
       // Get Data
-      let pointsData: QueryResponse[] = await getBackendSrv().post(this.url + "/query",query);
+      let pointsData: QueryResponse[] = await getBackendSrv().post(this.url + "/query", query);
 
-      const tags = await this.getTags();
-    
+      const tags = this.timeSeriesDefinitions;
+
       const transposeFrame = new MutableDataFrame({
         refId: target.refId,
-        fields: tags.map((s,i) => ({
-          name: s, 
-          type: (i < (tags.length - 1)? FieldType.number : FieldType.time)
+        fields: tags.map((s, i) => ({
+          name: s,
+          type: (i < (tags.length - 1) ? FieldType.number : FieldType.time)
         })),
       });
 
       //Add MetaData Fields.
       const frames = pointsData.map((d) => {
-        
+
         const metaData: string[] = Object.keys(d.metadata);
-        
+
         if (options.targets.find(item => item.refId === d.refID)?.transpose ?? false) {
-          const row: {[k: string]: any} = {};
-          tags.forEach((t,i) =>{ row[t] = d.datapoints[0][i]});
+          const row: { [k: string]: any } = {};
+          tags.forEach((t, i) => { row[t] = d.datapoints[0][i] });
           metaData.forEach((m) => {
             if (!transposeFrame.fields.map(f => f.name).includes(m)) {
-              transposeFrame.addField({name: m, type: FieldType.other})
+              transposeFrame.addField({ name: m, type: FieldType.other })
             }
-            row[m] = d.metadata[m]; })
+            row[m] = d.metadata[m];
+          })
           transposeFrame.add(row);
           return undefined;
         }
         else {
 
-        const frame = new MutableDataFrame({
-          refId: target.refId,
-          fields: metaData.concat(tags).map((s,i) => ({
-            name: s, 
-            type: (i < metaData.length? FieldType.other : (i < (metaData.length + tags.length - 1)? FieldType.number : FieldType.time))
-          })),
-        });
+          const frame = new MutableDataFrame({
+            refId: target.refId,
+            fields: metaData.concat(tags).map((s, i) => ({
+              name: s,
+              type: (i < metaData.length ? FieldType.other : (i < (metaData.length + tags.length - 1) ? FieldType.number : FieldType.time))
+            })),
+          });
 
-        frame.refId = d.refID;
-        frame.name = d.target;
+          frame.refId = d.refID;
+          frame.name = d.target;
 
-        d.datapoints.forEach((pt) => {
-          const row: {[k: string]: any} = {};
-          tags.forEach((t,i) =>{ row[t] = pt[i]});
-          metaData.forEach((m) => { row[m] = d.metadata[m] })
-          frame.add(row);
-        })
+          d.datapoints.forEach((pt) => {
+            const row: { [k: string]: any } = {};
+            tags.forEach((t, i) => { row[t] = pt[i] });
+            metaData.forEach((m) => { row[m] = d.metadata[m] })
+            frame.add(row);
+          })
 
-        return frame;
-      }
+          return frame;
+        }
       })
-    
+
       if (options.targets.some(t => t.transpose)) {
         frames.push(transposeFrame);
       }
@@ -239,7 +253,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
         status: "success",
         message: "Data source is working",
         title: "Success",
-      }),() => ({
+      }), () => ({
         status: "error",
         message: "Data source is not working",
         title: "Error",
@@ -248,41 +262,41 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
 
   async queryAnnotations(options: DataQueryRequest<MyQuery>): Promise<MutableDataFrame<any>> {
 
-      const queyText = options.targets
-        .map((t) => getTemplateSrv().replace(t.queryText, options.scopedVars))
-        .join(';');
+    const queyText = options.targets
+      .map((t) => getTemplateSrv().replace(t.queryText, options.scopedVars))
+      .join(';');
 
-      const annotationQuery = {
-          range: options.range,
-          annotationQuery: queyText,
-          rangeRaw: options.rangeRaw
-      };
+    const annotationQuery = {
+      range: options.range,
+      annotationQuery: queyText,
+      rangeRaw: options.rangeRaw
+    };
 
-      const data = await getBackendSrv().post(this.url + '/annotations', annotationQuery);
-      if (data.length > 500) {
-        throw Error(`There are ${data.length} annotations. Grafana can not display more than 500.`)
-      }
-      const frame = new MutableDataFrame({
-        refId:  options.targets[0].refId,
-        fields: [
-          { name: "time", type: FieldType.time },
-          { name: "timeEnd", type: FieldType.time },
-          { name: "title", type: FieldType.string },
-          { name: "text", type: FieldType.string },
-          { name: "tags", type: FieldType.string },
-        ],
-      });
-      data.forEach((a: any) => {
-        frame.add(
-          {
-            "time": a["time"], 
-            "timeEnd": a["endTime"],
-            "title": a["title"],
-            "text": a["text"], 
-            "tags": a["tags"]
-          })
-      })
-      return frame;
+    const data = await getBackendSrv().post(this.url + '/annotations', annotationQuery);
+    if (data.length > 500) {
+      throw Error(`There are ${data.length} annotations. Grafana can not display more than 500.`)
+    }
+    const frame = new MutableDataFrame({
+      refId: options.targets[0].refId,
+      fields: [
+        { name: "time", type: FieldType.time },
+        { name: "timeEnd", type: FieldType.time },
+        { name: "title", type: FieldType.string },
+        { name: "text", type: FieldType.string },
+        { name: "tags", type: FieldType.string },
+      ],
+    });
+    data.forEach((a: any) => {
+      frame.add(
+        {
+          "time": a["time"],
+          "timeEnd": a["endTime"],
+          "title": a["title"],
+          "text": a["text"],
+          "tags": a["tags"]
+        })
+    })
+    return frame;
   }
 }
 

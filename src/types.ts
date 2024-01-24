@@ -1,7 +1,7 @@
 import { DataQuery, DataSourceJsonData, DataSourceSettings } from '@grafana/data';
 
 // Query
-export interface QueryBase extends DataQuery{
+export interface QueryBase extends DataQuery {
   queryType: QueryTypes;
   queryText: string;
   parsedQuery: ParsedQuery
@@ -13,13 +13,13 @@ export interface MyQuery extends QueryBase {
   commandLevel?: CommandLevelFlags
 }
 
-export type QueryTypes = 'Elements'|'Text'|'Annotations';
+export type QueryTypes = 'Elements' | 'Text' | 'Annotations';
 
 export const DEFAULT_QUERY: Partial<MyQuery> = {
   queryType: "Elements",
   queryText: "",
-  metadataOptions: [{Table: 'ActiveMeasurements', FieldName: 'PointTag'}],
-  parsedQuery: { Elements: [], Functions: [], Filters: []}
+  metadataOptions: [{ Table: 'ActiveMeasurements', FieldName: 'PointTag' }],
+  parsedQuery: { Elements: [], Functions: [], Filters: [] }
 };
 
 // Config
@@ -28,7 +28,10 @@ export interface MyDataSourceOptions extends DataSourceJsonData {
   flags: {
     [key: string]: boolean;
   };
-  valueType: string
+  valueTypeIndex: string;
+  valueTypeName: string;
+  timeSeriesDefinitions: string[];
+  metadataTableName: string;
 }
 
 
@@ -43,14 +46,14 @@ export interface ParsedQuery {
   Elements: string[],
   Functions: FunctionQuery[],
   Filters: FilterQuery[],
-  
+
 }
 
 export interface FilterQuery {
   Table: string,
   Condition: string,
   Number: number,
-  NumberMode: ''|'Top'
+  NumberMode: '' | 'Top'
 }
 
 export interface FunctionQuery {
@@ -61,7 +64,7 @@ export interface FunctionQuery {
 
 export type ParameterType = {
   type: ParameterDescription,
-  value: string|number|boolean|ParsedQuery
+  value: string | number | boolean | ParsedQuery
 };
 
 export interface MetadataTarget {
@@ -70,19 +73,19 @@ export interface MetadataTarget {
 }
 
 interface Range {
-  from:	string,
-  to: 	string
+  from: string,
+  to: string
 }
 
 export interface QueryRequest {
-  dataTypeIndex: number, 
+  dataTypeIndex: number,
   range: Range,
   interval: string,
   maxDataPoints: number,
   targets: Target[],
   adhocFilters: AdHocFilter[],
-  excludedFlags: number, 
-  excludeNormalFlags: boolean 
+  excludedFlags: number,
+  excludeNormalFlags: boolean
 }
 
 export interface Target {
@@ -102,16 +105,16 @@ export interface AdHocFilter {
 }
 
 export interface MyVariableQuery {
-  fieldName: string;
+  fieldNames: Array<string>;
   tableName: string,
   condition: string
 }
 
 export interface DataSourceValueType {
-  name: string, 
-  index: 	number, 
-  timeSeriesDefinition: string, 
-  metadataTableName: string 
+  name: string,
+  index: number,
+  timeSeriesDefinition: string
+  metadataTableName: string
 }
 
 export interface CommandLevelFlags {
@@ -123,32 +126,32 @@ export interface CommandLevelFlags {
   Zoom?: number
 }
 
-export interface FieldDescription { 
-      name:	string,
-      type: string, 
-      required: boolean
+export interface FieldDescription {
+  name: string,
+  type: string,
+  required: boolean
 }
 
 export interface FunctionDescription {
-  name:	string, 
-  description: string, 
-  aliases: string[], 
-  allowedGroupOperations: string[], 
-  parameters:	ParameterDescription[]
+  name: string,
+  description: string,
+  aliases: string[],
+  allowedGroupOperations: string[],
+  parameters: ParameterDescription[]
 };
 
 export interface ParameterDescription {
-  name:	string, 
-  description: string, 
-  type:	string, 
-  required:	boolean, 
-  default: string 
+  name: string,
+  description: string,
+  type: string,
+  required: boolean,
+  default: string
 }
 
 export interface QueryResponse {
-  target: string, 
-  rootTarget:	string,
-  refID: string, 
-  metadata: any, 
+  target: string,
+  rootTarget: string,
+  refID: string,
+  metadata: any,
   datapoints: number[][]
 }

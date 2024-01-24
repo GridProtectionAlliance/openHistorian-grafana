@@ -1,5 +1,5 @@
 import React from 'react';
-import { InlineField, InlineFieldRow, Input, Select } from '@grafana/ui';
+import { FieldSet, InlineField, InlineFieldRow, Input, MultiSelect, Select } from '@grafana/ui';
 import { DataSource } from '../datasource';
 import { FieldDescription, MyVariableQuery } from '../types';
 import "../css/query-editor.css";
@@ -15,74 +15,101 @@ interface VariableQueryProps {
 export function VariableQueryEditor(props: VariableQueryProps) {
   const [tableOptions, setTableOptions] = React.useState<Array<SelectableValue<string>>>([]);
   const [fieldOptions, setFieldOptions] = React.useState<Array<SelectableValue<string>>>([]);
+  const [isInitialLoad, setIsInitialLoad] = React.useState(true);
+  const { onChange, query } = props;
+
+  // Effect for setting default tableName
+  React.useEffect(() => {
+    if (isInitialLoad && !query.tableName) {
+      onChange({ ...query, tableName: 'ActiveMeasurements', fieldNames: ['PointTag'] });
+    }
+    setIsInitialLoad(false);
+  }, [isInitialLoad, onChange, query]);
 
   React.useEffect(() => {
-    getBackendSrv().post(props.datasource.url + "/GetValueTypeTables", {dataTypeIndex: props.datasource.dataSourceValueType, expression: ""})
-      .then((d: string[]) => { setTableOptions(d.map(t => ({value: t, label: t}))); })
-  }, [props.datasource.url, props.datasource.dataSourceValueType])
+    getBackendSrv().post(props.datasource.url + "/GetValueTypeTables", {
+      dataTypeIndex: -1 /* no restriction */,
+      expression: ""
+    })
+      .then((d: string[]) => { setTableOptions(d.map(t => ({ value: t, label: t }))); })
+  }, [props.datasource.url, props.datasource.valueTypeIndex, query.tableName])
 
   React.useEffect(() => {
-    if (props.query?.tableName === undefined || props.query?.tableName.length === 0) {
+    if (!query.tableName) {
       return;
     }
-    getBackendSrv().post(props.datasource.url + "/GetValueTypeTableFields",{
-      dataTypeIndex: props.datasource.dataSourceValueType, 
-      expression: props.query.tableName
-    }).then((d: FieldDescription[]) => { setFieldOptions(d.map(t => ({value: t.name, label: t.name}))); })
 
-  }, [props.datasource.url, props.datasource.dataSourceValueType, props.query.tableName])
+    getBackendSrv().post(props.datasource.url + "/GetValueTypeTableFields", {
+      dataTypeIndex: -1 /* no restriction */,
+      expression: query.tableName
+    })
+      .then((d: FieldDescription[]) => { setFieldOptions(d.map(t => ({ value: t.name, label: t.name }))); })
+  }, [props.datasource.url, props.datasource.valueTypeIndex, query.tableName])
 
   function onTableChange(t: SelectableValue<string>) {
-    props.onChange({...props.query, tableName: t.value ?? '', fieldName: ''})
+    let newFieldNames = props.query.fieldNames;
+
+    if (t.value === 'ActiveMeasurements') {
+      if (!newFieldNames.includes('PointTag')) {
+        newFieldNames = ['PointTag'];
+      }
+    } else {
+      newFieldNames = ['*'];
+    }
+
+    props.onChange({ ...props.query, tableName: t.value ?? '', fieldNames: newFieldNames });
   }
 
-  
-  function onFieldChange(t: SelectableValue<string>) {
-    props.onChange({...props.query, fieldName: t.value ?? ''})
+  function onFieldChange(t: Array<SelectableValue<string>>) {
+    let newFieldNames = t.map(sv => sv.value?.toString() ?? '');
+
+    // Handle special case for ActiveMeasurements (allows 'PointTag` field to be deselected)
+    if (props.query.tableName === 'ActiveMeasurements' && newFieldNames.length === 0) {
+      newFieldNames = ['*'];
+    }
+
+    props.onChange({ ...props.query, fieldNames: newFieldNames });
   }
 
   function onConditionChange(val: any) {
-    props.onChange({...props.query, condition: val.target.value})
+    props.onChange({ ...props.query, condition: val.target.value })
   }
 
-
   return (
-    <div className="gf-form" style={{ display: 'flex', flexDirection: 'column' }}>
-      <div className='gf-form-group'> 
-      <InlineFieldRow>
-        <InlineField label="Select" labelWidth={12}>
-         <Select  
-            value={props.query?.fieldName}
-            options={fieldOptions}
-            isLoading={fieldOptions.length === 0}
-            onChange={onFieldChange}
-            isSearchable
-            invalid={(props.query?.fieldName?.length ?? 0) === 0}
-            disabled={(props.query?.tableName?.length ?? 0) === 0}
-          />
-        </InlineField>
-        <InlineField label="FROM" labelWidth={12}>
-          <Select  
-            value={props.query?.tableName}
-            options={tableOptions}
-            isLoading={tableOptions.length === 0}
-            onChange={onTableChange}
-            isSearchable
-            invalid={(props.query?.tableName?.length ?? 0) === 0}
-          />
-        </InlineField>
+    <FieldSet style={{ display: 'flex', flexDirection: 'column' }}>
+      <FieldSet>
+        <InlineFieldRow>
+          <InlineField label="Select" labelWidth={12}>
+            <MultiSelect
+              value={props.query?.fieldNames}
+              options={fieldOptions}
+              isLoading={fieldOptions.length === 0}
+              onChange={onFieldChange}
+              isSearchable
+              invalid={(props.query?.fieldNames?.length ?? 0) === 0}
+              disabled={(props.query?.tableName?.length ?? 0) === 0}
+            />
+          </InlineField>
+          <InlineField label="FROM" labelWidth={12}>
+            <Select
+              value={props.query?.tableName}
+              options={tableOptions}
+              isLoading={tableOptions.length === 0}
+              onChange={onTableChange}
+              isSearchable
+              invalid={(props.query?.tableName?.length ?? 0) === 0}
+            />
+          </InlineField>
         </InlineFieldRow>
         <InlineFieldRow>
-        <InlineField label="WHERE" labelWidth={12}>
-          <Input  
-          value={props.query?.condition}
-          onChange={onConditionChange}
-          />
-
-        </InlineField>
-      </InlineFieldRow>
-    </div>
-  </div>
+          <InlineField label="WHERE" labelWidth={12}>
+            <Input
+              value={props.query?.condition}
+              onChange={onConditionChange}
+            />
+          </InlineField>
+        </InlineFieldRow>
+      </FieldSet>
+    </FieldSet>
   );
-  
 }
