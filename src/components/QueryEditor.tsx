@@ -42,8 +42,8 @@ export function QueryEditor({ query, onChange, datasource, onRunQuery }: Props) 
   return (
     <FieldSet style={{ display: 'flex', flexDirection: 'column' }}>
       <FieldSet>
-        <h3 className="page-heading" style={{ marginTop: '8px' }}>General Settings</h3>
-        <FieldSet>
+        <h3 className="page-heading" style={{ marginTop: 16 }}>General Settings</h3>
+        <FieldSet style={{ marginBottom: 16 }}>
           <table>
             <tr>
               <td>
@@ -51,7 +51,7 @@ export function QueryEditor({ query, onChange, datasource, onRunQuery }: Props) 
                   <InlineField label="Data Selection Mode" labelWidth={24}>
                     <Select options={QuerySelectOptions} value={selectedMode} onChange={modeChange} allowCustomValue={false} />
                   </InlineField>
-                  <InlineField label="Transpose Query" labelWidth={24}>
+                  <InlineField label="Transpose Query Results" labelWidth={24}>
                     <InlineSwitch value={query.transpose ?? false}
                       onChange={(v) => OnChange({ ...query, transpose: !(query.transpose ?? false) })}
                       showLabel={true}
@@ -60,7 +60,7 @@ export function QueryEditor({ query, onChange, datasource, onRunQuery }: Props) 
                 </InlineFieldRow>
               </td>
             </tr>
-            <tr style={{ height: 15 }}>
+            <tr style={{ height: 16 }}>
               <td></td>
             </tr>
             <tr>
@@ -71,7 +71,7 @@ export function QueryEditor({ query, onChange, datasource, onRunQuery }: Props) 
           </table>
         </FieldSet>
       </FieldSet>
-      <FieldSet>
+      <FieldSet style={{ marginBottom: 16 }}>
         <h3 className="page-heading">Meta Data</h3>
         <MetaDataSelector datasource={datasource} onChange={(flds) => OnChange({ ...query, metadataOptions: flds })} query={query.metadataOptions} />
       </FieldSet>
