@@ -42,7 +42,7 @@ export function QueryEditor({ query, onChange, datasource, onRunQuery }: Props) 
   return (
     <FieldSet style={{ display: 'flex', flexDirection: 'column' }}>
       <FieldSet>
-        <h3 className="page-heading">General Settings</h3>
+        <h3 className="page-heading" style={{ marginTop: '8px' }}>General Settings</h3>
         <FieldSet>
           <table>
             <tr>
@@ -82,7 +82,7 @@ export function QueryEditor({ query, onChange, datasource, onRunQuery }: Props) 
           onChange={(q) => OnChange({ ...query, queryText: q.queryText, parsedQuery: q.parsedQuery })} query={query}
           datasource={datasource} /> : null}
       </FieldSet>
-    </FieldSet>
+    </FieldSet >
   );
 
 }
