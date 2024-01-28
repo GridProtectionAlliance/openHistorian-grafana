@@ -29,12 +29,12 @@ export function QueryEditor({ query, onChange, datasource, onRunQuery }: Props) 
     onChange(p);
   }
 
-  const textOnBlur = () => {
+  const onBlur = () => {
     onRunQuery();
   };
 
   return (
-    <FieldSet style={{ display: 'flex', flexDirection: 'column' }}>
+    <FieldSet style={{ display: 'flex', flexDirection: 'column' }} onBlur={onBlur}>
       <FieldSet>
         <h3 className="page-heading" style={{ marginTop: 16 }}>General Settings</h3>
         <FieldSet style={{ marginBottom: 16 }}>
@@ -71,7 +71,7 @@ export function QueryEditor({ query, onChange, datasource, onRunQuery }: Props) 
       </FieldSet>
       <FieldSet>
         <h3 className="page-heading">Data Selection</h3>
-        {query.queryType === 'Text' ? <TextQuery onChange={(t) => textOnChange({ ...query, queryText: t })} onBlur={textOnBlur} query={query.queryText} /> : null}
+        {query.queryType === 'Text' ? <TextQuery onChange={(t) => textOnChange({ ...query, queryText: t })} query={query.queryText} /> : null}
         {query.queryType === 'Elements' || query.queryType === undefined ? <QueryEditorWizard
           onChange={(q) => elementsOnChange({ ...query, queryText: q.queryText, parsedQuery: q.parsedQuery })} query={query}
           datasource={datasource} /> : null}

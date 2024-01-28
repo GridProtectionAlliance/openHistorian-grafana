@@ -3,7 +3,7 @@ import { FieldSet, InlineField, TextArea } from '@grafana/ui';
 import "../css/query-editor.css";
 
 
-interface TextQueryProps { onChange: (value: string) => void, onBlur: () => void, query: string }
+interface TextQueryProps { onChange: (value: string) => void, query: string }
 
 export const TextQuery = (props: TextQueryProps) => {
   return <FieldSet>
@@ -13,7 +13,6 @@ export const TextQuery = (props: TextQueryProps) => {
         onChange={(evt: React.ChangeEvent<HTMLTextAreaElement>) => props.onChange(evt.target.value)}
         rows={10}
         width={150}
-        onBlur={props.onBlur}
       />
     </InlineField>
   </FieldSet>;
