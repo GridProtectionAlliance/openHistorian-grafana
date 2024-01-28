@@ -152,6 +152,7 @@ export interface QueryResponse {
   target: string,
   rootTarget: string,
   refID: string,
+  syntaxError: string,
   metadata: any,
   datapoints: number[][]
 }
