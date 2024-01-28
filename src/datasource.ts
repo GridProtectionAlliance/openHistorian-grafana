@@ -1,6 +1,7 @@
 import {
   DataQueryRequest,
   DataQueryResponse,
+  DataQueryError,
   DataSourceApi,
   DataSourceInstanceSettings,
   MutableDataFrame,
@@ -125,36 +126,41 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
 
     const targets: Target[] = options.targets.filter(t => !(t.hide ?? false) && t.queryType !== 'Annotations').map((t) => {
 
-      const mData: MetaDataSelection[] = [];
+      const metadataSelections: MetaDataSelection[] = [];
+
       if (t.metadataOptions !== undefined) {
         t.metadataOptions.forEach((m) => {
-          if (mData.find(t => t.tableName === m.Table) !== undefined) {
-            mData.find(t => t.tableName === m.Table)?.fieldNames.push(m.FieldName);
+          if (metadataSelections.find(t => t.tableName === m.Table) !== undefined) {
+            metadataSelections.find(t => t.tableName === m.Table)?.fieldNames.push(m.FieldName);
           }
           else {
-            mData.push({ tableName: m.Table, fieldNames: [m.FieldName] })
+            metadataSelections.push({ tableName: m.Table, fieldNames: [m.FieldName] })
           }
         })
       }
 
-      let qstring = getTemplateSrv().replace(this.targetToString(t), options.scopedVars);
+      let queryExpression = getTemplateSrv().replace(this.targetToString(t), options.scopedVars);
+
       if (t.commandLevel?.DropEmpty ?? false) {
-        qstring = qstring + "; dropEmptySeries";
+        queryExpression = `${queryExpression}; dropEmptySeries`;
       }
+
       if (t.commandLevel?.IncludePeaks ?? false) {
-        qstring = qstring + "; includePeaks";
+        queryExpression = `${queryExpression}; includePeaks`;
       }
+
       if (t.commandLevel?.FullResolution ?? false) {
-        qstring = qstring + "; fullResolutionQuery";
+        queryExpression = `${queryExpression}; fullResolutionQuery`;
       }
+
       if (t.commandLevel?.RadialDistribution ?? false) {
-        qstring = qstring + `; radialDistribution={radius=${(t.commandLevel?.Radius ?? 1.5)}; zoom=${(t.commandLevel?.Zoom ?? 2)}}`;
+        queryExpression = `${queryExpression}; radialDistribution={radius=${(t.commandLevel?.Radius ?? 1.5)}; zoom=${(t.commandLevel?.Zoom ?? 2)}}`;
       }
 
       return ({
         refID: t.refId,
-        target: qstring,
-        metadataSelections: mData,
+        target: queryExpression,
+        metadataSelections: metadataSelections,
       })
     });
 
@@ -177,7 +183,10 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
     const hasAnnotationQuery = options.targets.some(t => t.queryType === 'Annotations');;
 
     let data: Array<(MutableDataFrame<any> | undefined)> = [];
-    //Generate query
+    let error: DataQueryError = {};
+    let syntaxErrors: string[] = [];
+
+    // Generate query
     if (hasDataQuery) {
       let query: QueryRequest = this.buildQueryParameters(options);
 
@@ -194,8 +203,12 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
         })),
       });
 
-      //Add MetaData Fields.
+      // Add metadata fields
       const frames = pointsData.map((d) => {
+        // Cumulate any reported syntax errors
+        if (d.syntaxError) {
+          syntaxErrors.push(d.syntaxError);
+        }
 
         const metaData: string[] = Object.keys(d.metadata);
 
@@ -208,6 +221,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
             }
             row[m] = d.metadata[m];
           })
+
           transposeFrame.add(row);
           return undefined;
         }
@@ -244,7 +258,13 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
       data.push(await this.queryAnnotations(options))
     }
 
-    return { data };
+    if (syntaxErrors.length > 0) {
+      error = {
+        message: syntaxErrors.join('\n\n')
+      }
+    }
+
+    return { data, error };
   }
 
   async testDatasource() {
