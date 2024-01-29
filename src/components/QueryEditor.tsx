@@ -35,7 +35,7 @@ export function QueryEditor({ query, onChange, datasource, onRunQuery }: Props) 
 
   return (
     <FieldSet style={{ display: 'flex', flexDirection: 'column' }} onBlur={onBlur}>
-      <FieldSet>
+      <FieldSet style={{ marginBottom: 0 }}>
         <h3 className="page-heading" style={{ marginTop: 16 }}>General Settings</h3>
         <FieldSet style={{ marginBottom: 16 }}>
           <table>
