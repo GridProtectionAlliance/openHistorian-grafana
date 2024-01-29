@@ -8,9 +8,8 @@ interface CommandLevelSelectorProps { onChange: (value: CommandLevelFlags) => vo
 
 export const CommandLevelSelector = (props: CommandLevelSelectorProps) => {
 
-  const onChange = (event: React.FormEvent<HTMLInputElement>, setting: 'DropEmpty' | 'IncludePeaks' | 'FullResolution' | 'RadialDistribution') => {
-
-    let updated: CommandLevelFlags = {
+  const getInitialUpdatedValue = (query: CommandLevelFlags | undefined): CommandLevelFlags => {
+    return query ?? {
       DropEmpty: false,
       IncludePeaks: false,
       FullResolution: false,
@@ -18,51 +17,26 @@ export const CommandLevelSelector = (props: CommandLevelSelectorProps) => {
       Radius: 1.5,
       Zoom: 2.0
     };
+  };
 
-    if (props.query !== undefined) {
-      updated = { ...props.query };
-    }
-
+  const onChange = (event: React.FormEvent<HTMLInputElement>, setting: 'DropEmpty' | 'IncludePeaks' | 'FullResolution' | 'RadialDistribution') => {
+    let updated: CommandLevelFlags = getInitialUpdatedValue(props.query);
     updated[setting] = !updated[setting];
     props.onChange(updated);
-
   };
 
   function onRadiusChange(val: any) {
-    let updated: CommandLevelFlags = {
-      DropEmpty: false,
-      IncludePeaks: false,
-      FullResolution: false,
-      RadialDistribution: false,
-      Radius: 1.5,
-      Zoom: 2.0
-    };
-
-    if (props.query !== undefined) {
-      updated = { ...props.query };
-    }
-
+    let updated: CommandLevelFlags = getInitialUpdatedValue(props.query);
     updated.Radius = parseFloat(val.toString());
     props.onChange(updated);
   }
 
   function onZoomChange(val: any) {
-    let updated: CommandLevelFlags = {
-      DropEmpty: false,
-      IncludePeaks: false,
-      FullResolution: false,
-      RadialDistribution: false,
-      Radius: 1.5,
-      Zoom: 2.0
-    };
-
-    if (props.query !== undefined) {
-      updated = { ...props.query };
-    }
-
+    let updated: CommandLevelFlags = getInitialUpdatedValue(props.query);
     updated.Zoom = parseFloat(val.toString());
     props.onChange(updated);
   }
+
   return <FieldSet>
     <InlineFieldRow>
       <InlineField label={'Drop Empty Series'} labelWidth={24}>
@@ -72,7 +46,6 @@ export const CommandLevelSelector = (props: CommandLevelSelectorProps) => {
           onChange={(e) => onChange(e, 'DropEmpty')}
         />
       </InlineField>
-
       <InlineField label={'Include Peaks'} labelWidth={24}>
         <InlineSwitch
           disabled={false}
@@ -81,7 +54,6 @@ export const CommandLevelSelector = (props: CommandLevelSelectorProps) => {
         />
       </InlineField>
     </InlineFieldRow>
-
     <InlineFieldRow>
       <InlineField label={'Get Full Resolution Data'} labelWidth={24}>
         <InlineSwitch
@@ -90,7 +62,6 @@ export const CommandLevelSelector = (props: CommandLevelSelectorProps) => {
           onChange={(e) => onChange(e, 'FullResolution')}
         />
       </InlineField>
-
       <InlineField label={'Distribute Radially'} labelWidth={24}>
         <InlineSwitch
           disabled={false}
