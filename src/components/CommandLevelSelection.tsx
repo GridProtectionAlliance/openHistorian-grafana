@@ -65,7 +65,7 @@ export const CommandLevelSelector = (props: CommandLevelSelectorProps) => {
   }
   return <FieldSet>
     <InlineFieldRow>
-      <InlineField label={'Drop Empty Points'} labelWidth={24}>
+      <InlineField label={'Drop Empty Series'} labelWidth={24}>
         <InlineSwitch
           disabled={false}
           value={props.query?.DropEmpty ?? false}
