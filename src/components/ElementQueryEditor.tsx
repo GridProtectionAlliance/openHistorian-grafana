@@ -259,7 +259,7 @@ const FunctionQueryUI = (props: FunctionQueryProps) => {
     props.update(u);
   }
 
-  return <Collapse label={
+  return <Collapse collapsible={true} label={
     <InlineFieldRow>
       <IconButton name={'trash-alt'} size='xl' iconType='default' variant='destructive' onClick={() => props.update(undefined)} />
       <Select
