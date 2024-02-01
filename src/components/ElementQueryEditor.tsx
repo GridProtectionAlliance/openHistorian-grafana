@@ -163,7 +163,7 @@ export const ElementQuery = (props: ElementQueryProps) => {
      Filter 
   </Button>
   <Button size={'sm'} variant = 'secondary' fill='solid' icon='plus-circle' style={{ marginTop: 4, marginLeft: 5 }} 
-  onClick={() => props.update(selectedOptions.map(d => d.value),  props.availableFunctions.find(() => true)?.name, true )}>
+  onClick={() => props.update(selectedOptions.map(d => d.value),  props.availableFunctions.find(() => true)?.name, false )}>
      Function 
   </Button>
   </InlineFieldRow>
