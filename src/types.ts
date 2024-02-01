@@ -136,7 +136,10 @@ export interface FunctionDescription {
   name: string,
   description: string,
   aliases: string[],
-  allowedGroupOperations: string[],
+  returnType: string, // either 'Scalar' or 'Series'
+  category: string,   // either 'BuiltIn' or 'Custom'
+  allowedGroupOperations: string, // Comma separated list
+  publishedGroupOperations: string, // Comma separated list
   parameters: ParameterDescription[]
 };
 
