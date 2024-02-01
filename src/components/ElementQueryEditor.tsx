@@ -192,7 +192,7 @@ const FilterQueryUI = (props: FilterQueryProps) => {
 
 
   return <InlineFieldRow>
-    <IconButton name={'trash-alt'} size='xl' iconType='default' variant='destructive' onClick={() => props.update(undefined)} />
+    <IconButton name={'trash-alt'} size='xl' iconType='default' variant='destructive' style={{ marginTop: 4, marginRight: 8 }} onClick={() => props.update(undefined)} />
     <InlineField label="Filter" labelWidth={12}>
       <Select
         value={props.filter.NumberMode}
@@ -261,14 +261,15 @@ const FunctionQueryUI = (props: FunctionQueryProps) => {
 
   return <Collapse collapsible={true} label={
     <InlineFieldRow>
-      <IconButton name={'trash-alt'} size='xl' iconType='default' variant='destructive' onClick={() => props.update(undefined)} />
+      <IconButton name={'trash-alt'} size='xl' iconType='default' variant='destructive' style={{ marginTop: 4, marginRight: 8 }} onClick={() => props.update(undefined)} />
       <Select
         value={props.func.Function}
         options={fxOptions}
         onChange={onFunctionChange}
         isSearchable
-        width={20}
+        width={'auto'}
       />
+      <div style={{ marginTop: 5, marginLeft: 10 }}>{getCategory(fxDescription)} {fxDescription?.returnType.toLowerCase()}{getGroupOperation(fxDescription)} function{extractGroupOperations(fxDescription)}.</div>
     </InlineFieldRow>
   } isOpen={isOpen} onToggle={() => setIsOpen((x) => !x)}>
     <p>{fxDescription?.description}</p>
@@ -370,10 +371,10 @@ const ParameterUI = (props: ParameterQueryProps) => {
   }
 
   return <Card>
-    <Card.Heading>{props.param.type.name}</Card.Heading>
+    <Card.Heading>{props.param.type.name} ({props.param.type.required ? 'required' : 'optional'})</Card.Heading>
     <Card.Description>
       <>
-        <p>{props.param.type.description} ({props.param.type.type})</p>
+        <p>{props.param.type.description} ({props.param.type.type}{!props.param.type.required && props.param.type.default?.length > 0 ? `: default = ${props.param.type.default}` : ''})</p>
 
         {props.param.type.type.includes("IAsyncEnumerable") ? <>
           <ElementQuery
@@ -434,3 +435,102 @@ const ParameterUI = (props: ParameterQueryProps) => {
   </Card>;
 };
 
+const getCategory = (fxDescription: FunctionDescription | undefined): string => {
+  return (fxDescription?.category ?? 'BuiltIn') === 'BuiltIn' ? 'Built-in' : 'Custom';
+}
+
+const getGroupOperation = (fxDescription: FunctionDescription | undefined): string => {
+  const functionName = fxDescription?.name ?? '';
+
+  if (functionName.startsWith('Slice')) {
+    return ' slice';
+  } else if (functionName.startsWith('Set')) {
+    return ' set';
+  }
+
+  return '';
+}
+
+const extractGroupOperations = (fxDescription: FunctionDescription | undefined): string => {
+  const allowedGroupOperations = fxDescription?.allowedGroupOperations.split(',').map(operation => operation.trim()) ?? [];
+  let publishedGroupOperations = fxDescription?.publishedGroupOperations.split(',').map(operation => operation.trim()) ?? [];
+
+  if (publishedGroupOperations.length === 0) {
+    return '';
+  }
+
+  const allowedGroupOperationsSet = new Set(allowedGroupOperations);
+  let functionName = fxDescription?.name ?? '';
+
+  // If published group operations are not a subset of allowed group operations,
+  // use the allowed group operations as the published group operations
+  if (!publishedGroupOperations.every(element => allowedGroupOperationsSet.has(element))) {
+    functionName = allowedGroupOperations[0];
+    publishedGroupOperations = allowedGroupOperations;
+  }
+
+  const publishedGroupOperationsSet = new Set(publishedGroupOperations);
+  const supportedGroupOperations: string[] = [];
+  let supportsNonGroupedOperation = false;
+
+  if (functionName.startsWith('Slice')) {
+    // If slice-type function is selected, show possible support for 'None' and 'Set' group operations
+    if (publishedGroupOperationsSet.has('None')) {
+      supportsNonGroupedOperation = true;
+    }
+
+    if (publishedGroupOperationsSet.has('Set')) {
+      supportedGroupOperations.push('set');
+    }
+  } else if (functionName.startsWith('Set')) {
+    // If set-type function is selected, show possible support for 'None' and 'Slice' group operations
+    if (publishedGroupOperationsSet.has('None')) {
+      supportsNonGroupedOperation = true;
+    }
+
+    if (publishedGroupOperationsSet.has('Slice')) {
+      supportedGroupOperations.push('slice');
+    }
+  }
+  else {
+    // If standard non-grouped function is selected, show possible support for 'Slice' and 'Set' group operations
+    if (publishedGroupOperationsSet.has('Slice')) {
+      supportedGroupOperations.push('slice');
+    }
+
+    if (publishedGroupOperationsSet.has('Set')) {
+      supportedGroupOperations.push('set');
+    }
+  }
+
+  if (!supportsNonGroupedOperation && supportedGroupOperations.length === 0) {
+    return '';
+  }
+
+  const groupOperationsDisplay: string[] = [];
+
+  if (supportsNonGroupedOperation) {
+    groupOperationsDisplay.push('standard non-grouped');
+  }
+
+  if (supportedGroupOperations.length > 0) {
+    if (groupOperationsDisplay.length > 0) {
+      groupOperationsDisplay.push(' and ');
+    }
+
+    groupOperationsDisplay.push(supportedGroupOperations.join(' and '));
+    groupOperationsDisplay.push(' group');
+
+    if (supportedGroupOperations.length > 1) {
+      groupOperationsDisplay.push('ed');
+    }
+  }
+
+  groupOperationsDisplay.push(' operation');
+
+  if ((supportsNonGroupedOperation ? 1 : 0) + supportedGroupOperations.length > 1) {
+    groupOperationsDisplay.push('s');
+  }
+
+  return `, also supports ${groupOperationsDisplay.join('')}`;
+}

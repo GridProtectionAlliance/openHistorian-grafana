@@ -101,7 +101,7 @@ const MetaDataFieldSelector = (props: MeataDataFieldSelectorProps) => {
       />
     </InlineField>
     <InlineField>
-      <IconButton name={'trash-alt'} size='xl' iconType='default' variant='destructive' onClick={() => props.Remove()} />
+      <IconButton name={'trash-alt'} size='xl' iconType='default' variant='destructive' style={{ marginTop: 4, marginLeft: 4 }} onClick={() => props.Remove()} />
     </InlineField>
   </InlineFieldRow>
 
