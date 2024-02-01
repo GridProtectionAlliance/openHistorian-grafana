@@ -21,9 +21,10 @@ export function QueryEditor({ query, onChange, datasource, onRunQuery }: Props) 
     const oldMode = ((query?.queryType ?? 'Elements') as QueryTypes);
 
     if (oldMode === 'Elements' && newMode === 'Text') {
-      textOnChange({ ...query, queryText: datasource.targetToString(query as QueryBase) })
+      onChange({ ...query, queryText: datasource.targetToString(query as QueryBase), queryType: newMode })
+      return;
     }
-    onChange({ ...query, queryType: ((selected.value ?? 'Elements') as QueryTypes) })
+    onChange({ ...query, queryType: newMode })
   }
 
   const elementsOnChange = (p: MyQuery) => {
