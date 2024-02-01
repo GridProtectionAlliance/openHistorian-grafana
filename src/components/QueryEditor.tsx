@@ -2,7 +2,7 @@ import React from 'react';
 import { InlineFieldRow, InlineField, Select, InlineSwitch, FieldSet } from '@grafana/ui';
 import { SelectableValue, QueryEditorProps } from '@grafana/data';
 import { DataSource } from '../datasource';
-import { MyDataSourceOptions, MyQuery, QueryTypes } from '../types';
+import { MyDataSourceOptions, MyQuery, QueryBase, QueryTypes } from '../types';
 import { QuerySelectOptions } from '../js/constants'
 import "../css/query-editor.css";
 import { QueryEditorWizard } from './ElementQueryEditor';
@@ -16,9 +16,15 @@ export function QueryEditor({ query, onChange, datasource, onRunQuery }: Props) 
 
   const selectedMode = React.useMemo(() => (query.queryType ?? 'Elements'), [query])
 
-  const modeChange = React.useCallback((selected: SelectableValue<string>) => {
+  const modeChange = (selected: SelectableValue<string>) => {
+    const newMode = ((selected.value ?? 'Elements') as QueryTypes);
+    const oldMode = ((query?.queryType ?? 'Elements') as QueryTypes);
+
+    if (oldMode === 'Elements' && newMode === 'Text') {
+      textOnChange({ ...query, queryText: datasource.targetToString(query as QueryBase) })
+    }
     onChange({ ...query, queryType: ((selected.value ?? 'Elements') as QueryTypes) })
-  }, [query, onChange])
+  }
 
   const elementsOnChange = (p: MyQuery) => {
     onChange(p);
