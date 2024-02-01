@@ -1,5 +1,5 @@
 import React from 'react';
-import { InlineFieldRow, InlineField, Select, InlineSwitch, FieldSet } from '@grafana/ui';
+import { InlineFieldRow, InlineField, Select, InlineSwitch, FieldSet, IconButton } from '@grafana/ui';
 import { SelectableValue, QueryEditorProps } from '@grafana/data';
 import { DataSource } from '../datasource';
 import { MyDataSourceOptions, MyQuery, QueryBase, QueryTypes } from '../types';
@@ -51,6 +51,13 @@ export function QueryEditor({ query, onChange, datasource, onRunQuery }: Props) 
                   <InlineField label="Data Selection Mode" labelWidth={24}>
                     <Select options={QuerySelectOptions} value={selectedMode} onChange={modeChange} allowCustomValue={false} />
                   </InlineField>
+                  {selectedMode === 'Elements'? <IconButton name={'question-circle'} size='xl' iconType='default' variant='destructive' style={{ marginTop: 4, marginRight: 0 }}
+                   tooltip={<div> 
+                    <p> The current Text Query is:</p>
+                    <p> <em>{datasource.targetToString(query as QueryBase)}</em> </p>
+                  </div>}/> : null}
+                </InlineFieldRow>
+                <InlineFieldRow>
                   <InlineField label="Transpose Query Results" labelWidth={24}>
                     <InlineSwitch value={query.transpose ?? false}
                       onChange={(v) => elementsOnChange({ ...query, transpose: !(query.transpose ?? false) })}
