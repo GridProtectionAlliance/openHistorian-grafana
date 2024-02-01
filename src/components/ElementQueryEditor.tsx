@@ -1,5 +1,5 @@
 import React from 'react';
-import { InlineField, AsyncMultiSelect, Select, Input, InlineFieldRow, Collapse, IconButton, Card } from '@grafana/ui';
+import { InlineField, AsyncMultiSelect, Select, Input, InlineFieldRow, Collapse, FieldSet, IconButton, Card, InlineLabel } from '@grafana/ui';
 import { SelectableValue } from '@grafana/data';
 import { DataSource } from '../datasource';
 import { FilterQuery, FunctionDescription, FunctionQuery, ParameterType, ParsedQuery, QueryBase } from '../types';
@@ -52,7 +52,7 @@ export const QueryEditorWizard = (props: Props) => {
     }
     u.parsedQuery.Elements = e;
     if (filter) {
-      u.parsedQuery.Filters.push({ Table: '', Condition: '', Number: 10, NumberMode: 'Top' });
+      u.parsedQuery.Filters.push({ Table: '', Condition: '', Number: 10, NumberMode: 'TOP' });
       setFilters(u.parsedQuery.Filters);
     }
     props.onChange(u);
@@ -148,7 +148,7 @@ export const ElementQuery = (props: ElementQueryProps) => {
   };
 
 
-  return <InlineField label="Query" labelWidth={12}>
+  return <InlineField label="Query" labelWidth={'auto'}>
     <AsyncMultiSelect
       loadOptions={loadOptions}
       defaultOptions={true}
@@ -167,14 +167,14 @@ interface FilterQueryProps {
 
 const FilterQueryUI = (props: FilterQueryProps) => {
   const numberOptions = [
-    { label: 'TOP', value: 'Top' },
+    { label: 'TOP', value: 'TOP' },
     { label: 'ALL', value: '' }]
 
   const tableOptions: Array<SelectableValue<string>> = React.useMemo(() => props.availableTables.map((t) => ({ label: t, value: t })), [props.availableTables])
   const selectedOptions: Array<SelectableValue<string>> = React.useMemo(() => props.filter.Table === '' ? [] : [{ value: props.filter.Table, label: props.filter.Table }], [props.filter.Table]);
 
   function onNumberModeChange(val: SelectableValue<string>) {
-    props.update({ ...props.filter, NumberMode: val.value as ('Top' | '') })
+    props.update({ ...props.filter, NumberMode: val.value as ('TOP' | '') })
   }
 
   function OnNumberChange(val: any) {
@@ -190,38 +190,45 @@ const FilterQueryUI = (props: FilterQueryProps) => {
     props.update({ ...props.filter, Condition: val.target.value })
   }
 
-
-  return <InlineFieldRow>
-    <IconButton name={'trash-alt'} size='xl' iconType='default' variant='destructive' style={{ marginTop: 4, marginRight: 8 }} onClick={() => props.update(undefined)} />
-    <InlineField label="Filter" labelWidth={12}>
-      <Select
-        value={props.filter.NumberMode}
-        options={numberOptions}
-        onChange={onNumberModeChange}
-      />
-    </InlineField>
-    {props.filter.NumberMode !== '' ? <Input type={'number'}
-      min={0} max={99999}
-      value={props.filter.Number}
-      onChange={OnNumberChange}
-      width={20}
-    /> : null}
-    <Select
-      value={selectedOptions}
-      options={tableOptions}
-      isLoading={tableOptions.length === 0}
-      onChange={onTableChange}
-      isSearchable
-      width={80}
-    />
-    <InlineField label="WHERE" labelWidth={12}>
-      <Input
-        value={props.filter.Condition}
-        onChange={onConditionChange}
-      />
-    </InlineField>
-  </InlineFieldRow>
-
+  return <FieldSet>
+    <InlineFieldRow>
+      <IconButton name={'trash-alt'} size='xl' iconType='default' variant='destructive' style={{ marginTop: 4, marginRight: 0 }} onClick={() => props.update(undefined)} />
+      <InlineField label={
+        <InlineLabel style={{ flexShrink: 1 }}><IconButton name={'filter'} size='md' iconType='default' variant='secondary' style={{ marginLeft: -2 }} />FILTER</InlineLabel>
+      } labelWidth={'auto'}>
+        <Select
+          value={props.filter.NumberMode}
+          options={numberOptions}
+          onChange={onNumberModeChange}
+        />
+      </InlineField>
+      {props.filter.NumberMode !== '' ? <Input type={'number'}
+        min={0} max={99999}
+        value={props.filter.Number}
+        onChange={OnNumberChange}
+        width={10}
+      /> : null}
+      <InlineField label="" labelWidth={1} transparent={true} style={{ marginLeft: -16 }}>
+        <Select
+          value={selectedOptions}
+          options={tableOptions}
+          isLoading={tableOptions.length === 0}
+          onChange={onTableChange}
+          isSearchable
+          width={'auto'}
+        />
+      </InlineField>
+    </InlineFieldRow>
+    <InlineFieldRow>
+      <InlineField label="WHERE" grow>
+        <Input
+          value={props.filter.Condition}
+          onChange={onConditionChange}
+          placeholder="SignalType = 'FREQ'"
+        />
+      </InlineField>
+    </InlineFieldRow>
+  </FieldSet>
 }
 
 interface FunctionQueryProps {
@@ -261,12 +268,14 @@ const FunctionQueryUI = (props: FunctionQueryProps) => {
 
   return <Collapse collapsible={true} label={
     <InlineFieldRow>
-      <IconButton name={'trash-alt'} size='xl' iconType='default' variant='destructive' style={{ marginTop: 4, marginRight: 8 }} onClick={() => props.update(undefined)} />
+      <IconButton name={'trash-alt'} size='xl' iconType='default' variant='destructive' style={{ marginTop: 4, marginRight: 6 }} onClick={() => props.update(undefined)} />
+      <span style={{ marginTop: 5, marginRight: 4, fontSize: 'small' }}>ƒ(x)</span>
       <Select
         value={props.func.Function}
         options={fxOptions}
         onChange={onFunctionChange}
         isSearchable
+        tabSelectsValue={true}
         width={'auto'}
       />
       <div style={{ marginTop: 5, marginLeft: 10 }}>{getCategory(fxDescription)} {fxDescription?.returnType.toLowerCase()}{getGroupOperation(fxDescription)} function{extractGroupOperations(fxDescription)}.</div>
@@ -331,7 +340,7 @@ const ParameterUI = (props: ParameterQueryProps) => {
 
     (u.value as ParsedQuery).Elements = e;
     if (filter) {
-      (u.value as ParsedQuery)?.Filters.push({ Table: '', Condition: '', Number: 10, NumberMode: 'Top' });
+      (u.value as ParsedQuery)?.Filters.push({ Table: '', Condition: '', Number: 10, NumberMode: 'TOP' });
     }
     props.update(u);
   }
@@ -429,8 +438,6 @@ const ParameterUI = (props: ParameterQueryProps) => {
           isSearchable
         /> : null}
       </>
-
-
     </Card.Description>
   </Card>;
 };

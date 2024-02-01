@@ -112,7 +112,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
       parts.push(query.Elements.join(";"));
     }
     if (query.Filters !== undefined) {
-      parts.push(query.Filters.map(f => `Filter ${f.NumberMode === '' ? '' : `${f.NumberMode} ${f.Number}`} ${f.Table}${f.Condition?.length > 0 ? ` WHERE ${f.Condition}` : ''}`).join(";"))
+      parts.push(query.Filters.map(f => `FILTER ${f.NumberMode === '' ? '' : `${f.NumberMode} ${f.Number}`} ${f.Table}${f.Condition?.length > 0 ? ` WHERE ${f.Condition}` : ''}`).join(";"))
     }
     if (query.Functions !== undefined) {
       parts.push(query.Functions.map(f => this.functionToString(f)).join(';'))

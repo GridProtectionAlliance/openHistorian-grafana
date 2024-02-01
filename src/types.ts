@@ -53,7 +53,7 @@ export interface FilterQuery {
   Table: string,
   Condition: string,
   Number: number,
-  NumberMode: '' | 'Top'
+  NumberMode: '' | 'TOP'
 }
 
 export interface FunctionQuery {
