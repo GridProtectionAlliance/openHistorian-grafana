@@ -1,5 +1,5 @@
 import React from 'react';
-import { InlineField, AsyncMultiSelect, Select, Input, InlineFieldRow, Collapse, FieldSet, IconButton, Card, InlineLabel } from '@grafana/ui';
+import { InlineField, AsyncMultiSelect, Select, Input, InlineFieldRow, Collapse, FieldSet, IconButton, Card, InlineLabel, Button } from '@grafana/ui';
 import { SelectableValue } from '@grafana/data';
 import { DataSource } from '../datasource';
 import { FilterQuery, FunctionDescription, FunctionQuery, ParameterType, ParsedQuery, QueryBase } from '../types';
@@ -148,7 +148,8 @@ export const ElementQuery = (props: ElementQueryProps) => {
   };
 
 
-  return <InlineField label="Query" labelWidth={'auto'}>
+  return  <InlineFieldRow>
+  <InlineField label="Query" labelWidth={'auto'}>
     <AsyncMultiSelect
       loadOptions={loadOptions}
       defaultOptions={true}
@@ -157,6 +158,16 @@ export const ElementQuery = (props: ElementQueryProps) => {
       isSearchable
     />
   </InlineField>
+  <Button size={'sm'} variant = 'secondary' fill='solid' icon='plus-circle' style={{ marginTop: 4, marginLeft: 5 }}
+   onClick={() => props.update(selectedOptions.map(d => d.value), undefined, true )}>
+     Filter 
+  </Button>
+  <Button size={'sm'} variant = 'secondary' fill='solid' icon='plus-circle' style={{ marginTop: 4, marginLeft: 5 }} 
+  onClick={() => props.update(selectedOptions.map(d => d.value),  props.availableFunctions.find(() => true)?.name, true )}>
+     Function 
+  </Button>
+  </InlineFieldRow>
+
 }
 
 interface FilterQueryProps {
