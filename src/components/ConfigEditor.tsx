@@ -90,7 +90,6 @@ export function ConfigEditor(props: Props) {
   };
 
   const onTypeChange = (val: SelectableValue<string>) => {
-    console.log(val);
     const index: string = (val.value ?? '0').toString();
     const dataSource: DataSourceValueType | undefined = dataSourceTypes.find(d => d.index.toString() === index);
 
