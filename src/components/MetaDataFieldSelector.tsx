@@ -25,9 +25,9 @@ export const MetaDataSelector = (props: MetaDataProps) => {
 
   const onAddFld = () => {
     if (props.query === undefined) {
-      props.onChange([{ Table: props.datasource.metadataTableName, FieldName: "" }]);
+      props.onChange([{ Table: props.datasource.metadataTableName, FieldName: "", Type: "" }]);
     }
-    props.onChange([...props.query, { Table: props.datasource.metadataTableName, FieldName: "" }]);
+    props.onChange([...props.query, { Table: props.datasource.metadataTableName, FieldName: "", Type: "" }]);
   };
 
   const onUpdateFld = (fld: IMetaDataField, index: number) => {
@@ -50,7 +50,7 @@ export const MetaDataSelector = (props: MetaDataProps) => {
     </FieldSet>)
 }
 
-interface MeataDataFieldSelectorProps {
+interface MetaDataFieldSelectorProps {
   Field: IMetaDataField,
   Remove: () => void,
   Update: (fld: IMetaDataField) => void,
@@ -58,26 +58,32 @@ interface MeataDataFieldSelectorProps {
   Datasource: DataSource
 }
 
-const MetaDataFieldSelector = (props: MeataDataFieldSelectorProps) => {
-  const [fieldOptions, setFieldOptions] = React.useState<Array<SelectableValue<string>>>([]);
+const MetaDataFieldSelector = (props: MetaDataFieldSelectorProps) => {
+  const [fields, setFields] = React.useState<IMetaDataField[]>([])
+  const fieldOptions: Array<SelectableValue<string>> = React.useMemo(() => fields.map((f) => ({ value: f.FieldName, label: f.FieldName})),[fields]);
 
   React.useEffect(() => {
-    setFieldOptions([]);
+    setFields([]);
     if (props.Field.Table === undefined) {
       return;
     }
     getBackendSrv().post(props.Datasource.url + "/GetValueTypeTableFields", {
       dataTypeIndex: props.Datasource.valueTypeIndex,
       expression: props.Field.Table
-    }).then((d: FieldDescription[]) => setFieldOptions(d?.map((fld) => ({ value: fld.name, label: fld.name })) ?? []))
+    }).then((d: FieldDescription[]) => setFields(d?.map((fld) => ({  FieldName: fld.name, Table: props.Field.Table, Type: fld.type })) ?? []))
   }, [props.Field.Table, props.Datasource.url, props.Datasource.valueTypeIndex])
 
   const updateTable = (val: SelectableValue<string>) => {
-    props.Update({ Table: val.value ?? "", FieldName: "" })
+    props.Update({ Table: val.value ?? "", FieldName: "", Type: "" })
   };
 
   const updateField = (val: SelectableValue<string>) => {
-    props.Update({ Table: props.Field.Table, FieldName: val.value ?? "" })
+    const fld = fields.find(d => d.FieldName === val.value)
+    console.log(fld)
+    if (fld === undefined) {
+      return;
+    }
+    props.Update(fld)
   };
 
   return <InlineFieldRow>
@@ -92,7 +98,7 @@ const MetaDataFieldSelector = (props: MeataDataFieldSelectorProps) => {
     </InlineField>
     <InlineField label="Field" labelWidth={12}>
       <Select
-        value={props.Field.FieldName}
+        value={props.Field?.FieldName}
         options={fieldOptions}
         onChange={updateField}
         isLoading={fieldOptions.length === 0}

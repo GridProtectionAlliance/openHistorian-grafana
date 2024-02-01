@@ -7,7 +7,18 @@ import {
   MutableDataFrame,
   FieldType,
 } from "@grafana/data";
-import { MyQuery, MyDataSourceOptions, QueryRequest, Target, FunctionQuery, ParsedQuery, MyVariableQuery, QueryBase, MetaDataSelection, QueryResponse } from "./types";
+import { 
+  MyQuery,
+  MyDataSourceOptions,
+  QueryRequest,
+  Target,
+  FunctionQuery,
+  ParsedQuery,
+  MyVariableQuery,
+  QueryBase,
+  MetaDataSelection,
+  QueryResponse
+ } from "./types";
 import { getBackendSrv, getTemplateSrv } from "@grafana/runtime";
 import _ from "lodash";
 import { DefaultFlags } from "./js/constants";
@@ -179,6 +190,8 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
   async query(options: DataQueryRequest<MyQuery>): Promise<DataQueryResponse> {
     const target = options.targets[0];
 
+    const metaDataTypes = options.targets.map(i => i.metadataOptions).flat();
+    
     const hasDataQuery = options.targets.some(t => t.queryType !== 'Annotations');
     const hasAnnotationQuery = options.targets.some(t => t.queryType === 'Annotations');;
 
@@ -231,7 +244,9 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
             refId: target.refId,
             fields: metaData.concat(tags).map((s, i) => ({
               name: s,
-              type: (i < metaData.length ? FieldType.other : (i < (metaData.length + tags.length - 1) ? FieldType.number : FieldType.time))
+              type: (i < metaData.length ? this.metaDataDataType(metaDataTypes.find(m => m.FieldName === metaData[i] || `${m.Table}.${m.FieldName}` === metaData[i])?.Type ?? "")
+               : (i < (metaData.length + tags.length - 1)
+               ? FieldType.number : FieldType.time))
             })),
           });
 
@@ -280,6 +295,62 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
       }))
   }
 
+  metaDataDataType(type: string) {
+    if (type === 'Int16') {
+      return FieldType.number;
+    }
+    if (type === 'Int32') {
+      return FieldType.number;
+    }
+    if (type === 'Int64') {
+      return FieldType.number;
+    }
+    if (type === 'UInt16') {
+      return FieldType.number;
+    }
+    if (type === 'UInt32') {
+      return FieldType.number;
+    }
+    if (type === 'UInt64') {
+      return FieldType.number;
+    }
+    if (type === 'IntPtr') {
+      return FieldType.number;
+    }
+    if (type === 'UIntPtr') {
+      return FieldType.number;
+    }
+    if (type === 'Boolean') {
+      return FieldType.boolean;
+    }
+    if (type === 'Byte') {
+      return FieldType.number;
+    }
+    if (type === 'SByte') {
+      return FieldType.number;
+    }
+    if (type === 'Char') {
+      return FieldType.number;
+    }
+    if (type === 'Decimal') {
+      return FieldType.number;
+    }
+    if (type === 'Double') {
+      return FieldType.number;
+    }
+    if (type === 'Single') {
+      return FieldType.number;
+    }
+    if (type === 'String') {
+      return FieldType.string;
+    }
+    if (type === 'Guid') {
+      return FieldType.string;
+    }
+
+    return FieldType.other;
+
+  }
   async queryAnnotations(options: DataQueryRequest<MyQuery>): Promise<MutableDataFrame<any>> {
 
     const queyText = options.targets

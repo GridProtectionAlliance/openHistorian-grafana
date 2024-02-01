@@ -18,7 +18,7 @@ export type QueryTypes = 'Elements' | 'Text' | 'Annotations';
 export const DEFAULT_QUERY: Partial<MyQuery> = {
   queryType: "Elements",
   queryText: "",
-  metadataOptions: [{ Table: 'ActiveMeasurements', FieldName: 'PointTag' }],
+  metadataOptions: [{ Table: 'ActiveMeasurements', FieldName: 'PointTag', Type: 'String' }],
   parsedQuery: { Elements: [], Functions: [], Filters: [] }
 };
 
@@ -40,6 +40,7 @@ export interface MyDataSourceOptions extends DataSourceJsonData {
 export interface IMetaDataField {
   Table: string,
   FieldName: string,
+  Type: string,
 }
 
 export interface ParsedQuery {
