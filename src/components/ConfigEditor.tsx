@@ -26,18 +26,10 @@ export function ConfigEditor(props: Props) {
   const dataSourceTypeOptions = React.useMemo(() => dataSourceTypes.map(s => ({ value: s.index.toString(), label: s.name })), [dataSourceTypes]);
   const url = React.useMemo(() => (options?.jsonData?.http?.url ?? ''), [options])
 
-  //const [isInitialLoad, setIsInitialLoad] = React.useState(true);
-  //.then(() => {
-  //  if (isInitialLoad && options.jsonData.valueTypeIndex === undefined) {
-  //    onTypeChange({ value: '0' });
-  //  }
-  //  setIsInitialLoad(false);
-  //});
-
   // Fetch data source value types when URL changes
   React.useEffect(() => {
     if (url.length === 0) {
-      onOptionsChange({ ...options, jsonData: {...options.jsonData, http: {...options.jsonData.http, url: '../api/grafana'}} });
+      onOptionsChange({ ...options, jsonData: { ...options.jsonData, http: { ...options.jsonData.http, url: '../api/grafana' } } });
       return;
     }
     if (url.length < 1) {
