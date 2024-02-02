@@ -52,7 +52,7 @@ export function QueryEditor({ query, onChange, datasource, onRunQuery }: Props) 
                   <InlineField label="Data Selection Mode" labelWidth={24}>
                     <Select options={QuerySelectOptions} value={selectedMode} onChange={modeChange} allowCustomValue={false} />
                   </InlineField>
-                  {selectedMode === 'Elements'? <IconButton name={'question-circle'} size='xl' iconType='default' variant='destructive' style={{ marginTop: 4, marginRight: 0 }}
+                  {selectedMode === 'Elements'? <IconButton name={'question-circle'} size='xl' iconType='default' variant='secondary' style={{ marginTop: 4, marginRight: 0 }}
                    tooltip={<div> 
                     <p> The current Text Query is:</p>
                     <p> <em>{datasource.targetToString(query as QueryBase)}</em> </p>
