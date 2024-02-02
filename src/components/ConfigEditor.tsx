@@ -36,12 +36,28 @@ export function ConfigEditor(props: Props) {
 
   // Fetch data source value types when URL changes
   React.useEffect(() => {
+    if (url.length === 0) {
+      onOptionsChange({ ...options, jsonData: {...options.jsonData, http: {...options.jsonData.http, url: '../api/grafana'}} });
+      return;
+    }
     if (url.length < 1) {
       return;
     }
-
     getBackendSrv().post(url + "/GetValueTypes", {}).then((d: DataSourceValueType[]) => setDataSourceTypes(d))
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [url]);
+
+  React.useEffect(() => {
+    if (dataSourceTypeOptions.length < 1) {
+      return;
+    }
+    if (options.jsonData.valueTypeIndex === undefined) {
+      onTypeChange(dataSourceTypeOptions[0]);
+      return;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dataSourceTypeOptions, options.jsonData])
 
   const onHttpChange = (config: DataSourceSettings<MyDataSourceOptions>) => {
     const jsonData = {
