@@ -2,12 +2,12 @@ import React from 'react';
 import { InlineField, InlineFieldRow, Select, IconButton, Button, FieldSet } from '@grafana/ui';
 import { SelectableValue } from '@grafana/data';
 import { DataSource } from '../datasource';
-import { FieldDescription, IMetaDataField } from '../types';
+import { FieldDescription, MetaDataField } from '../types';
 import "../css/query-editor.css";
 import { getBackendSrv } from "@grafana/runtime";
 import _ from 'lodash';
 
-interface MetaDataProps { datasource: DataSource, onChange: (value: IMetaDataField[]) => void, query: IMetaDataField[] }
+interface MetaDataProps { datasource: DataSource, onChange: (value: MetaDataField[]) => void, query: MetaDataField[] }
 
 export const MetaDataSelector = (props: MetaDataProps) => {
   const [tableOptions, setTableOptions] = React.useState<Array<SelectableValue<string>>>([]);
@@ -30,7 +30,7 @@ export const MetaDataSelector = (props: MetaDataProps) => {
     props.onChange([...props.query, { Table: props.datasource.metadataTableName, FieldName: "", Type: "" }]);
   };
 
-  const onUpdateFld = (fld: IMetaDataField, index: number) => {
+  const onUpdateFld = (fld: MetaDataField, index: number) => {
 
     let u = [...props.query];
     u[index] = fld;
@@ -44,23 +44,23 @@ export const MetaDataSelector = (props: MetaDataProps) => {
         TableOptions={tableOptions} Datasource={props.datasource} />)}
       <InlineFieldRow>
         <InlineField>
-          <Button onClick={() => onAddFld()}> Add Meta Data Field</Button>
+          <Button size='md' icon={'plus-circle'} variant='secondary' onClick={() => onAddFld()}>Add Metadata</Button>
         </InlineField>
       </InlineFieldRow>
     </FieldSet>)
 }
 
 interface MetaDataFieldSelectorProps {
-  Field: IMetaDataField,
+  Field: MetaDataField,
   Remove: () => void,
-  Update: (fld: IMetaDataField) => void,
+  Update: (fld: MetaDataField) => void,
   TableOptions: Array<SelectableValue<string>>,
   Datasource: DataSource
 }
 
 const MetaDataFieldSelector = (props: MetaDataFieldSelectorProps) => {
-  const [fields, setFields] = React.useState<IMetaDataField[]>([])
-  const fieldOptions: Array<SelectableValue<string>> = React.useMemo(() => fields.map((f) => ({ value: f.FieldName, label: f.FieldName})),[fields]);
+  const [fields, setFields] = React.useState<MetaDataField[]>([])
+  const fieldOptions: Array<SelectableValue<string>> = React.useMemo(() => fields.map((f) => ({ value: f.FieldName, label: f.FieldName })), [fields]);
 
   React.useEffect(() => {
     setFields([]);
@@ -70,7 +70,7 @@ const MetaDataFieldSelector = (props: MetaDataFieldSelectorProps) => {
     getBackendSrv().post(props.Datasource.url + "/GetValueTypeTableFields", {
       dataTypeIndex: props.Datasource.valueTypeIndex,
       expression: props.Field.Table
-    }).then((d: FieldDescription[]) => setFields(d?.map((fld) => ({  FieldName: fld.name, Table: props.Field.Table, Type: fld.type })) ?? []))
+    }).then((d: FieldDescription[]) => setFields(d?.map((fld) => ({ FieldName: fld.name, Table: props.Field.Table, Type: fld.type })) ?? []))
   }, [props.Field.Table, props.Datasource.url, props.Datasource.valueTypeIndex])
 
   const updateTable = (val: SelectableValue<string>) => {
@@ -79,7 +79,6 @@ const MetaDataFieldSelector = (props: MetaDataFieldSelectorProps) => {
 
   const updateField = (val: SelectableValue<string>) => {
     const fld = fields.find(d => d.FieldName === val.value)
-    console.log(fld)
     if (fld === undefined) {
       return;
     }

@@ -8,7 +8,7 @@ export interface QueryBase extends DataQuery {
 }
 
 export interface MyQuery extends QueryBase {
-  metadataOptions: IMetaDataField[];
+  metadataOptions: MetaDataField[];
   transpose: boolean,
   commandLevel?: CommandLevelFlags
 }
@@ -37,7 +37,7 @@ export interface MyDataSourceOptions extends DataSourceJsonData {
 
 /* Custom Interfaces below */
 
-export interface IMetaDataField {
+export interface MetaDataField {
   Table: string,
   FieldName: string,
   Type: string,
@@ -106,7 +106,7 @@ export interface AdHocFilter {
 }
 
 export interface MyVariableQuery {
-  fieldNames: Array<string>;
+  fieldNames: string[];
   tableName: string,
   condition: string
 }
