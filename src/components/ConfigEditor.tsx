@@ -12,33 +12,31 @@ import {
 
 import React from "react";
 import { DataSourcePluginOptionsEditorProps, DataSourceSettings, SelectableValue } from "@grafana/data";
-import { DataSourceValueType, MyDataSourceOptions } from "../types";
+import { DataSourceValueType, openHistorianDataSourceOptions } from "../types";
 import { DefaultFlags } from "../js/constants";
 import "../css/config-editor.css";
 import { getBackendSrv } from "@grafana/runtime";
 
 interface Props
-  extends DataSourcePluginOptionsEditorProps<MyDataSourceOptions> { }
+  extends DataSourcePluginOptionsEditorProps<openHistorianDataSourceOptions> { }
 
 export function ConfigEditor(props: Props) {
   const { onOptionsChange, options } = props;
   const [dataSourceTypes, setDataSourceTypes] = React.useState<DataSourceValueType[]>([])
   const dataSourceTypeOptions = React.useMemo(() => dataSourceTypes.map(s => ({ value: s.index.toString(), label: s.name })), [dataSourceTypes]);
   const url = React.useMemo(() => (options?.jsonData?.http?.url ?? ''), [options])
+  const [isInitialAssignment, setIsInitialAssignment] = React.useState(true);
 
-  // Fetch data source value types when URL changes
-  React.useEffect(() => {
+  // Fetch data source value types when exiting URL area
+  const onBlur = () => {
     if (url.length === 0) {
-      onOptionsChange({ ...options, jsonData: { ...options.jsonData, http: { ...options.jsonData.http, url: '../api/grafana' } } });
       return;
     }
-    if (url.length < 1) {
-      return;
-    }
-    getBackendSrv().post(url + "/GetValueTypes", {}).then((d: DataSourceValueType[]) => setDataSourceTypes(d))
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [url]);
+    getBackendSrv().post(url + "/GetValueTypes", {})
+      .then((d: DataSourceValueType[]) => setDataSourceTypes(d))
+      .catch((error) => console.error("Error fetching data source types:", error));
+  };
 
   React.useEffect(() => {
     if (dataSourceTypeOptions.length < 1) {
@@ -51,7 +49,12 @@ export function ConfigEditor(props: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dataSourceTypeOptions, options.jsonData])
 
-  const onHttpChange = (config: DataSourceSettings<MyDataSourceOptions>) => {
+  const onHttpChange = (config: DataSourceSettings<openHistorianDataSourceOptions>) => {
+    if (url.length === 0 && isInitialAssignment) {
+      setIsInitialAssignment(false);
+      config.url = '../api/grafana'; // Set the default URL
+    }
+
     const jsonData = {
       ...options.jsonData,
       flags: options.jsonData.flags || {},
@@ -113,7 +116,7 @@ export function ConfigEditor(props: Props) {
   };
 
   return (
-    <FieldSet>
+    <FieldSet onBlur={onBlur}>
       <DataSourceHttpSettings
         defaultUrl={'../api/grafana'}
         dataSourceConfig={options.jsonData.http ? options.jsonData.http : options}

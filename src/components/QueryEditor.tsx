@@ -2,7 +2,7 @@ import React from 'react';
 import { InlineFieldRow, InlineField, Select, InlineSwitch, FieldSet, IconButton } from '@grafana/ui';
 import { SelectableValue, QueryEditorProps } from '@grafana/data';
 import { DataSource } from '../datasource';
-import { MyDataSourceOptions, MyQuery, QueryBase, QueryTypes } from '../types';
+import { openHistorianDataSourceOptions, openHistorianQuery, QueryBase, QueryTypes } from '../types';
 import { QuerySelectOptions } from '../js/constants'
 import "../css/query-editor.css";
 import { QueryEditorWizard } from './ElementQueryEditor';
@@ -10,7 +10,7 @@ import { MetaDataSelector } from './MetaDataFieldSelector';
 import { TextQuery } from './TextQueryEditor';
 import { CommandLevelSelector } from './CommandLevelSelection';
 
-type Props = QueryEditorProps<DataSource, MyQuery, MyDataSourceOptions>;
+type Props = QueryEditorProps<DataSource, openHistorianQuery, openHistorianDataSourceOptions>;
 
 export function QueryEditor({ query, onChange, datasource, onRunQuery }: Props) {
 
@@ -20,19 +20,19 @@ export function QueryEditor({ query, onChange, datasource, onRunQuery }: Props) 
     const newMode = ((selected.value ?? 'Elements') as QueryTypes);
     const oldMode = ((query?.queryType ?? 'Elements') as QueryTypes);
 
-    if (oldMode === 'Elements' && newMode === 'Text') {
+    if (oldMode === 'Elements' && newMode === 'Text' && (query.queryText === undefined || query.queryText.length === 0)) {
       onChange({ ...query, queryText: datasource.targetToString(query as QueryBase), queryType: newMode })
       return;
     }
     onChange({ ...query, queryType: newMode })
   }
 
-  const elementsOnChange = (p: MyQuery) => {
+  const elementsOnChange = (p: openHistorianQuery) => {
     onChange(p);
     onRunQuery();
   }
 
-  const textOnChange = (p: MyQuery) => {
+  const textOnChange = (p: openHistorianQuery) => {
     onChange(p);
   }
 
@@ -52,14 +52,12 @@ export function QueryEditor({ query, onChange, datasource, onRunQuery }: Props) 
                   <InlineField label="Data Selection Mode" labelWidth={24}>
                     <Select options={QuerySelectOptions} value={selectedMode} onChange={modeChange} allowCustomValue={false} />
                   </InlineField>
-                  {selectedMode === 'Elements'? <IconButton name={'question-circle'} size='xl' iconType='default' variant='secondary' style={{ marginTop: 4, marginRight: 0 }}
-                   tooltip={<div> 
-                    <p> The current Text Query is:</p>
-                    <p> <em>{datasource.targetToString(query as QueryBase)}</em> </p>
-                  </div>}/> : null}
-                </InlineFieldRow>
-                <InlineFieldRow>
-                  <InlineField label="Transpose Query Results" labelWidth={24}>
+                  {selectedMode === 'Elements' ? <IconButton name={'question-circle'} size='lg' iconType='default' variant='secondary' style={{ marginTop: 4, marginRight: 0 }}
+                    tooltip={<div>
+                      <p style={{ marginBottom: 8 }}>Current Query Expression:</p>
+                      <p><em>{datasource.targetToString(query as QueryBase)}</em></p>
+                    </div>} /> : null}
+                  <InlineField label="Transpose Query Results" labelWidth={24} style={{ marginLeft: 16 }}>
                     <InlineSwitch value={query.transpose ?? false}
                       onChange={(v) => elementsOnChange({ ...query, transpose: !(query.transpose ?? false) })}
                       showLabel={true}

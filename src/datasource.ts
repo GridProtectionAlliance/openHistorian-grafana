@@ -7,9 +7,9 @@ import {
   MutableDataFrame,
   FieldType,
 } from "@grafana/data";
-import { 
-  MyQuery,
-  MyDataSourceOptions,
+import {
+  openHistorianQuery,
+  openHistorianDataSourceOptions,
   QueryRequest,
   Target,
   FunctionQuery,
@@ -18,14 +18,14 @@ import {
   QueryBase,
   MetaDataSelection,
   QueryResponse
- } from "./types";
+} from "./types";
 import { getBackendSrv, getTemplateSrv } from "@grafana/runtime";
 import _ from "lodash";
 import { DefaultFlags } from "./js/constants";
 import { AnnotationEditor } from "./components/AnnotationEditor";
 
 
-export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
+export class DataSource extends DataSourceApi<openHistorianQuery, openHistorianDataSourceOptions> {
   url: string;
   flags: {
     [key: string]: boolean;
@@ -36,7 +36,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
   metadataTableName: string;
 
   constructor(
-    instanceSettings: DataSourceInstanceSettings<MyDataSourceOptions>
+    instanceSettings: DataSourceInstanceSettings<openHistorianDataSourceOptions>
   ) {
     super(instanceSettings);
 
@@ -131,7 +131,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
     return parts.filter(s => s.length > 0).join(";");
   }
 
-  buildQueryParameters(options: DataQueryRequest<MyQuery>): QueryRequest {
+  buildQueryParameters(options: DataQueryRequest<openHistorianQuery>): QueryRequest {
     const excludedFlags = this.calculateFlags();
     const excludeNormalFlags = this.flags["Normal"] ?? false;
 
@@ -187,11 +187,11 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
     };
   }
 
-  async query(options: DataQueryRequest<MyQuery>): Promise<DataQueryResponse> {
+  async query(options: DataQueryRequest<openHistorianQuery>): Promise<DataQueryResponse> {
     const target = options.targets[0];
 
     const metaDataTypes = options.targets.map(i => i.metadataOptions).flat();
-    
+
     const hasDataQuery = options.targets.some(t => t.queryType !== 'Annotations');
     const hasAnnotationQuery = options.targets.some(t => t.queryType === 'Annotations');;
 
@@ -245,8 +245,8 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
             fields: metaData.concat(tags).map((s, i) => ({
               name: s,
               type: (i < metaData.length ? this.metaDataDataType(metaDataTypes.find(m => m.FieldName === metaData[i] || `${m.Table}.${m.FieldName}` === metaData[i])?.Type ?? "")
-               : (i < (metaData.length + tags.length - 1)
-               ? FieldType.number : FieldType.time))
+                : (i < (metaData.length + tags.length - 1)
+                  ? FieldType.number : FieldType.time))
             })),
           });
 
@@ -351,7 +351,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
     return FieldType.other;
 
   }
-  async queryAnnotations(options: DataQueryRequest<MyQuery>): Promise<MutableDataFrame<any>> {
+  async queryAnnotations(options: DataQueryRequest<openHistorianQuery>): Promise<MutableDataFrame<any>> {
 
     const queyText = options.targets
       .map((t) => getTemplateSrv().replace(t.queryText, options.scopedVars))
