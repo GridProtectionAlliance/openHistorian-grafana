@@ -52,7 +52,7 @@ export const QueryEditorWizard = (props: Props) => {
     }
     u.parsedQuery.Elements = e;
     if (filter) {
-      u.parsedQuery.Filters.push({ Table: '', Condition: '', Number: 10, NumberMode: 'TOP' });
+      u.parsedQuery.Filters.push({ Table: props.datasource.metadataTableName, Condition: '', Number: 10, NumberMode: 'TOP' });
       setFilters(u.parsedQuery.Filters);
     }
     props.onChange(u);
@@ -148,24 +148,24 @@ export const ElementQuery = (props: ElementQueryProps) => {
   };
 
 
-  return  <InlineFieldRow>
-  <InlineField label="Query" labelWidth={'auto'}>
-    <AsyncMultiSelect
-      loadOptions={loadOptions}
-      defaultOptions={true}
-      value={selectedOptions}
-      onChange={onElementsChange}
-      isSearchable
-    />
-  </InlineField>
-  <Button size={'sm'} variant = 'secondary' fill='solid' icon='plus-circle' style={{ marginTop: 4, marginLeft: 5 }}
-   onClick={() => props.update(selectedOptions.map(d => d.value), undefined, true )}>
-     Filter 
-  </Button>
-  <Button size={'sm'} variant = 'secondary' fill='solid' icon='plus-circle' style={{ marginTop: 4, marginLeft: 5 }} 
-  onClick={() => props.update(selectedOptions.map(d => d.value),  props.availableFunctions.find(() => true)?.name, false )}>
-     Function 
-  </Button>
+  return <InlineFieldRow>
+    <InlineField label="Query" labelWidth={'auto'}>
+      <AsyncMultiSelect
+        loadOptions={loadOptions}
+        defaultOptions={true}
+        value={selectedOptions}
+        onChange={onElementsChange}
+        isSearchable
+      />
+    </InlineField>
+    <Button size={'sm'} variant='secondary' fill='solid' icon='plus-circle' style={{ marginTop: 4, marginLeft: 5 }}
+      onClick={() => props.update(selectedOptions.map(d => d.value), undefined, true)}>
+      Filter
+    </Button>
+    <Button size={'sm'} variant='secondary' fill='solid' icon='plus-circle' style={{ marginTop: 4, marginLeft: 5 }}
+      onClick={() => props.update(selectedOptions.map(d => d.value), props.availableFunctions.find(() => true)?.name, false)}>
+      Function
+    </Button>
   </InlineFieldRow>
 
 }
@@ -351,7 +351,7 @@ const ParameterUI = (props: ParameterQueryProps) => {
 
     (u.value as ParsedQuery).Elements = e;
     if (filter) {
-      (u.value as ParsedQuery)?.Filters.push({ Table: '', Condition: '', Number: 10, NumberMode: 'TOP' });
+      (u.value as ParsedQuery)?.Filters.push({ Table: props.datasource.metadataTableName, Condition: '', Number: 10, NumberMode: 'TOP' });
     }
     props.update(u);
   }
