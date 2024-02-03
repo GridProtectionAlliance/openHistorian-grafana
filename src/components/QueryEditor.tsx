@@ -20,11 +20,22 @@ export function QueryEditor({ query, onChange, datasource, onRunQuery }: Props) 
     const newMode = ((selected.value ?? 'Elements') as QueryTypes);
     const oldMode = ((query?.queryType ?? 'Elements') as QueryTypes);
 
-    if (oldMode === 'Elements' && newMode === 'Text' && (query.queryText === undefined || query.queryText.length === 0)) {
+    if (oldMode === 'Elements' && newMode === 'Text' && (queryTextMatches() || window.confirm('Text mode has existing, distinct query expression text. Do you want replace the existing text query expression with the one that was built here?'))) {
       onChange({ ...query, queryText: datasource.targetToString(query as QueryBase), queryType: newMode })
       return;
     }
     onChange({ ...query, queryType: newMode })
+  }
+
+  const queryTextMatches = (): boolean => {
+    if (query.queryText?.length === 0) {
+      return true;
+    }
+
+    const src: string = datasource.targetToString(query as QueryBase).replace(/\s+/g, '').toLowerCase();
+    const dest: string = query.queryText.replace(/\s+/g, '').toLowerCase();
+
+    return src === dest;
   }
 
   const elementsOnChange = (p: openHistorianQuery) => {

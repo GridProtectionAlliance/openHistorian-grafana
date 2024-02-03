@@ -147,7 +147,6 @@ export const ElementQuery = (props: ElementQueryProps) => {
     props.update(selectedValues.filter(i => i !== 'FILTER' && !i.startsWith('fx-')), func, hasFilter);
   };
 
-
   return <InlineFieldRow>
     <InlineField label="Query" labelWidth={'auto'}>
       <AsyncMultiSelect
@@ -167,7 +166,6 @@ export const ElementQuery = (props: ElementQueryProps) => {
       Function
     </Button>
   </InlineFieldRow>
-
 }
 
 interface FilterQueryProps {
