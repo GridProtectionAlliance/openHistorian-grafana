@@ -39,14 +39,14 @@ export const CommandLevelSelector = (props: CommandLevelSelectorProps) => {
 
   return <FieldSet>
     <InlineFieldRow>
-      <InlineField label={'Drop Empty Series'} labelWidth={24}>
+      <InlineField label={'Drop Empty Series'} labelWidth={24} tooltip={'Requests that series that return no data be removed from the the visualization targets'}>
         <InlineSwitch
           disabled={false}
           value={props.query?.DropEmpty ?? false}
           onChange={(e) => onChange(e, 'DropEmpty')}
         />
       </InlineField>
-      <InlineField label={'Include Peaks'} labelWidth={24}>
+      <InlineField label={'Include Peaks'} labelWidth={24} tooltip={'Requests that decimated data from query source include both minimum and maximum interval peaks, note that this can reduce query performance.'}>
         <InlineSwitch
           disabled={false}
           value={props.query?.IncludePeaks ?? false}
@@ -55,14 +55,14 @@ export const CommandLevelSelector = (props: CommandLevelSelectorProps) => {
       </InlineField>
     </InlineFieldRow>
     <InlineFieldRow>
-      <InlineField label={'Get Full Resolution Data'} labelWidth={24}>
+      <InlineField label={'Full Resolution Data'} labelWidth={24} tooltip={'Requests that query source return full resolution data, note that this can reduce query and/or visualization performance.'}>
         <InlineSwitch
           disabled={false}
           value={props.query?.FullResolution ?? false}
           onChange={(e) => onChange(e, 'FullResolution')}
         />
       </InlineField>
-      <InlineField label={'Distribute Radially'} labelWidth={24}>
+      <InlineField label={'Radial Geo Distribution'} labelWidth={24} tooltip={'Requests that overlapping geo-coordinates, i.e., longitude and latitude, when included as selected as metadata, be distributed radially.'}>
         <InlineSwitch
           disabled={false}
           value={props.query?.RadialDistribution ?? false}
