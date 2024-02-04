@@ -259,11 +259,12 @@ const FunctionQueryUI = (props: FunctionQueryProps) => {
     if (fx === null) {
       return
     }
+    const p = fx?.parameters.map((p) => {
+      const param: ParameterType = { type: p, value: p.type.includes("IAsyncEnumerable") ? { Elements: [], Functions: [], Filters: [] } : p.default };
+      return param;
+    }) ?? [];
     props.update({
-      Function: val.value ?? 'AbsoluteValue', Parameters: fx?.parameters.map((p) => {
-        const param: ParameterType = { type: p, value: p.type.includes("IAsyncEnumerable") ? { Elements: [], Functions: [], Filters: [] } : p.default };
-        return param;
-      }) ?? []
+      Function: val.value ?? 'AbsoluteValue', Parameters: p
     });
 
     setIsOpen(true);
@@ -341,9 +342,18 @@ const ParameterUI = (props: ParameterQueryProps) => {
       u = { type: props.param.type, value: { Elements: [], Functions: [], Filters: [] } }
     }
     if (fx !== undefined) {
+      const fxParsed = props.availableFunctions.find(f => f.name === fx)
+      if (fxParsed === null) {
+        return
+      }
+      const p = fxParsed?.parameters.map((p) => {
+        const param: ParameterType = { type: p, value: p.type.includes("IAsyncEnumerable") ? { Elements: [], Functions: [], Filters: [] } : p.default };
+        return param;
+      }) ?? [];
+
       (u.value as ParsedQuery)?.Functions.push({
         Function: fx,
-        Parameters: [],
+        Parameters: p,
       })
     }
 
