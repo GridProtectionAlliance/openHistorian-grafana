@@ -1,5 +1,5 @@
 import React from 'react';
-import { InlineFieldRow, InlineField, Select, InlineSwitch, FieldSet, IconButton } from '@grafana/ui';
+import { InlineFieldRow, InlineField, Select, InlineSwitch, FieldSet, IconButton, ConfirmModal } from '@grafana/ui';
 import { SelectableValue, QueryEditorProps } from '@grafana/data';
 import { DataSource } from '../datasource';
 import { openHistorianDataSourceOptions, openHistorianQuery, QueryBase, QueryTypes } from '../types';
@@ -15,13 +15,19 @@ type Props = QueryEditorProps<DataSource, openHistorianQuery, openHistorianDataS
 export function QueryEditor({ query, onChange, datasource, onRunQuery }: Props) {
 
   const selectedMode = React.useMemo(() => (query.queryType ?? 'Elements'), [query])
+  const [tmpText, setTmpText] = React.useState<string|undefined>(undefined);
 
   const modeChange = (selected: SelectableValue<string>) => {
     const newMode = ((selected.value ?? 'Elements') as QueryTypes);
     const oldMode = ((query?.queryType ?? 'Elements') as QueryTypes);
 
-    if (oldMode === 'Elements' && newMode === 'Text' && (queryTextMatches() || window.confirm('Text mode has existing, distinct query expression text. Do you want replace the existing text query expression with the one that was built here?'))) {
-      onChange({ ...query, queryText: generateTextQuery(query), queryType: newMode })
+    if (oldMode === 'Elements' && newMode === 'Text') {
+      if (queryTextMatches()) {
+        onChange({ ...query, queryText: generateTextQuery(query), queryType: newMode })
+      }
+      else {
+        setTmpText(generateTextQuery(query));
+      }      
       return;
     }
     onChange({ ...query, queryType: newMode })
@@ -120,6 +126,22 @@ export function QueryEditor({ query, onChange, datasource, onRunQuery }: Props) 
           onChange={(q) => elementsOnChange({ ...query, queryText: q.queryText, parsedQuery: q.parsedQuery })} query={query}
           datasource={datasource} /> : null}
       </FieldSet>
+      
+    <ConfirmModal
+      isOpen={tmpText !== undefined}
+      title="Replace Existing Text Query"
+      body="Text mode has existing, distinct query expression text. Do you want replace the existing text query expression with the one that was built here?'"
+      confirmText="Confirm"
+      icon="exclamation-triangle"
+      onConfirm={() => { 
+        onChange({ ...query, queryText: tmpText ?? '', queryType: 'Text' });
+        setTmpText(undefined);
+       }}
+      onDismiss={() => {
+        setTmpText(undefined);
+        onChange({ ...query, queryType: 'Text' });
+      }}
+    />
     </FieldSet >
   );
 }
