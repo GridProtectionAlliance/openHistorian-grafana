@@ -21,21 +21,42 @@ export function QueryEditor({ query, onChange, datasource, onRunQuery }: Props) 
     const oldMode = ((query?.queryType ?? 'Elements') as QueryTypes);
 
     if (oldMode === 'Elements' && newMode === 'Text' && (queryTextMatches() || window.confirm('Text mode has existing, distinct query expression text. Do you want replace the existing text query expression with the one that was built here?'))) {
-      onChange({ ...query, queryText: datasource.targetToString(query as QueryBase), queryType: newMode })
+      onChange({ ...query, queryText: generateTextQuery(query), queryType: newMode })
       return;
     }
     onChange({ ...query, queryType: newMode })
   }
 
   const queryTextMatches = (): boolean => {
-    if (query.queryText?.length === 0) {
+    if ((query.queryText?.length ?? 0) === 0) {
       return true;
     }
 
-    const src: string = datasource.targetToString(query as QueryBase).replace(/\s+/g, '').toLowerCase();
+    const src: string = generateTextQuery(query).replace(/\s+/g, '').toLowerCase();
     const dest: string = query.queryText.replace(/\s+/g, '').toLowerCase();
 
     return src === dest;
+  }
+
+  const generateTextQuery = (q: openHistorianQuery) => {
+    let text = datasource.targetToString(q as QueryBase);
+
+    if (q.commandLevel?.DropEmpty ?? false) {
+      text = `${text}; dropEmptySeries`;
+    }
+
+    if (q.commandLevel?.IncludePeaks ?? false) {
+      text = `${text}; includePeaks`;
+    }
+
+    if (q.commandLevel?.FullResolution ?? false) {
+      text = `${text}; fullResolutionQuery`;
+    }
+
+    if (q.commandLevel?.RadialDistribution ?? false) {
+      text = `${text}; radialDistribution={radius=${(q.commandLevel?.Radius ?? 1.5)}; zoom=${(q.commandLevel?.Zoom ?? 2)}}`;
+    }
+    return text;
   }
 
   const elementsOnChange = (p: openHistorianQuery) => {
@@ -66,7 +87,7 @@ export function QueryEditor({ query, onChange, datasource, onRunQuery }: Props) 
                   {selectedMode === 'Elements' ? <IconButton name={'question-circle'} size='lg' iconType='default' variant='secondary' style={{ marginTop: 4, marginRight: 0 }}
                     tooltip={<div>
                       <p style={{ marginBottom: 8 }}>Current Query Expression:</p>
-                      <p><em>{datasource.targetToString(query as QueryBase)}</em></p>
+                      <p><em>{generateTextQuery(query)}</em></p>
                     </div>} /> : null}
                   <InlineField label="Transpose Query Results" labelWidth={24} style={{ marginLeft: 16 }}>
                     <InlineSwitch value={query.transpose ?? false}
