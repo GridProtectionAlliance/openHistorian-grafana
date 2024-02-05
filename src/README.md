@@ -5,6 +5,7 @@ This Grafana [data source](https://grafana.com/grafana/plugins/data-source-plugi
 ## What's New
 
 - **Simplified Query Building**: We’ve merged the `Element List Builder` and `Filter Expression Query Builder` into one intuitive interface, accessible via `Query Wizard`. The Query Wizard Mode provides a guided experience for creating queries with signal search or filter expression building, function picker with detailed parameter breakouts, and helpful toggles for including peaks, dropping empty series, and more.
+- **Metadata Selections**: Metadata can now be combined with queried data to support custom panels, like the [Geomap](https://grafana.com/docs/grafana/latest/panels-visualizations/visualizations/geomap/) plug-in.
 - **Multiple Data Source Value Types**: Multiple data source value types are now supported. In addition to the standard `DataSourceValue` type which consists of a `Value` and a `Times`, custom types, like a `PhasorValue` type, which consists of a tuple of `Magnitude` and `Angle` values and a `Time`, are now available.
 - **Custom User Functions**: The backend Grafana adapters of the openHistorian now supports user-defined custom functions.
 - **Fully Async Interfaces**: All operations, including data queries and function processing, are all processed asynchronously. 
@@ -54,6 +55,12 @@ See [GSF Grafana Functions](https://github.com/GridProtectionAlliance/gsf/blob/m
 ### Function Selection from the Query Wizard
 
 ![Function Wizard](img/FunctionWizard.png)
+
+## Metadata Selections
+
+Query results can easily now be combined with metadata. For example, selecting `Longitude` and `Latitude` metadata will provide geo-coordinates for maps:
+
+![Metadata](img/Metadata.png)
 
 ## Alarm Annotations
 
