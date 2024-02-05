@@ -108,6 +108,6 @@ As part of a data source configuration, selection of the data source value type 
 
 ## Installation
 
-Deploying the openHistorian Grafana data source is simple, with support for auto-launch and user security synchronization in openHistorian 2.4 and beyond. For standalone Grafana instances, installation via the Grafana CLI tool or direct repository cloning is a breeze.
+Deploying the openHistorian Grafana data source is simple, with support for auto-launch and user security synchronization in openHistorian 2.4 and beyond. For standalone Grafana instances, installation via the Grafana CLI tool or direct repository cloning is available.
 
-For detailed installation steps, visit our [official installation guide](https://grafana.com/grafana/plugins/gridprotectionalliance-openhistorian-datasource/?tab=installation).
+For detailed installation steps, visit the [official installation guide](https://grafana.com/grafana/plugins/gridprotectionalliance-openhistorian-datasource/?tab=installation).
