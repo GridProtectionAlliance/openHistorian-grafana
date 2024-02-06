@@ -6,7 +6,7 @@
 	"metrics": true,
 	"annotations": true,
 	"info": {
-		"description": "Data source plugin to transfer information from open historian to grafana in order to be displayed",
+		"description": "Datasource plugin for openHistorian",
 		"author": {
 			"name": "Grid Protection Alliance",
 			"url": "https://www.gridprotectionalliance.org"
