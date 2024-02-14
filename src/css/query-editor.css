@@ -1,0 +1,19 @@
+.dark-box {
+    background-color: rgba(17, 18, 23);
+    padding: 6px;
+    border-radius: 2px;
+    border: 1px solid darkgray;
+    display: flex;
+    align-items: center;
+}
+  
+.dark-box span {
+    margin: 0;
+    padding: 2px; 
+}
+
+.auto-width {
+    width: auto;
+}
+  
+  
