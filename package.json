@@ -66,5 +66,5 @@
     "react-modal": "^3.16.1",
     "tslib": "2.5.0"
   },
-  "packageManager": "pnpm@8.19.2"
+  "packageManager": "pnpm@8.15.3"
 }
