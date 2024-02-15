@@ -1,4 +1,3 @@
-{{!-- /* 🚨 The `${{ }}` Github workflow expressions need to be escaped so they are not being interpreted by Handlebars. (this comment is going to be removed after scaffolding) 🚨 */ --}}
 name: CI
 
 on:
@@ -15,31 +14,29 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      GRAFANA_ACCESS_POLICY_TOKEN: $\{{ secrets.GRAFANA_ACCESS_POLICY_TOKEN }}
+      GRAFANA_ACCESS_POLICY_TOKEN: ${{ secrets.GRAFANA_ACCESS_POLICY_TOKEN }}
     steps:
       - uses: actions/checkout@v4
-{{#if_eq packageManagerName "pnpm"}}
       # pnpm action uses the packageManager field in package.json to
       # understand which version to install.
       - uses: pnpm/action-setup@v2
-{{/if_eq}}
       - name: Setup Node.js environment
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: '{{ packageManagerName }}'
+          cache: 'npm@8.19.2'
 
       - name: Install dependencies
-        run: {{ packageManagerInstallCmd }}
+        run: npm install
 
       - name: Check types
-        run: {{ packageManagerName }} run typecheck
+        run: npm@8.19.2 run typecheck
       - name: Lint
-        run: {{ packageManagerName }} run lint
+        run: npm@8.19.2 run lint
       - name: Unit tests
-        run: {{ packageManagerName }} run test:ci
+        run: npm@8.19.2 run test:ci
       - name: Build frontend
-        run: {{ packageManagerName }} run build
+        run: npm@8.19.2 run build
 
       - name: Check for backend
         id: check-for-backend
@@ -83,7 +80,7 @@ jobs:
 
       - name: Run e2e tests
         if: steps.check-for-e2e.outputs.has-e2e == 'true'
-        run: {{ packageManagerName }} run e2e
+        run: npm@8.19.2 run e2e
 
       - name: Stop grafana docker
         if: steps.check-for-e2e.outputs.has-e2e == 'true'
@@ -98,8 +95,8 @@ jobs:
           retention-days: 5
 
       - name: Sign plugin
-        run: {{ packageManagerName }} run sign
-        if: $\{{ env.GRAFANA_ACCESS_POLICY_TOKEN != '' }}
+        run: npm@8.19.2 run sign
+        if: ${{ env.GRAFANA_ACCESS_POLICY_TOKEN != '' }}
 
       - name: Get plugin metadata
         id: metadata
@@ -117,12 +114,12 @@ jobs:
       - name: Package plugin
         id: package-plugin
         run: |
-          mv dist $\{{ steps.metadata.outputs.plugin-id }}
-          zip $\{{ steps.metadata.outputs.archive }} $\{{ steps.metadata.outputs.plugin-id }} -r
+          mv dist ${{ steps.metadata.outputs.plugin-id }}
+          zip ${{ steps.metadata.outputs.archive }} ${{ steps.metadata.outputs.plugin-id }} -r
 
       - name: Archive Build
         uses: actions/upload-artifact@v4
         with:
-          name: $\{{ steps.metadata.outputs.plugin-id }}-$\{{ steps.metadata.outputs.plugin-version }}
-          path: $\{{ steps.metadata.outputs.plugin-id }}
+          name: ${{ steps.metadata.outputs.plugin-id }}-${{ steps.metadata.outputs.plugin-version }}
+          path: ${{ steps.metadata.outputs.plugin-id }}
           retention-days: 5
