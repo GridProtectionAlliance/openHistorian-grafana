@@ -28,7 +28,7 @@ export function VariableQueryEditor(props: VariableQueryProps) {
 
   React.useEffect(() => {
     getBackendSrv().post(props.datasource.url + "/GetValueTypeTables", {
-      dataTypeIndex: -1 /* no restriction */,
+      dataTypeIndex: props.datasource.valueTypeIndex /* restriction to this datasource */,
       expression: ""
     })
       .then((d: string[]) => { setTableOptions(d.map(t => ({ value: t, label: t }))); })
@@ -40,7 +40,7 @@ export function VariableQueryEditor(props: VariableQueryProps) {
     }
 
     getBackendSrv().post(props.datasource.url + "/GetValueTypeTableFields", {
-      dataTypeIndex: -1 /* no restriction */,
+      dataTypeIndex: props.datasource.valueTypeIndex /* no restriction */,
       expression: query.tableName
     })
       .then((d: FieldDescription[]) => { setFieldOptions(d.map(t => ({ value: t.name, label: t.name }))); })
