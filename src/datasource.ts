@@ -208,13 +208,9 @@ export class DataSource extends DataSourceApi<openHistorianQuery, openHistorianD
 
       const tags = this.timeSeriesDefinitions;
 
-      const transposeFrame = new MutableDataFrame({
-        refId: target.refId,
-        fields: tags.map((s, i) => ({
-          name: s,
-          type: (i < (tags.length - 1) ? FieldType.number : FieldType.time)
-        })),
-      });
+      const transposeFrames = new Map<string,(MutableDataFrame<any>|undefined)>();
+
+   
 
       // Add metadata fields
       const frames = pointsData.map((d) => {
@@ -227,15 +223,26 @@ export class DataSource extends DataSourceApi<openHistorianQuery, openHistorianD
 
         if (options.targets.find(item => item.refId === d.refID)?.transpose ?? false) {
           const row: { [k: string]: any } = {};
+
+          if (!transposeFrames.has(d.refID)) {
+            transposeFrames.set(d.refID, new MutableDataFrame({
+              refId: d.refID,
+              fields: tags.map((s, i) => ({
+                name: s,
+                type: (i < (tags.length - 1) ? FieldType.number : FieldType.time)
+              })),
+            }))
+          }
+
           tags.forEach((t, i) => { row[t] = d.datapoints[0][i] });
           metaData.forEach((m) => {
-            if (!transposeFrame.fields.map(f => f.name).includes(m)) {
-              transposeFrame.addField({ name: m, type: FieldType.other })
+            if (!transposeFrames.get(d.refID)!.fields.map(f => f.name).includes(m)) {
+              transposeFrames.get(d.refID)!.addField({ name: m, type: FieldType.other })
             }
             row[m] = d.metadata[m];
           })
 
-          transposeFrame.add(row);
+          transposeFrames.get(d.refID)!.add(row);
           return undefined;
         }
         else {
@@ -263,11 +270,7 @@ export class DataSource extends DataSourceApi<openHistorianQuery, openHistorianD
           return frame;
         }
       })
-
-      if (options.targets.some(t => t.transpose)) {
-        frames.push(transposeFrame);
-      }
-      data = frames.filter(f => f !== undefined);
+        data = frames.concat([...transposeFrames.values()]).filter(f => f !== undefined);
     }
     if (hasAnnotationQuery) {
       data.push(await this.queryAnnotations(options))
