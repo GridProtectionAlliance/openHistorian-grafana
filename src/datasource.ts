@@ -235,7 +235,12 @@ export class DataSource extends DataSourceApi<openHistorianQuery, openHistorianD
             }))
           }
 
-          tags.forEach((t, i) => { row[t] = d.datapoints[0][i] });
+          if (d.datapoints.length > 0) {
+            tags.forEach((t, i) => { row[t] = d.datapoints[0][i] });
+          }
+          else {
+            tags.forEach((t, i) => { row[t] = NaN });
+          }
           metaData.forEach((m) => {
             if (!transposeFrames.get(d.refID)!.fields.map(f => f.name).includes(m)) {
               transposeFrames.get(d.refID)!.addField({ name: m, type: FieldType.other })
