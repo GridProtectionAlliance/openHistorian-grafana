@@ -227,6 +227,7 @@ export class DataSource extends DataSourceApi<openHistorianQuery, openHistorianD
           if (!transposeFrames.has(d.refID)) {
             transposeFrames.set(d.refID, new MutableDataFrame({
               refId: d.refID,
+              name: d.refID,
               fields: tags.map((s, i) => ({
                 name: s,
                 type: (i < (tags.length - 1) ? FieldType.number : FieldType.time)
