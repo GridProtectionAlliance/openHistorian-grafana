@@ -27,6 +27,16 @@ export function ConfigEditor(props: Props) {
   const url = React.useMemo(() => (options?.jsonData?.http?.url ?? ''), [options])
   const [isInitialAssignment, setIsInitialAssignment] = React.useState(true);
 
+  React.useEffect(() => {
+    if (url.length === 0) {
+      return;
+    }
+
+    getBackendSrv().post(url + "/GetValueTypes", {})
+      .then((d: DataSourceValueType[]) => setDataSourceTypes(d))
+      .catch((error) => console.error("Error fetching data source types:", error));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
   // Fetch data source value types when exiting URL area
   const onBlur = () => {
     if (url.length === 0) {

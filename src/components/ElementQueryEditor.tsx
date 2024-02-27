@@ -251,7 +251,7 @@ interface FunctionQueryProps {
 
 const FunctionQueryUI = (props: FunctionQueryProps) => {
   const [isOpen, setIsOpen] = React.useState<boolean>(true);
-  const fxDescription = React.useMemo(() => props.availableFunctions.find(f => f.name === props.func.Function), [props.func, props.availableFunctions]);
+  const fxDescription = React.useMemo(() => (props.availableFunctions.find(f => f.name === props.func.Function) ?? props.availableFunctions[0]), [props.func, props.availableFunctions]);
   const fxOptions = React.useMemo(() => props.availableFunctions.map((f) => ({ value: f.name, label: f.name })), [props.availableFunctions])
 
   function onFunctionChange(val: SelectableValue<string>) {

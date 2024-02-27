@@ -7,6 +7,7 @@ import { CommandLevelFlags } from '../types';
 interface CommandLevelSelectorProps { onChange: (value: CommandLevelFlags) => void, query?: CommandLevelFlags }
 
 export const CommandLevelSelector = (props: CommandLevelSelectorProps) => {
+  
 
   const getInitialUpdatedValue = (query: CommandLevelFlags | undefined): CommandLevelFlags => {
     return query ?? {
@@ -27,13 +28,13 @@ export const CommandLevelSelector = (props: CommandLevelSelectorProps) => {
 
   function onRadiusChange(val: any) {
     let updated: CommandLevelFlags = getInitialUpdatedValue(props.query);
-    updated.Radius = parseFloat(val.toString());
+    updated.Radius = parseFloat(val.target.value.toString());
     props.onChange(updated);
   }
 
   function onZoomChange(val: any) {
     let updated: CommandLevelFlags = getInitialUpdatedValue(props.query);
-    updated.Zoom = parseFloat(val.toString());
+    updated.Zoom = parseFloat(val.target.value.toString());
     props.onChange(updated);
   }
 
