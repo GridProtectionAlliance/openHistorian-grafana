@@ -28,11 +28,11 @@ export function VariableQueryEditor(props: VariableQueryProps) {
 
   React.useEffect(() => {
     getBackendSrv().post(props.datasource.url + "/GetValueTypeTables", {
-      dataTypeIndex: props.datasource.valueTypeIndex /* restriction to this datasource */,
+      dataTypeIndex: -1 /* restriction to this datasource */,
       expression: ""
     })
       .then((d: string[]) => { setTableOptions(d.map(t => ({ value: t, label: t }))); })
-  }, [props.datasource.url, props.datasource.valueTypeIndex, query.tableName])
+  }, [props.datasource.url, query.tableName])
 
   React.useEffect(() => {
     if (!query.tableName) {
@@ -40,11 +40,11 @@ export function VariableQueryEditor(props: VariableQueryProps) {
     }
 
     getBackendSrv().post(props.datasource.url + "/GetValueTypeTableFields", {
-      dataTypeIndex: props.datasource.valueTypeIndex /* no restriction */,
+      dataTypeIndex: -1/* no restriction */,
       expression: query.tableName
     })
       .then((d: FieldDescription[]) => { setFieldOptions(d.map(t => ({ value: t.name, label: t.name }))); })
-  }, [props.datasource.url, props.datasource.valueTypeIndex, query.tableName])
+  }, [props.datasource.url, query.tableName])
 
   function onTableChange(t: SelectableValue<string>) {
     let newFieldNames = props.query.fieldNames;
