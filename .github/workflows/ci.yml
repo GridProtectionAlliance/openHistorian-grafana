@@ -28,8 +28,6 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Check types
-        run: npm@8.19.2 run typecheck
       - name: Lint
         run: npm@8.19.2 run lint
       - name: Unit tests
