@@ -29,11 +29,11 @@ jobs:
         run: npm install
 
       - name: Lint
-        run: npm@8.19.2 run lint
+        run: npm run lint
       - name: Unit tests
-        run: npm@8.19.2 run test:ci
+        run: npmrun test:ci
       - name: Build frontend
-        run: npm@8.19.2 run build
+        run: npm run build
 
       - name: Check for backend
         id: check-for-backend
@@ -92,7 +92,7 @@ jobs:
           retention-days: 5
 
       - name: Sign plugin
-        run: npm@8.19.2 run sign
+        run: npm run sign
         if: ${{ env.GRAFANA_ACCESS_POLICY_TOKEN != '' }}
 
       - name: Get plugin metadata
