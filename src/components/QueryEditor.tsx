@@ -2,7 +2,7 @@ import React from 'react';
 import { InlineFieldRow, InlineField, Select, InlineSwitch, FieldSet, IconButton, ConfirmModal } from '@grafana/ui';
 import { SelectableValue, QueryEditorProps } from '@grafana/data';
 import { DataSource } from '../datasource';
-import { openHistorianDataSourceOptions, openHistorianQuery, QueryBase, QueryTypes } from '../types';
+import { OpenHistorianDataSourceOptions, OpenHistorianQuery, QueryBase, QueryTypes } from '../types';
 import { QuerySelectOptions } from '../js/constants'
 import "../css/query-editor.css";
 import { QueryEditorWizard } from './ElementQueryEditor';
@@ -10,7 +10,7 @@ import { MetaDataSelector } from './MetaDataFieldSelector';
 import { TextQuery } from './TextQueryEditor';
 import { CommandLevelSelector } from './CommandLevelSelection';
 
-type Props = QueryEditorProps<DataSource, openHistorianQuery, openHistorianDataSourceOptions>;
+type Props = QueryEditorProps<DataSource, OpenHistorianQuery, OpenHistorianDataSourceOptions>;
 
 export function QueryEditor({ query, onChange, datasource, onRunQuery }: Props) {
 
@@ -44,7 +44,7 @@ export function QueryEditor({ query, onChange, datasource, onRunQuery }: Props) 
     return src === dest;
   }
 
-  const generateTextQuery = (q: openHistorianQuery) => {
+  const generateTextQuery = (q: OpenHistorianQuery) => {
     let text = datasource.targetToString(q as QueryBase);
 
     if (q.commandLevel?.DropEmpty ?? false) {
@@ -65,12 +65,12 @@ export function QueryEditor({ query, onChange, datasource, onRunQuery }: Props) 
     return text;
   }
 
-  const elementsOnChange = (p: openHistorianQuery) => {
+  const elementsOnChange = (p: OpenHistorianQuery) => {
     onChange(p);
     onRunQuery();
   }
 
-  const textOnChange = (p: openHistorianQuery) => {
+  const textOnChange = (p: OpenHistorianQuery) => {
     onChange(p);
   }
 

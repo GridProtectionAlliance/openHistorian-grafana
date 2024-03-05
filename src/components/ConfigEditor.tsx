@@ -9,16 +9,15 @@ import {
   Card,
   TagList,
 } from "@grafana/ui";
-
 import React from "react";
 import { DataSourcePluginOptionsEditorProps, DataSourceSettings, SelectableValue } from "@grafana/data";
-import { DataSourceValueType, openHistorianDataSourceOptions } from "../types";
+import { DataSourceValueType, OpenHistorianDataSourceOptions } from "../types";
 import { DefaultFlags } from "../js/constants";
 import "../css/config-editor.css";
 import { getBackendSrv } from "@grafana/runtime";
 
 interface Props
-  extends DataSourcePluginOptionsEditorProps<openHistorianDataSourceOptions> { }
+  extends DataSourcePluginOptionsEditorProps<OpenHistorianDataSourceOptions> { }
 
 export function ConfigEditor(props: Props) {
   const { onOptionsChange, options } = props;
@@ -59,7 +58,7 @@ export function ConfigEditor(props: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dataSourceTypeOptions, options.jsonData])
 
-  const onHttpChange = (config: DataSourceSettings<openHistorianDataSourceOptions>) => {
+  const onHttpChange = (config: DataSourceSettings<OpenHistorianDataSourceOptions>) => {
     if (url.length === 0 && isInitialAssignment) {
       setIsInitialAssignment(false);
       config.url = '../api/grafana'; // Set the default URL
