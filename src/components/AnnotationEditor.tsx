@@ -2,10 +2,10 @@ import React from 'react';
 import { FieldSet, InlineField, TextArea } from '@grafana/ui';
 import { QueryEditorProps } from '@grafana/data';
 import { DataSource } from '../datasource';
-import { openHistorianDataSourceOptions, openHistorianQuery } from '../types';
+import { OpenHistorianDataSourceOptions, OpenHistorianQuery } from '../types';
 import "../css/query-editor.css";
 
-type Props = QueryEditorProps<DataSource, openHistorianQuery, openHistorianDataSourceOptions>;
+type Props = QueryEditorProps<DataSource, OpenHistorianQuery, OpenHistorianDataSourceOptions>;
 
 export function AnnotationEditor({ query, onChange }: Props) {
 

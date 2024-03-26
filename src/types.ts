@@ -7,7 +7,7 @@ export interface QueryBase extends DataQuery {
   parsedQuery: ParsedQuery
 }
 
-export interface openHistorianQuery extends QueryBase {
+export interface OpenHistorianQuery extends QueryBase {
   metadataOptions: MetaDataField[];
   transpose: boolean,
   commandLevel?: CommandLevelFlags
@@ -15,7 +15,7 @@ export interface openHistorianQuery extends QueryBase {
 
 export type QueryTypes = 'Elements' | 'Text' | 'Annotations';
 
-export const DEFAULT_QUERY: Partial<openHistorianQuery> = {
+export const DEFAULT_QUERY: Partial<OpenHistorianQuery> = {
   queryType: "Elements",
   queryText: "",
   metadataOptions: [{ Table: 'ActiveMeasurements', FieldName: 'PointTag', Type: 'String' }],
@@ -23,7 +23,7 @@ export const DEFAULT_QUERY: Partial<openHistorianQuery> = {
 };
 
 // Config
-export interface openHistorianDataSourceOptions extends DataSourceJsonData {
+export interface OpenHistorianDataSourceOptions extends DataSourceJsonData {
   http: DataSourceSettings<any, any>;
   flags: {
     [key: string]: boolean;
