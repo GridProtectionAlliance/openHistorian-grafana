@@ -43,7 +43,7 @@ export class DataSource extends DataSourceApi<OpenHistorianQuery, OpenHistorianD
     this.annotations = {
       QueryEditor: AnnotationEditor
     }
-    this.url = instanceSettings.jsonData.http.url || "";
+    this.url = instanceSettings.url || "";
     this.flags = instanceSettings.jsonData.flags || {};
     this.valueTypeIndex = parseInt(instanceSettings.jsonData.valueTypeIndex || "0", 10);
     this.valueTypeName = instanceSettings.jsonData.valueTypeName || "";

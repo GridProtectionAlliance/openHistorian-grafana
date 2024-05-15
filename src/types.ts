@@ -24,7 +24,6 @@ export const DEFAULT_QUERY: Partial<OpenHistorianQuery> = {
 
 // Config
 export interface OpenHistorianDataSourceOptions extends DataSourceJsonData {
-  http: DataSourceSettings<any, any>;
   flags: {
     [key: string]: boolean;
   };
