@@ -23,7 +23,7 @@ export function ConfigEditor(props: Props) {
   const { onOptionsChange, options } = props;
   const [dataSourceTypes, setDataSourceTypes] = React.useState<DataSourceValueType[]>([])
   const dataSourceTypeOptions = React.useMemo(() => dataSourceTypes.map(s => ({ value: s.index.toString(), label: s.name })), [dataSourceTypes]);
-  const url = React.useMemo(() => (options?.jsonData?.http?.url ?? ''), [options])
+  const url = React.useMemo(() => (options.url ?? ''), [options])
   const [isInitialAssignment, setIsInitialAssignment] = React.useState(true);
 
   React.useEffect(() => {
@@ -64,13 +64,7 @@ export function ConfigEditor(props: Props) {
       config.url = '../api/grafana'; // Set the default URL
     }
 
-    const jsonData = {
-      ...options.jsonData,
-      flags: options.jsonData.flags || {},
-      http: config,
-    };
-
-    onOptionsChange({ ...options, jsonData });
+    onOptionsChange(config);
   };
 
   const onFlagsChange = (event: React.FormEvent<HTMLInputElement>) => {
@@ -128,7 +122,7 @@ export function ConfigEditor(props: Props) {
     <FieldSet onBlur={onBlur}>
       <DataSourceHttpSettings
         defaultUrl={'../api/grafana'}
-        dataSourceConfig={options.jsonData.http ? options.jsonData.http : options}
+        dataSourceConfig={options}
         showAccessOptions={true}
         onChange={onHttpChange}
       />
