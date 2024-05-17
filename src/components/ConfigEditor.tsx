@@ -44,7 +44,10 @@ export function ConfigEditor(props: Props) {
 
     getBackendSrv().post(url + "/GetValueTypes", {})
       .then((d: DataSourceValueType[]) => setDataSourceTypes(d))
-      .catch((error) => console.error("Error fetching data source types:", error));
+      .catch((error) => {
+        console.error("Error fetching data source types:", error);
+        setDataSourceTypes(defaultDataSourceTypes);
+      });
   };
 
   React.useEffect(() => {
@@ -183,3 +186,18 @@ export function ConfigEditor(props: Props) {
     </FieldSet>
   );
 }
+
+const defaultDataSourceTypes: DataSourceValueType[] = [
+  {
+    name: "MeasurementValue",
+    index: 0,
+    timeSeriesDefinition: "Value, Time",
+    metadataTableName: "ActiveMeasurements"
+  },
+  {
+    name: "PhasorValue",
+    index: 1,
+    timeSeriesDefinition: "Magnitude, Angle, Time",
+    metadataTableName: "PhasorValues"
+  }
+]
