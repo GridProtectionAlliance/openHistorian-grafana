@@ -1,4 +1,5 @@
-import { DataQuery, DataSourceJsonData, DataSourceSettings } from '@grafana/data';
+import { DataSourceJsonData } from '@grafana/data';
+import { DataQuery } from "@grafana/schema";
 
 // Query
 export interface QueryBase extends DataQuery {
