@@ -8,8 +8,8 @@ import {
   FieldType,
 } from "@grafana/data";
 import {
-  openHistorianQuery,
-  openHistorianDataSourceOptions,
+  OpenHistorianQuery,
+  OpenHistorianDataSourceOptions,
   QueryRequest,
   Target,
   FunctionQuery,
@@ -25,7 +25,7 @@ import { DefaultFlags } from "./js/constants";
 import { AnnotationEditor } from "./components/AnnotationEditor";
 
 
-export class DataSource extends DataSourceApi<openHistorianQuery, openHistorianDataSourceOptions> {
+export class DataSource extends DataSourceApi<OpenHistorianQuery, OpenHistorianDataSourceOptions> {
   url: string;
   flags: {
     [key: string]: boolean;
@@ -36,14 +36,14 @@ export class DataSource extends DataSourceApi<openHistorianQuery, openHistorianD
   metadataTableName: string;
 
   constructor(
-    instanceSettings: DataSourceInstanceSettings<openHistorianDataSourceOptions>
+    instanceSettings: DataSourceInstanceSettings<OpenHistorianDataSourceOptions>
   ) {
     super(instanceSettings);
 
     this.annotations = {
       QueryEditor: AnnotationEditor
     }
-    this.url = instanceSettings.jsonData.http.url || "";
+    this.url = instanceSettings.url || "";
     this.flags = instanceSettings.jsonData.flags || {};
     this.valueTypeIndex = parseInt(instanceSettings.jsonData.valueTypeIndex || "0", 10);
     this.valueTypeName = instanceSettings.jsonData.valueTypeName || "";
@@ -131,7 +131,7 @@ export class DataSource extends DataSourceApi<openHistorianQuery, openHistorianD
     return parts.filter(s => s.length > 0).join(";");
   }
 
-  buildQueryParameters(options: DataQueryRequest<openHistorianQuery>): QueryRequest {
+  buildQueryParameters(options: DataQueryRequest<OpenHistorianQuery>): QueryRequest {
     const excludedFlags = this.calculateFlags();
     const excludeNormalFlags = this.flags["Normal"] ?? false;
 
@@ -187,7 +187,7 @@ export class DataSource extends DataSourceApi<openHistorianQuery, openHistorianD
     };
   }
 
-  async query(options: DataQueryRequest<openHistorianQuery>): Promise<DataQueryResponse> {
+  async query(options: DataQueryRequest<OpenHistorianQuery>): Promise<DataQueryResponse> {
     const target = options.targets[0];
 
     const metaDataTypes = options.targets.map(i => i.metadataOptions).flat();
@@ -360,7 +360,7 @@ export class DataSource extends DataSourceApi<openHistorianQuery, openHistorianD
     return FieldType.other;
 
   }
-  async queryAnnotations(options: DataQueryRequest<openHistorianQuery>): Promise<MutableDataFrame<any>> {
+  async queryAnnotations(options: DataQueryRequest<OpenHistorianQuery>): Promise<MutableDataFrame<any>> {
 
     const queyText = options.targets
       .map((t) => getTemplateSrv().replace(t.queryText, options.scopedVars))

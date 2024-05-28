@@ -9,22 +9,21 @@ import {
   Card,
   TagList,
 } from "@grafana/ui";
-
 import React from "react";
 import { DataSourcePluginOptionsEditorProps, DataSourceSettings, SelectableValue } from "@grafana/data";
-import { DataSourceValueType, openHistorianDataSourceOptions } from "../types";
+import { DataSourceValueType, OpenHistorianDataSourceOptions } from "../types";
 import { DefaultFlags } from "../js/constants";
 import "../css/config-editor.css";
 import { getBackendSrv } from "@grafana/runtime";
 
 interface Props
-  extends DataSourcePluginOptionsEditorProps<openHistorianDataSourceOptions> { }
+  extends DataSourcePluginOptionsEditorProps<OpenHistorianDataSourceOptions> { }
 
 export function ConfigEditor(props: Props) {
   const { onOptionsChange, options } = props;
   const [dataSourceTypes, setDataSourceTypes] = React.useState<DataSourceValueType[]>([])
   const dataSourceTypeOptions = React.useMemo(() => dataSourceTypes.map(s => ({ value: s.index.toString(), label: s.name })), [dataSourceTypes]);
-  const url = React.useMemo(() => (options?.jsonData?.http?.url ?? ''), [options])
+  const url = React.useMemo(() => (options.url ?? ''), [options])
   const [isInitialAssignment, setIsInitialAssignment] = React.useState(true);
 
   React.useEffect(() => {
@@ -45,7 +44,10 @@ export function ConfigEditor(props: Props) {
 
     getBackendSrv().post(url + "/GetValueTypes", {})
       .then((d: DataSourceValueType[]) => setDataSourceTypes(d))
-      .catch((error) => console.error("Error fetching data source types:", error));
+      .catch((error) => {
+        console.error("Error fetching data source types:", error);
+        setDataSourceTypes(defaultDataSourceTypes);
+      });
   };
 
   React.useEffect(() => {
@@ -59,19 +61,13 @@ export function ConfigEditor(props: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dataSourceTypeOptions, options.jsonData])
 
-  const onHttpChange = (config: DataSourceSettings<openHistorianDataSourceOptions>) => {
+  const onHttpChange = (config: DataSourceSettings<OpenHistorianDataSourceOptions>) => {
     if (url.length === 0 && isInitialAssignment) {
       setIsInitialAssignment(false);
       config.url = '../api/grafana'; // Set the default URL
     }
 
-    const jsonData = {
-      ...options.jsonData,
-      flags: options.jsonData.flags || {},
-      http: config,
-    };
-
-    onOptionsChange({ ...options, jsonData });
+    onOptionsChange(config);
   };
 
   const onFlagsChange = (event: React.FormEvent<HTMLInputElement>) => {
@@ -129,7 +125,7 @@ export function ConfigEditor(props: Props) {
     <FieldSet onBlur={onBlur}>
       <DataSourceHttpSettings
         defaultUrl={'../api/grafana'}
-        dataSourceConfig={options.jsonData.http ? options.jsonData.http : options}
+        dataSourceConfig={options}
         showAccessOptions={true}
         onChange={onHttpChange}
       />
@@ -190,3 +186,18 @@ export function ConfigEditor(props: Props) {
     </FieldSet>
   );
 }
+
+const defaultDataSourceTypes: DataSourceValueType[] = [
+  {
+    name: "MeasurementValue",
+    index: 0,
+    timeSeriesDefinition: "Value, Time",
+    metadataTableName: "ActiveMeasurements"
+  },
+  {
+    name: "PhasorValue",
+    index: 1,
+    timeSeriesDefinition: "Magnitude, Angle, Time",
+    metadataTableName: "PhasorValues"
+  }
+]
