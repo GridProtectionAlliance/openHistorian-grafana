@@ -1,75 +1,75 @@
-name: E2E tests
+name: CI
+
 on:
+  push:
+    branches:
+      - master
   pull_request:
-
-permissions:
-  contents: read
-  id-token: write
-
+    branches:
+      - master
 jobs:
-  resolve-versions:
-    name: Resolve Grafana images
-    runs-on: ubuntu-latest
-    timeout-minutes: 3
-    outputs:
-      matrix: ${{ steps.resolve-versions.outputs.matrix }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Resolve Grafana E2E versions
-        id: resolve-versions
-        uses: grafana/plugin-actions/e2e-version@main
-        with:
-          version-resolver-type: version-support-policy
-    
-
-  playwright-tests:
-    needs: resolve-versions
-    timeout-minutes: 60
-    strategy:
-      fail-fast: false
-      matrix:
-        GRAFANA_IMAGE: ${{fromJson(needs.resolve-versions.outputs.matrix)}}
-    name: e2e ${{ matrix.GRAFANA_IMAGE.name }}@${{ matrix.GRAFANA_IMAGE.VERSION }}
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
       - name: Setup Node.js environment
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v2.1.2
         with:
-          node-version-file: .nvmrc
+          node-version: "20.x"
 
-      - name: Install npm dependencies
-        run: npm ci
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
 
-      - name: Build frontend
-        run: npm run build
+      - name: Cache yarn cache
+        uses: actions/cache@v4
+        id: cache-yarn-cache
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
 
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
+      - name: Cache node_modules
+        id: cache-node-modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-${{ matrix.node-version }}-nodemodules-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.node-version }}-nodemodules-
 
-      - name: Start Grafana
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build and test frontend
+        run: yarn build
+
+      - name: Check for backend
+        id: check-for-backend
         run: |
-          docker-compose pull
-          GRAFANA_VERSION=${{ matrix.GRAFANA_IMAGE.VERSION }} GRAFANA_IMAGE=${{ matrix.GRAFANA_IMAGE.NAME }} docker-compose up -d
+          if [ -f "Magefile.go" ]
+          then
+            echo "::set-output name=has-backend::true"
+          fi
 
-      - name: Wait for Grafana to start
-        uses: nev7n/wait_for_response@v1
+      - name: Setup Go environment
+        if: steps.check-for-backend.outputs.has-backend == 'true'
+        uses: actions/setup-go@v4
         with:
-          url: 'http://localhost:3000/'
-          responseCode: 200
-          timeout: 60000
-          interval: 500
+          go-version: "1.20"
 
-      - name: Run Playwright tests
-        id: run-tests
-        run: npx playwright test
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        if: ${{ (always() && steps.run-tests.outcome == 'success') || (failure() && steps.run-tests.outcome == 'failure') }}
+      - name: Test backend
+        if: steps.check-for-backend.outputs.has-backend == 'true'
+        uses: magefile/mage-action@v3
         with:
-          name: playwright-report-${{ matrix.GRAFANA_IMAGE.NAME }}-v${{ matrix.GRAFANA_IMAGE.VERSION }}-${{github.run_id}}
-          path: playwright-report/
-          retention-days: 30
+          version: latest
+          args: coverage
+
+      - name: Build backend
+        if: steps.check-for-backend.outputs.has-backend == 'true'
+        uses: magefile/mage-action@v3
+        with:
+          version: latest
+          args: buildAll
