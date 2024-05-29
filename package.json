@@ -1,6 +1,6 @@
 {
-  "name": "open-historian",
-  "version": "1.0.0",
+  "name": "openhistorian",
+  "version": "2.1.0",
   "description": "Data source plugin to transfer information from open historian to grafana in order to be displayed",
   "scripts": {
     "build": "webpack -c ./.config/webpack/webpack.config.ts --env production",
