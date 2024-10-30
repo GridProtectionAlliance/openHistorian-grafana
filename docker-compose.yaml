@@ -12,3 +12,10 @@ services:
     volumes:
       - ./dist:/var/lib/grafana/plugins/gpa-openhistorian-datasource
       - ./provisioning:/etc/grafana/provisioning
+      
+  openhistorian:
+    container_name: openhistorian
+    image: gridprotectionalliance/openhistorian:v2.8.421
+    ports:
+      - 8180:8180/tcp
+ 
