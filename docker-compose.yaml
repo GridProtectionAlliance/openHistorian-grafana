@@ -15,7 +15,7 @@ services:
       
   openhistorian:
     container_name: openhistorian
-    image: gridprotectionalliance/openhistorian:v2.8.421
+    image: gridprotectionalliance/openhistorian:v2.8.423
     ports:
       - 8180:8180/tcp
  
