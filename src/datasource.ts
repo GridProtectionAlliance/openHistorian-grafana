@@ -50,7 +50,7 @@ export class DataSource extends DataSourceApi<OpenHistorianQuery, OpenHistorianD
     this.flags = instanceSettings.jsonData.flags || {};
     this.valueTypeIndex = parseInt(instanceSettings.jsonData.valueTypeIndex || "0", 10);
     this.valueTypeName = instanceSettings.jsonData.valueTypeName || "";
-    this.timeSeriesDefinitions = instanceSettings.jsonData.timeSeriesDefinitions ?? [''];
+    this.timeSeriesDefinitions = instanceSettings.jsonData.timeSeriesDefinitions ?? ['Value', 'Time'];
     this.metadataTableName = instanceSettings.jsonData.metadataTableName || "";
   }
 
@@ -199,7 +199,7 @@ export class DataSource extends DataSourceApi<OpenHistorianQuery, OpenHistorianD
     const hasAnnotationQuery = options.targets.some(t => t.queryType === 'Annotations');;
 
     let data: Array<(MutableDataFrame<any> | undefined)> = [];
-    let error: DataQueryError = {};
+    let error: DataQueryError|undefined = undefined;
     let syntaxErrors: string[] = [];
 
     // Generate query
@@ -210,10 +210,7 @@ export class DataSource extends DataSourceApi<OpenHistorianQuery, OpenHistorianD
       let pointsData: QueryResponse[] = await getBackendSrv().post(this.url + "/query", query);
 
       const tags = this.timeSeriesDefinitions;
-
       const transposeFrames = new Map<string,(MutableDataFrame<any>|undefined)>();
-
-   
 
       // Add metadata fields
       const frames = pointsData.map((d) => {
