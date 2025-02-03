@@ -44,6 +44,9 @@ export class DataSource extends DataSourceApi<OpenHistorianQuery, OpenHistorianD
       QueryEditor: AnnotationEditor
     }
     this.url = instanceSettings.url || "";
+    if (this.url.length == 0) {
+      this.url = '../api/grafana';
+    }
     this.flags = instanceSettings.jsonData.flags || {};
     this.valueTypeIndex = parseInt(instanceSettings.jsonData.valueTypeIndex || "0", 10);
     this.valueTypeName = instanceSettings.jsonData.valueTypeName || "";

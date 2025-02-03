@@ -64,7 +64,6 @@ export function ConfigEditor(props: Props) {
   const onHttpChange = (config: DataSourceSettings<OpenHistorianDataSourceOptions>) => {
     if (url.length === 0 && isInitialAssignment) {
       setIsInitialAssignment(false);
-      config.url = '../api/grafana'; // Set the default URL
     }
 
     onOptionsChange(config);
