@@ -1,0 +1,446 @@
+{
+    "annotations": {
+      "list": []
+    },
+    "editable": true,
+    "fiscalYearStartMonth": 0,
+    "graphTooltip": 0,
+    "id": 4,
+    "links": [],
+    "liveNow": false,
+    "panels": [
+      {
+        "datasource": {
+          "type": "gridprotectionalliance-openhistorian-datasource"
+        },
+        "description": "",
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "custom": {
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              }
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "dark-blue",
+                  "value": null
+                },
+                {
+                  "color": "dark-green",
+                  "value": 59.95
+                },
+                {
+                  "color": "dark-red",
+                  "value": 60.05
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 13,
+          "w": 13,
+          "x": 0,
+          "y": 0
+        },
+        "id": 4,
+        "options": {
+          "basemap": {
+            "config": {},
+            "name": "Base Map",
+            "type": "default"
+          },
+          "controls": {
+            "mouseWheelZoom": true,
+            "showAttribution": true,
+            "showDebug": false,
+            "showMeasure": false,
+            "showScale": false,
+            "showZoom": true
+          },
+          "layers": [
+            {
+              "config": {
+                "showLegend": true,
+                "style": {
+                  "color": {
+                    "field": "Value",
+                    "fixed": "dark-green"
+                  },
+                  "opacity": 0.4,
+                  "rotation": {
+                    "fixed": 0,
+                    "max": 360,
+                    "min": -360,
+                    "mode": "mod"
+                  },
+                  "size": {
+                    "fixed": 5,
+                    "max": 15,
+                    "min": 2
+                  },
+                  "symbol": {
+                    "fixed": "img/icons/marker/circle.svg",
+                    "mode": "fixed"
+                  },
+                  "textConfig": {
+                    "fontSize": 12,
+                    "offsetX": 0,
+                    "offsetY": 0,
+                    "textAlign": "center",
+                    "textBaseline": "middle"
+                  }
+                }
+              },
+              "location": {
+                "mode": "auto"
+              },
+              "name": "Frequency",
+              "tooltip": true,
+              "type": "markers"
+            }
+          ],
+          "tooltip": {
+            "mode": "details"
+          },
+          "view": {
+            "allLayers": true,
+            "id": "north-america",
+            "lat": 40,
+            "lon": -100,
+            "zoom": 4
+          }
+        },
+        "pluginVersion": "9.5.1",
+        "targets": [
+          {
+            "datasource": {
+              "type": "gridprotectionalliance-openhistorian-datasource"
+            },
+            "metadataOptions": [
+              {
+                "FieldName": "Longitude",
+                "Table": "ActiveMeasurements",
+                "Type": "Decimal"
+              },
+              {
+                "FieldName": "Latitude",
+                "Table": "ActiveMeasurements",
+                "Type": "Decimal"
+              }
+            ],
+            "parsedQuery": {
+              "Elements": [],
+              "Filters": [],
+              "Functions": [
+                {
+                  "Function": "Average",
+                  "Parameters": [
+                    {
+                      "type": {
+                        "default": "",
+                        "description": "Target expression that produces a series of values representing input data for the function.",
+                        "name": "expression",
+                        "required": true,
+                        "type": "IAsyncEnumerable<IDataSourceValueType>"
+                      },
+                      "value": {
+                        "Elements": [],
+                        "Filters": [
+                          {
+                            "Condition": "SignalType = 'FREQ'",
+                            "Number": 10,
+                            "NumberMode": "",
+                            "Table": "ActiveMeasurements"
+                          }
+                        ],
+                        "Functions": []
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            "refId": "A",
+            "transpose": true
+          }
+        ],
+        "type": "geomap"
+      },
+      {
+        "datasource": {
+          "type": "gridprotectionalliance-openhistorian-datasource"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "decimals": 3,
+            "mappings": [],
+            "max": 60.05,
+            "min": 59.95,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "dark-blue",
+                  "value": null
+                },
+                {
+                  "color": "dark-green",
+                  "value": 59.98
+                },
+                {
+                  "color": "dark-red",
+                  "value": 60.02
+                }
+              ]
+            },
+            "unit": "Hz"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 13,
+          "w": 11,
+          "x": 13,
+          "y": 0
+        },
+        "id": 3,
+        "options": {
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "mean"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showThresholdLabels": false,
+          "showThresholdMarkers": true
+        },
+        "pluginVersion": "9.5.1",
+        "targets": [
+          {
+            "datasource": {
+              "type": "openHistorian"
+            },
+           "parsedQuery": {
+            "Elements": [],
+            "Filters": [],
+            "Functions": [
+              {
+                "Function": "SetAverage",
+                "Parameters": [
+                  {
+                    "type": {
+                      "default": "",
+                      "description": "Target expression that produces a series of values representing input data for the function.",
+                      "name": "expression",
+                      "required": true,
+                      "type": "IAsyncEnumerable<IDataSourceValueType>"
+                    },
+                    "value": {
+                      "Elements": [],
+                      "Filters": [],
+                      "Functions": [
+                        {
+                          "Function": "IncludeRange",
+                          "Parameters": [
+                            {
+                              "type": {
+                                "default": "0",
+                                "description": "A floating point value representing the low end of the range allowed in the return series.",
+                                "name": "low",
+                                "required": true,
+                                "type": "Double"
+                              },
+                              "value": "59"
+                            },
+                            {
+                              "type": {
+                                "default": "0",
+                                "description": "A floating point value representing the high end of the range allowed in the return series.",
+                                "name": "high",
+                                "required": true,
+                                "type": "Double"
+                              },
+                              "value": "61"
+                            },
+                            {
+                              "type": {
+                                "default": "False",
+                                "description": "A boolean flag which determines if low value is inclusive.",
+                                "name": "lowInclusive",
+                                "required": false,
+                                "type": "Boolean"
+                              },
+                              "value": "False"
+                            },
+                            {
+                              "type": {
+                                "default": "False",
+                                "description": "A boolean flag which determines if high value is inclusive.",
+                                "name": "highInclusive",
+                                "required": false,
+                                "type": "Boolean"
+                              },
+                              "value": "False"
+                            },
+                            {
+                              "type": {
+                                "default": "",
+                                "description": "Target expression that produces a series of values representing input data for the function.",
+                                "name": "expression",
+                                "required": true,
+                                "type": "IAsyncEnumerable<IDataSourceValueType>"
+                              },
+                              "value": {
+                                "Elements": [],
+                                "Filters": [
+                                  {
+                                    "Condition": "SignalType='FREQ'",
+                                    "Number": 10,
+                                    "NumberMode": "",
+                                    "Table": "ActiveMeasurements"
+                                  }
+                                ],
+                                "Functions": []
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+            "queryText": "SetAverage(IncludeRange(59, 61, FILTER ActiveMeasurements WHERE SignalType='FREQ'))",
+            "queryType": "Elements",
+            "refId": "A"
+          }
+        ],
+        "type": "gauge"
+      },
+      {
+        "datasource": {
+          "type": "gridprotectionalliance-openhistorian-datasource"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "drawStyle": "line",
+              "fillOpacity": 0,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "lineInterpolation": "linear",
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "auto",
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 24,
+          "x": 0,
+          "y": 13
+        },
+        "id": 2,
+        "options": {
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "mode": "single",
+            "sort": "none"
+          }
+        },
+        "pluginVersion": "9.5.1",
+        "targets": [
+          {
+            "datasource": {
+             "type": "gridprotectionalliance-openhistorian-datasource"
+            },
+            "queryText": "LABEL('Average Frequency',SliceAvg(0.75, IncludeRange(59, 61, FILTER ActiveMeasurements WHERE SignalType='FREQ')))",
+            "queryType": "Text",
+            "refId": "A"
+          }
+        ],
+        "title": "Average System",
+        "transformations": [],
+        "type": "timeseries"
+      }
+    ],
+    "refresh": "5s",
+    "schemaVersion": 1,
+    "style": "dark",
+    "tags": [],
+    "templating": {
+      "list": []
+    },
+    "time": {
+      "from": "now-5m",
+      "to": "now"
+    },
+    "timepicker": {},
+    "timezone": "",
+    "title": "Frequency Overview",
+    "uid": "f419c525-ac75-4b6e-918e-7e9237ed2535",
+    "version": 7,
+    "weekStart": ""
+  }

@@ -21,13 +21,14 @@ interface Props
 
 export function ConfigEditor(props: Props) {
   const { onOptionsChange, options } = props;
-  const [dataSourceTypes, setDataSourceTypes] = React.useState<DataSourceValueType[]>([])
+  const [dataSourceTypes, setDataSourceTypes] = React.useState<DataSourceValueType[]>(defaultDataSourceTypes)
   const dataSourceTypeOptions = React.useMemo(() => dataSourceTypes.map(s => ({ value: s.index.toString(), label: s.name })), [dataSourceTypes]);
   const url = React.useMemo(() => (options.url ?? ''), [options])
   const [isInitialAssignment, setIsInitialAssignment] = React.useState(true);
 
   React.useEffect(() => {
     if (url.length === 0) {
+      setDataSourceTypes(defaultDataSourceTypes);
       return;
     }
 
@@ -64,7 +65,6 @@ export function ConfigEditor(props: Props) {
   const onHttpChange = (config: DataSourceSettings<OpenHistorianDataSourceOptions>) => {
     if (url.length === 0 && isInitialAssignment) {
       setIsInitialAssignment(false);
-      config.url = '../api/grafana'; // Set the default URL
     }
 
     onOptionsChange(config);
