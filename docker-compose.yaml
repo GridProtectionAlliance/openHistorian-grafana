@@ -12,6 +12,7 @@ services:
     volumes:
       - ./dist:/var/lib/grafana/plugins/gpa-openhistorian-datasource
       - ./provisioning:/etc/grafana/provisioning
+      - ./dashboards:/var/lib/grafana/dashboards
       
   openhistorian:
     container_name: openhistorian
