@@ -4,11 +4,20 @@ This Grafana [data source](https://grafana.com/grafana/plugins/data-source-plugi
 
 ## What's New
 
+Moving from previous versions of the plugin to v2.1.0 may break various dashboards. We recommend the following process to maintain full functionality.
+1. Identify all queries using the openHistorian data source.  
+2. Switch identified queries to "Text Mode".  
+3. Copy the contents of the text box to a text editor.  
+4. Update the plugin.  
+5. Switch the queries to use the new data source.  
+6. Switch the mode to Text.  
+7. Paste in the appropriate content from (3).  
+Note that the all functionality present in previous versions is also available in v2.1.0.
 - **Simplified Query Building**: We’ve merged the `Element List Builder` and `Filter Expression Query Builder` into one intuitive interface, accessible via `Query Wizard`. The Query Wizard Mode provides a guided experience for creating queries with signal search or filter expression building, function picker with detailed parameter breakouts, and helpful toggles for including peaks, dropping empty series, and more.
 - **Metadata Selections**: Metadata can now be combined with queried data to support custom panels, like the [Geomap](https://grafana.com/docs/grafana/latest/panels-visualizations/visualizations/geomap/) plug-in.
 - **Multiple Data Source Value Types**: Multiple data source value types are now supported. In addition to the standard `DataSourceValue` type which consists of a `Value` and a `Times`, custom types, like a `PhasorValue` type, which consists of a tuple of `Magnitude` and `Angle` values and a `Time`, are now available.
-- **Custom User Functions**: The backend Grafana adapters of the openHistorian now supports user-defined custom functions.
-- **Fully Async Interfaces**: All operations, including data queries and function processing, are all processed asynchronously. 
+- **Extendable Functions**: The backend Grafana adapters of the openHistorian now supports user-defined custom functions.
+- **Performance Improvements**: All operations, including data queries and function processing, are all processed asynchronously. 
 
 ## Usage
 
