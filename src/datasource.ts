@@ -73,7 +73,7 @@ export class DataSource extends DataSourceApi<OpenHistorianQuery, OpenHistorianD
 
     let data = await getBackendSrv().post(this.url + "/Search", {
       dataTypeIndex: -1 /* unrestricted search */,
-      expression: `SELECT DISTINCT ${query.fieldNames} FROM ${query.tableName} ${query.condition?.length ?? 0 === 0 ? "" : ` WHERE ${query.condition}`}`
+      expression: `SELECT DISTINCT ${query.fieldNames} FROM ${query.tableName} ${(query.condition?.length ?? 0) === 0 ? "" : ` WHERE ${query.condition}`}`
     })
     return data.map((s: string) => ({ text: s }));
   }
