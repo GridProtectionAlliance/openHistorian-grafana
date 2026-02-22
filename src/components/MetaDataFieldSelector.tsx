@@ -106,7 +106,7 @@ const MetaDataFieldSelector = (props: MetaDataFieldSelectorProps) => {
       />
     </InlineField>
     <InlineField>
-      <IconButton name={'trash-alt'} size='xl' iconType='default' variant='destructive' style={{ marginTop: 4, marginLeft: 4 }} onClick={() => props.Remove()} />
+      <IconButton name={'trash-alt'} size='xl' iconType='default' variant='destructive' style={{ marginTop: 4, marginLeft: 4 }} onClick={() => props.Remove()} aria-label="Delete Metadata Field"/>
     </InlineField>
   </InlineFieldRow>
 

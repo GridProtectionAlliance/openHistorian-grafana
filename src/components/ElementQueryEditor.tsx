@@ -201,9 +201,9 @@ const FilterQueryUI = (props: FilterQueryProps) => {
 
   return <FieldSet>
     <InlineFieldRow>
-      <IconButton name={'trash-alt'} size='xl' iconType='default' variant='destructive' style={{ marginTop: 4, marginRight: 0 }} onClick={() => props.update(undefined)} />
+      <IconButton name={'trash-alt'} size='xl' iconType='default' variant='destructive' style={{ marginTop: 4, marginRight: 0 }} onClick={() => props.update(undefined)} aria-label="Delete Filter"/>
       <InlineField label={
-        <InlineLabel style={{ flexShrink: 1 }}><IconButton name={'filter'} size='md' iconType='default' variant='secondary' style={{ marginLeft: -2 }} />FILTER</InlineLabel>
+        <InlineLabel style={{ flexShrink: 1 }}><IconButton name={'filter'} size='md' iconType='default' variant='secondary' style={{ marginLeft: -2 }} aria-label="Filter"/>FILTER</InlineLabel>
       } labelWidth={'auto'}>
         <Select
           value={props.filter.NumberMode}
@@ -278,7 +278,7 @@ const FunctionQueryUI = (props: FunctionQueryProps) => {
 
   return <Collapse collapsible={true} label={
     <InlineFieldRow>
-      <IconButton name={'trash-alt'} size='xl' iconType='default' variant='destructive' style={{ marginTop: 4, marginRight: 6 }} onClick={() => props.update(undefined)} />
+      <IconButton name={'trash-alt'} size='xl' iconType='default' variant='destructive' style={{ marginTop: 4, marginRight: 6 }} onClick={() => props.update(undefined)} aria-label="Delete"/>
       <span style={{ marginTop: 5, marginRight: 4, fontSize: 'small' }}>ƒ(x)</span>
       <Select
         value={props.func.Function}
