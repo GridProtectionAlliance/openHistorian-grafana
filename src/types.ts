@@ -158,3 +158,9 @@ export interface QueryResponse {
   metadata: any,
   datapoints: number[][]
 }
+
+export enum DataTypeIndex {
+        Measurement = 0,
+        Phasor = 1,
+        Events = 2
+    }

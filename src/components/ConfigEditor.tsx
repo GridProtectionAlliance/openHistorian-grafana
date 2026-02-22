@@ -11,7 +11,7 @@ import {
 } from "@grafana/ui";
 import React from "react";
 import { DataSourcePluginOptionsEditorProps, DataSourceSettings, SelectableValue } from "@grafana/data";
-import { DataSourceValueType, OpenHistorianDataSourceOptions } from "../types";
+import { DataSourceValueType, DataTypeIndex, OpenHistorianDataSourceOptions } from "../types";
 import { DefaultFlags } from "../js/constants";
 import "../css/config-editor.css";
 import { getBackendSrv } from "@grafana/runtime";
@@ -190,13 +190,13 @@ export function ConfigEditor(props: Props) {
 const defaultDataSourceTypes: DataSourceValueType[] = [
   {
     name: "MeasurementValue",
-    index: 0,
+    index: DataTypeIndex.Measurement,
     timeSeriesDefinition: "Value, Time",
     metadataTableName: "ActiveMeasurements"
   },
   {
     name: "PhasorValue",
-    index: 1,
+    index: DataTypeIndex.Phasor,
     timeSeriesDefinition: "Magnitude, Angle, Time",
     metadataTableName: "PhasorValues"
   }
