@@ -17,7 +17,8 @@ import {
   MyVariableQuery,
   QueryBase,
   MetaDataSelection,
-  QueryResponse
+  QueryResponse,
+  DataTypeIndex
 } from "./types";
 import { getBackendSrv, getTemplateSrv } from "@grafana/runtime";
 import _ from "lodash";
@@ -255,14 +256,21 @@ export class DataSource extends DataSourceApi<OpenHistorianQuery, OpenHistorianD
         }
         else {
 
+          const eventFieldTypes = [FieldType.string, FieldType.string, FieldType.string, FieldType.time, FieldType.number, FieldType.time];
+        
+          const fields = tags.map((s, i) => ({
+              name: s,
+              type:  this.valueTypeIndex == DataTypeIndex.Events? eventFieldTypes[i] : (i < (tags.length - 1)? FieldType.number : FieldType.time)
+            }));
+
+          const metaFields = metaData.map((s, i) => ({
+              name: s,
+              type: this.metaDataDataType(metaDataTypes.find(m => m.FieldName === metaData[i] || `${m.Table}.${m.FieldName}` === metaData[i])?.Type ?? "")
+            }));
+
           const frame = new MutableDataFrame({
             refId: target.refId,
-            fields: metaData.concat(tags).map((s, i) => ({
-              name: s,
-              type: (i < metaData.length ? this.metaDataDataType(metaDataTypes.find(m => m.FieldName === metaData[i] || `${m.Table}.${m.FieldName}` === metaData[i])?.Type ?? "")
-                : (i < (metaData.length + tags.length - 1)
-                  ? FieldType.number : FieldType.time))
-            })),
+            fields: fields.concat(metaFields)
           });
 
           frame.refId = d.refID;
